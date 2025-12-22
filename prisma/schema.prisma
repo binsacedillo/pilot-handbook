@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  PILOT
+  USER
+}
+
+enum UnitSystem {
+  KG
+  LBS
+}
+
+model User {
+  id            String    @id @default(uuid())
+  clerkId       String    @unique
+  email         String    @unique
+  firstName     String?
+  lastName      String?
+  license       String?
+  licenseExpiry DateTime?
+  role          UserRole  @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  flights          Flight[]
+  aircraft         Aircraft[]
+  userPreferences  UserPreferences?
+}
+
+model Aircraft {
+  id           String  @id @default(uuid())
+  make         String
+  model        String
+  registration String
+  imageUrl     String?
+  status       String  @default("operational")
+  flightHours  Int     @default(0)
+
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flights Flight[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, registration])
+}
+
+model Flight {
+  id            String   @id @default(uuid())
+  date          DateTime
+  departureCode String
+  arrivalCode   String
+
+  duration Int
+  picTime  Int
+  dualTime Int
+
+  landings Int     @default(1)
+  remarks  String? @db.Text
+
+  aircraftId String
+  aircraft   Aircraft @relation(fields: [aircraftId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, date])
+}
+
+model UserPreferences {
+  id                String     @id @default(cuid())
+  userId            String     @unique
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  darkMode          Boolean    @default(false)
+  defaultAircraftId String?
+  unitSystem        UnitSystem @default(KG)
+  currency          String     @default("USD")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_preferences")
+}
