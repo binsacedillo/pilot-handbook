@@ -8,6 +8,42 @@ export const paginationSchema = z.object({
 });
 
 // Common ID (Used in Delete/Update)
-export const idSchema = z.object({ 
-  id: z.string() 
+export const idSchema = z.object({
+  id: z.string().min(1, 'Required'),
+});
+
+// ============================================================================
+// AIRCRAFT SCHEMAS
+// ============================================================================
+
+export const createAircraftSchema = z.object({
+  make: z.string().min(1, 'Aircraft make is required'),
+  model: z.string().min(1, 'Aircraft model is required'),
+  registration: z.string().min(1, 'Registration number is required'),
+  imageUrl: z.string().url().optional().or(z.literal('')),
+  status: z.string().default('operational'),
+});
+
+export const updateAircraftSchema = createAircraftSchema.partial().extend({
+  id: z.string().min(1, 'Aircraft ID is required'),
+});
+
+// ============================================================================
+// FLIGHT SCHEMAS
+// ============================================================================
+
+export const createFlightSchema = z.object({
+  date: z.date(),
+  departureCode: z.string().min(3).max(4),
+  arrivalCode: z.string().min(3).max(4),
+  duration: z.number().positive('Duration must be positive'),
+  picTime: z.number().min(0, 'PIC time cannot be negative'),
+  dualTime: z.number().min(0, 'Dual time cannot be negative'),
+  landings: z.number().int().positive('Landings must be positive').default(1),
+  remarks: z.string().optional(),
+  aircraftId: z.string().min(1, 'Aircraft is required'),
+});
+
+export const updateFlightSchema = createFlightSchema.partial().extend({
+  id: z.string().min(1, 'Flight ID is required'),
 });

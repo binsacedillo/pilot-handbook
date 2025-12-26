@@ -1,26 +1,32 @@
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+// ...existing code...
+
 import { TRPCProvider } from "@/trpc/Provider";
+import ClientNavBar from "@/components/ClientNavBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Pilot Logbook",
-  description: "Track your flight hours efficiently.",
+  title: "Pilot Handbook",
+  description: "Your personal pilot logbook",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>
-          <TRPCProvider>{children}</TRPCProvider>
+        <body className={`font-sans ${inter.variable}`}>
+          <TRPCProvider>
+            {children}
+          </TRPCProvider>
         </body>
       </html>
     </ClerkProvider>

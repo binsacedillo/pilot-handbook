@@ -1,0 +1,106 @@
+
+"use client";
+
+import AppHeader from "@/components/AppHeader";
+import AppFooter from "@/components/AppFooter";
+import Footer from "@/components/landing/Footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { trpc } from "@/trpc/client";
+import { useRouter, useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+
+export default function EditAircraftPage() {
+	const router = useRouter();
+	const params = useParams();
+	const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
+	const utils = trpc.useUtils();
+	const { data: aircraft, isLoading } = trpc.aircraft.getById.useQuery({ id }, { enabled: !!id });
+	const updateAircraft = trpc.aircraft.update.useMutation({
+		onSuccess: async () => {
+			await utils.aircraft.getAll.invalidate();
+			router.push("/aircraft");
+		},
+	});
+
+	const [form, setForm] = useState({
+		make: "",
+		model: "",
+		registration: "",
+		imageUrl: "",
+		status: "operational",
+	});
+
+	useEffect(() => {
+		if (aircraft) {
+			setForm({
+				make: aircraft.make || "",
+				model: aircraft.model || "",
+				registration: aircraft.registration || "",
+				imageUrl: aircraft.imageUrl || "",
+				status: aircraft.status || "operational",
+			});
+		}
+	}, [aircraft]);
+
+	function onSubmit(e: React.FormEvent) {
+		e.preventDefault();
+		if (!id) return;
+		updateAircraft.mutate({
+			id,
+			make: form.make,
+			model: form.model,
+			registration: form.registration.toUpperCase(),
+			imageUrl: form.imageUrl || undefined,
+			status: form.status,
+		});
+	}
+
+	if (isLoading) {
+		return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+	}
+	if (!aircraft) {
+		return <div className="min-h-screen flex items-center justify-center text-red-500">Aircraft not found.</div>;
+	}
+
+	return (
+		<div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
+			<AppHeader />
+			<main className="max-w-2xl mx-auto p-6 md:p-8">
+				<h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">Edit Aircraft</h1>
+				<form onSubmit={onSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<Label htmlFor="make">Make</Label>
+							<Input id="make" required value={form.make} onChange={(e) => setForm({ ...form, make: e.target.value })} />
+						</div>
+						<div>
+							<Label htmlFor="model">Model</Label>
+							<Input id="model" required value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} />
+						</div>
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<Label htmlFor="registration">Registration</Label>
+							<Input id="registration" required value={form.registration} onChange={(e) => setForm({ ...form, registration: e.target.value })} />
+						</div>
+						<div>
+							<Label htmlFor="status">Status</Label>
+							<Input id="status" required value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} />
+						</div>
+					</div>
+					<div>
+						<Label htmlFor="imageUrl">Image URL</Label>
+						<Input id="imageUrl" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} />
+					</div>
+					<div className="flex justify-end gap-2">
+						<Button type="button" variant="ghost" onClick={() => router.push("/aircraft")}>Cancel</Button>
+						<Button type="submit" disabled={updateAircraft.isPending}>{updateAircraft.isPending ? "Saving..." : "Save Changes"}</Button>
+					</div>
+				</form>
+			</main>
+			<AppFooter />
+		</div>
+	);
+}

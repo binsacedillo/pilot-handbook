@@ -13,8 +13,14 @@ enum UserRole {
 }
 
 enum UnitSystem {
-  KG
-  LBS
+  METRIC
+  IMPERIAL
+}
+
+enum Theme {
+  LIGHT
+  DARK
+  SYSTEM
 }
 
 model User {
@@ -83,10 +89,10 @@ model UserPreferences {
   id                String     @id @default(cuid())
   userId            String     @unique
   user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  darkMode          Boolean    @default(false)
+
   defaultAircraftId String?
-  unitSystem        UnitSystem @default(KG)
+  theme             Theme      @default(SYSTEM)
+  unitSystem        UnitSystem @default(METRIC)
   currency          String     @default("USD")
 
   createdAt DateTime @default(now())

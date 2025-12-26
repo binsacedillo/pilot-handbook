@@ -1,10 +1,12 @@
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
+import { currentUser } from '@clerk/nextjs/server';
+import { z } from 'zod';
 
 export const userRouter = createTRPCRouter({
   // Get current user profile
   getProfile: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
-      where: { clerkId: ctx.userId },
+      where: { clerkId: ctx.session.user },
       include: {
         userPreferences: true,
       },
@@ -15,34 +17,43 @@ export const userRouter = createTRPCRouter({
   // Get or create user (called on sign-in)
   getOrCreate: protectedProcedure.query(async ({ ctx }) => {
     let user = await ctx.db.user.findUnique({
-      where: { clerkId: ctx.userId },
+      where: { clerkId: ctx.session.user },
       include: {
         userPreferences: true,
       },
     });
 
+    const clerkUser = await currentUser();
+    const clerkEmail = clerkUser?.emailAddresses?.[0]?.emailAddress ?? '';
+    const clerkFirstName = clerkUser?.firstName ?? null;
+    const clerkLastName = clerkUser?.lastName ?? null;
+
     if (!user) {
-      // User doesn't exist yet, create from Clerk session
+      // User doesn't exist yet, create from Clerk
       user = await ctx.db.user.create({
         data: {
-          clerkId: ctx.userId,
-          email: ctx.auth.sessionClaims?.email as string ?? '',
-          firstName: ctx.auth.sessionClaims?.firstName as string ?? null,
-          lastName: ctx.auth.sessionClaims?.lastName as string ?? null,
+          clerkId: ctx.session.user,
+          email: clerkEmail,
+          firstName: clerkFirstName,
+          lastName: clerkLastName,
         },
         include: {
           userPreferences: true,
         },
       });
-
-      // Create default preferences
-      if (!user.userPreferences) {
-        await ctx.db.userPreferences.create({
-          data: {
-            userId: user.id,
-          },
-        });
-      }
+    } else if (!user.firstName || !user.lastName || !user.email) {
+      // User exists but is missing name/email - update from Clerk
+      user = await ctx.db.user.update({
+        where: { clerkId: ctx.session.user },
+        data: {
+          email: user.email || clerkEmail,
+          firstName: user.firstName || clerkFirstName,
+          lastName: user.lastName || clerkLastName,
+        },
+        include: {
+          userPreferences: true,
+        },
+      });
     }
 
     return user;
@@ -52,4 +63,28 @@ export const userRouter = createTRPCRouter({
   health: publicProcedure.query(() => {
     return { status: 'ok', timestamp: new Date() };
   }),
+
+  // Update user profile (name and license)
+  updateProfile: protectedProcedure
+    .input(
+      z.object({
+        firstName: z.string().min(1, 'First name required').optional(),
+        lastName: z.string().min(1, 'Last name required').optional(),
+        license: z.string().optional().nullable(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.update({
+        where: { clerkId: ctx.session.user },
+        data: {
+          firstName: input.firstName,
+          lastName: input.lastName,
+          license: input.license,
+        },
+        include: {
+          userPreferences: true,
+        },
+      });
+      return user;
+    }),
 });

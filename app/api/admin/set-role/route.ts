@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
 import { setUserRole } from "@/lib/clerk-admin-tools";
 
 /**
@@ -12,6 +14,11 @@ import { setUserRole } from "@/lib/clerk-admin-tools";
  *   "role": "ADMIN" | "PILOT" | "USER"
  * }
  */
+const bodySchema = z.object({
+  userId: z.string().min(1, "userId is required"),
+  role: z.enum(["ADMIN", "PILOT", "USER"]),
+});
+
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
@@ -23,33 +30,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check admin role from Clerk public metadata
-    const clerkUser = await currentUser();
-    const adminRole = clerkUser?.publicMetadata?.role as string | undefined;
-    if (adminRole !== "ADMIN") {
+    // Parse and validate request body
+    const parsedBody = bodySchema.safeParse(await request.json());
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        { error: "Invalid body", details: parsedBody.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    // Verify admin status against application database (defense in depth)
+    const requester = await db.user.findUnique({
+      where: { clerkId: userId },
+      select: { role: true },
+    });
+
+    if (requester?.role !== "ADMIN") {
       return NextResponse.json(
         { error: "Forbidden: Admin access required" },
         { status: 403 }
       );
     }
 
-    // Parse request body
-    const body = await request.json();
-    const { userId: targetUserId, role } = body;
-
-    if (!targetUserId || !role) {
-      return NextResponse.json(
-        { error: "Missing userId or role" },
-        { status: 400 }
-      );
-    }
-
-    if (!["ADMIN", "PILOT", "USER"].includes(role)) {
-      return NextResponse.json(
-        { error: "Invalid role" },
-        { status: 400 }
-      );
-    }
+    const { userId: targetUserId, role } = parsedBody.data;
 
     // Update user role
     const result = await setUserRole(targetUserId, role);

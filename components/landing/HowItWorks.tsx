@@ -7,14 +7,14 @@ import { steps } from "@/lib/landing-data";
 
 export default function HowItWorks() {
 	return (
-		<section className="bg-slate-50 py-16">
+		<section className="bg-muted py-16">
 			<div className="container mx-auto px-4">
 				<div className="max-w-5xl mx-auto">
 					<div className="text-center mb-12">
-						<h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+						<h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
 							Get Started in 3 Simple Steps
 						</h2>
-						<p className="text-lg text-slate-600">
+						<p className="text-lg text-muted-foreground">
 							Start tracking your flight hours in minutes
 						</p>
 					</div>
@@ -25,10 +25,10 @@ export default function HowItWorks() {
 								<div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
 									<span className="text-xl font-bold text-white">{step.number}</span>
 								</div>
-								<h3 className="text-xl font-semibold text-slate-900 mb-2">
+								<h3 className="text-xl font-semibold text-foreground mb-2">
 									{step.title}
 								</h3>
-								<p className="text-slate-600">{step.description}</p>
+								<p className="text-muted-foreground">{step.description}</p>
 							</div>
 						))}
 					</div>

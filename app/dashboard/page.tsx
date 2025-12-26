@@ -1,235 +1,133 @@
 "use client";
 
-import { SignOutButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
-import { trpc } from "@/trpc/client";
-import { Plane, Clock, BookOpen } from "lucide-react";
+
+
+import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+import { trpc } from "@/trpc/client";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import AppHeader from "@/components/AppHeader";
+import AppFooter from "@/components/AppFooter";
 
 export default function DashboardPage() {
-	// Use tRPC hooks to fetch data
-	const { data: user, isLoading: userLoading } = trpc.user.getOrCreate.useQuery();
-	const { data: flights, isLoading: flightsLoading } = trpc.flight.getAll.useQuery();
-	const { data: aircraft, isLoading: aircraftLoading } = trpc.aircraft.getAll.useQuery();
-	const { data: stats, isLoading: statsLoading } = trpc.flight.getStats.useQuery();
+  const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
 
-	const router = useRouter();
+  // Always call all hooks unconditionally
+  const userQuery = trpc.user.getOrCreate.useQuery(undefined, { enabled: !!isSignedIn });
+  const flightsQuery = trpc.flight.getAll.useQuery(undefined, { enabled: !!isSignedIn });
+  const aircraftQuery = trpc.aircraft.getAll.useQuery(undefined, { enabled: !!isSignedIn });
+  const statsQuery = trpc.flight.getStats.useQuery(undefined, { enabled: !!isSignedIn });
 
-	const isLoading = userLoading || flightsLoading || aircraftLoading || statsLoading;
-	const isAdmin = user?.role === "ADMIN";
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.replace("/sign-in");
+    }
+  }, [isLoaded, isSignedIn, router]);
 
-	if (isLoading) {
-		return (
-			<div className="flex min-h-screen items-center justify-center p-4">
-				<div className="text-center">
-					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-					<p className="text-slate-600">Loading your dashboard...</p>
-				</div>
-			</div>
-		);
-	}
+  if (!isLoaded) {
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+  }
 
-	if (!user) {
-		return (
-			<div className="flex min-h-screen items-center justify-center p-4">
-				<div className="text-center">
-					<h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-					<p className="text-slate-600 mb-6">
-						Please sign in to access the dashboard.
-					</p>
-				</div>
-			</div>
-		);
-	}
+  if (!isSignedIn) {
+    // Redirect handled by useEffect
+    return null;
+  }
 
-	return (
-		<div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 p-8">
-			<div className="max-w-4xl mx-auto">
-				{/* Header */}
-				<div className="flex justify-between items-center mb-8">
-					<div>
-						<h1 className="text-4xl font-bold text-slate-900">
-							Welcome back, {user.firstName || "Captain"}!
-						</h1>
-						<p className="text-slate-600 mt-2">Your pilot logbook dashboard</p>
-					</div>
-					<div className="flex items-center gap-2">
-						{isAdmin && (
-							<Button
-								variant="outline"
-								onClick={() => router.push("/admin")}
-								className="border-blue-600 text-blue-700"
-							>
-								Admin
-							</Button>
-						)}
-						<Button
-							variant="outline"
-							onClick={() => router.push("/")}
-							className="hover:bg-slate-50"
-						>
-							Home
-						</Button>
-						<SignOutButton>
-							<Button className="bg-white text-black border border-slate-300 hover:bg-slate-50">
-								Sign Out
-							</Button>
-						</SignOutButton>
-					</div>
-				</div>
+  // Loading and error states
+  const isLoading = userQuery.isLoading || flightsQuery.isLoading || aircraftQuery.isLoading || statsQuery.isLoading;
+  const isError = userQuery.isError || flightsQuery.isError || aircraftQuery.isError || statsQuery.isError;
 
-				{/* User Information Card */}
-				<div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-					<h2 className="text-2xl font-bold text-slate-900 mb-6">
-						Your Profile
-					</h2>
+  if (isError) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <AppHeader />
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="text-red-600 font-semibold text-lg mb-2">Error loading dashboard data.</div>
+          <button className="text-blue-600 underline" onClick={() => window.location.reload()}>Retry</button>
+        </div>
+        <AppFooter />
+      </div>
+    );
+  }
 
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-						{/* Basic Info */}
-						<div>
-							<h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">
-								Name
-							</h3>
-							<p className="text-lg text-slate-900">
-								{user.firstName} {user.lastName}
-							</p>
-						</div>
+  return (
+    <div className="min-h-screen flex flex-col">
+      <AppHeader />
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {/* Total Flights */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Total Flights</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {statsQuery.isLoading ? <Skeleton className="h-8 w-20" /> : <span className="text-3xl font-semibold">{statsQuery.data?.totalFlights ?? 0}</span>}
+            </CardContent>
+          </Card>
+          {/* Total Hours */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Total Hours</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {statsQuery.isLoading ? <Skeleton className="h-8 w-20" /> : <span className="text-3xl font-semibold">{statsQuery.data?.totalHours?.toFixed(1) ?? "0.0"}</span>}
+            </CardContent>
+          </Card>
+          {/* PIC Hours */}
+          <Card>
+            <CardHeader>
+              <CardTitle>PIC Hours</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {statsQuery.isLoading ? <Skeleton className="h-8 w-20" /> : <span className="text-3xl font-semibold">{statsQuery.data?.totalPicHours?.toFixed(1) ?? "0.0"}</span>}
+            </CardContent>
+          </Card>
+          {/* Landings */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Landings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {statsQuery.isLoading ? <Skeleton className="h-8 w-20" /> : <span className="text-3xl font-semibold">{statsQuery.data?.totalLandings ?? 0}</span>}
+            </CardContent>
+          </Card>
+        </div>
 
-						<div>
-							<h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">
-								Email
-							</h3>
-							<p className="text-lg text-slate-900">{user.email}</p>
-						</div>
-
-						{/* License Info */}
-						<div>
-							<h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">
-								License
-							</h3>
-							<p className="text-lg text-slate-900">
-								{user.license || "Not set"}
-							</p>
-						</div>
-
-						<div>
-							<h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">
-								License Expiry
-							</h3>
-							<p className="text-lg text-slate-900">
-								{user.licenseExpiry
-									? new Date(user.licenseExpiry).toLocaleDateString()
-									: "Not set"}
-							</p>
-						</div>
-					</div>
-
-					{/* Member Since */}
-					<div className="mt-6 pt-6 border-t border-slate-200">
-						<p className="text-sm text-slate-500">
-							Member since {new Date(user.createdAt).toLocaleDateString()}
-						</p>
-					</div>
-				</div>
-
-				{/* Quick Stats - Now with real data from tRPC */}
-				<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-					<div className="bg-white rounded-lg shadow p-6">
-						<div className="text-center">
-							<Plane className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-							<div className="text-3xl font-bold text-blue-600">
-								{stats?.totalFlights ?? 0}
-							</div>
-							<p className="text-slate-600 mt-2">Total Flights</p>
-						</div>
-					</div>
-
-					<div className="bg-white rounded-lg shadow p-6">
-						<div className="text-center">
-							<BookOpen className="w-8 h-8 text-green-600 mx-auto mb-2" />
-							<div className="text-3xl font-bold text-green-600">
-								{aircraft?.length ?? 0}
-							</div>
-							<p className="text-slate-600 mt-2">Aircraft</p>
-						</div>
-					</div>
-
-					<div className="bg-white rounded-lg shadow p-6">
-						<div className="text-center">
-							<Clock className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-							<div className="text-3xl font-bold text-purple-600">
-								{stats?.totalHours ?? 0}
-							</div>
-							<p className="text-slate-600 mt-2">Flight Hours</p>
-						</div>
-					</div>
-
-					<div className="bg-white rounded-lg shadow p-6">
-						<div className="text-center">
-							<Clock className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-							<div className="text-3xl font-bold text-orange-600">
-								{stats?.totalPicHours ?? 0}
-							</div>
-							<p className="text-slate-600 mt-2">PIC Hours</p>
-						</div>
-					</div>
-				</div>
-
-				{/* Recent Flights */}
-				{flights && flights.length > 0 ? (
-					<div className="bg-white rounded-lg shadow-lg p-8 mt-8">
-						<h2 className="text-2xl font-bold text-slate-900 mb-6">
-							Recent Flights
-						</h2>
-						<div className="space-y-4">
-							{flights.slice(0, 5).map((flight) => (
-								<div
-									key={flight.id}
-									className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50"
-								>
-									<div>
-										<p className="font-semibold text-slate-900">
-											{flight.departureCode} → {flight.arrivalCode}
-										</p>
-										<p className="text-sm text-slate-600">
-											{new Date(flight.date).toLocaleDateString()} • {flight.aircraft.registration}
-										</p>
-									</div>
-									<div className="text-right">
-										<p className="font-semibold text-blue-600">
-											{flight.duration}h
-										</p>
-										<p className="text-sm text-slate-600">
-											{flight.landings} landing{flight.landings > 1 ? 's' : ''}
-										</p>
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
-				) : (
-					<div className="bg-white rounded-lg shadow-lg p-8 mt-8">
-						<h2 className="text-2xl font-bold text-slate-900 mb-4">
-							No Flights Yet
-						</h2>
-						<p className="text-slate-600">
-							Start logging your flights to see them here!
-						</p>
-					</div>
-				)}
-
-				{/* Success Message */}
-				<div className="bg-green-50 border border-green-200 rounded-lg p-6 mt-8">
-					<h3 className="font-semibold text-green-900 mb-2">
-						✓ T3 Stack Complete!
-					</h3>
-					<p className="text-green-800 text-sm">
-						Your app is now a true T3 Stack project using tRPC! This dashboard
-						fetches data through type-safe tRPC procedures with React Query for
-						efficient caching. Check the browser console to see the tRPC API calls.
-					</p>
-				</div>
-			</div>
-		</div>
-	);
+        {/* Recent Flights */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Recent Flights</h2>
+          {flightsQuery.isLoading ? (
+            <div className="space-y-2">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          ) : flightsQuery.data && flightsQuery.data.length > 0 ? (
+            <div className="space-y-2">
+              {flightsQuery.data.slice(0, 5).map((flight: any) => (
+                <Card key={flight.id} className="flex-row flex items-center gap-4 p-4">
+                  <div className="flex-1">
+                    <div className="font-medium">{flight.aircraft?.name || "Aircraft"}</div>
+                    <div className="text-sm text-muted-foreground">{new Date(flight.date).toLocaleDateString()} &middot; {flight.duration} hrs</div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg font-semibold">{flight.route || "-"}</span>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-muted-foreground">No flights found.</div>
+          )}
+        </div>
+      </main>
+      <AppFooter />
+    </div>
+  );
 }

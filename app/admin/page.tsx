@@ -1,45 +1,65 @@
 // app/admin/page.tsx
-import { db } from '@/lib/db'
-import { currentUser } from '@clerk/nextjs/server'
-import Link from 'next/link'
+'use client';
 
-export default async function AdminDashboard() {
-  const user = await currentUser()
-  const totalUsers = await db.user.count()
-  const pilotCount = await db.user.count({ where: { role: 'PILOT' } })
+import { trpc } from '@/trpc/client';
+import AppHeader from '@/components/AppHeader';
+import AppFooter from '@/components/AppFooter';
+import { Card } from '@/components/ui/card';
+import { useUser } from '@clerk/nextjs';
+
+export default function AdminDashboard() {
+  const { user } = useUser();
+  const { data: stats, isLoading } = trpc.admin.getStats.useQuery();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen">
+        <AppHeader />
+        <div className="flex items-center justify-center p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    );
+  }
+
+  const totalUsers = stats?.userCount ?? 0;
+  const pilotCount = stats?.pilotCount ?? 0;
+  const pendingCount = stats?.pendingCount ?? 0;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-semibold">
-          Welcome back, Admin {user?.emailAddresses?.[0]?.emailAddress ?? 'Admin'}!
-        </h2>
-        <Link
-          href="/dashboard"
-          className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors inline-block"
-        >
-          ← Back to Dashboard
-        </Link>
-      </div>
+    <div className="min-h-screen bg-background">
+      <AppHeader />
+      <div className="p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground">
+              Welcome back, Admin {user?.emailAddresses?.[0]?.emailAddress ?? 'Admin'}!
+            </h2>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p className="text-sm text-gray-600 uppercase tracking-wide">Total Users</p>
-          <p className="text-4xl font-bold text-blue-600 mt-4">{totalUsers}</p>
-        </div>
-        <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p className="text-sm text-gray-600 uppercase tracking-wide">Pilots</p>
-          <p className="text-4xl font-bold text-green-600 mt-4">{pilotCount}</p>
-        </div>
-        <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p className="text-sm text-gray-600 uppercase tracking-wide">Pending Actions</p>
-          <p className="text-4xl font-bold text-orange-600 mt-4">0</p>
-        </div>
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="p-8 text-center">
+              <p className="text-sm uppercase tracking-wide text-muted-foreground">Total Users</p>
+              <p className="mt-4 text-4xl font-bold text-blue-600 dark:text-blue-400">{totalUsers}</p>
+            </Card>
+            <Card className="p-8 text-center">
+              <p className="text-sm uppercase tracking-wide text-muted-foreground">Pilots</p>
+              <p className="mt-4 text-4xl font-bold text-green-600 dark:text-green-400">{pilotCount}</p>
+            </Card>
+            <Card className="p-8 text-center">
+              <p className="text-sm uppercase tracking-wide text-muted-foreground">Pending Actions</p>
+              <p className="mt-4 text-4xl font-bold text-orange-600 dark:text-orange-400">{pendingCount}</p>
+            </Card>
+          </div>
 
-      <div className="mt-12 bg-white p-6 rounded-lg shadow">
-        <p className="text-lg">Admin panel is active. Start building user management, verifications, etc.</p>
+          <Card className="mt-12 p-6">
+            <p className="text-lg text-muted-foreground">
+              Admin panel is active. Start building user management, verifications, etc.
+            </p>
+          </Card>
+        </div>
       </div>
+      <AppFooter />
     </div>
   )
 }

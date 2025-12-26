@@ -3,6 +3,8 @@ import { flightRouter } from './flight';
 import { aircraftRouter } from './aircraft';
 import { userRouter } from './user';
 import { adminRouter } from './admin';
+import { preferencesRouter } from './preferences';
+import { statsRouter } from './stats';
 
 /**
  * Main tRPC router
@@ -13,6 +15,8 @@ export const appRouter = createTRPCRouter({
   aircraft: aircraftRouter,
   user: userRouter,
   admin: adminRouter,
+  preferences: preferencesRouter,
+  stats: statsRouter,
 });
 
 // Export type definition of the API

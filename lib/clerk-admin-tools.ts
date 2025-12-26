@@ -36,44 +36,4 @@ export async function setUserRole(clerkUserId: string, role: UserRole) {
   }
 }
 
-/**
- * Gets a user's metadata from Clerk
- */
-export async function getUserMetadata(clerkUserId: string) {
-  try {
-    const client = await clerkClient();
-    const user = await client.users.getUser(clerkUserId);
 
-    return {
-      id: user.id,
-      email: user.emailAddresses[0]?.emailAddress,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.publicMetadata?.role || "USER",
-    };
-  } catch (error) {
-    console.error("Error fetching user metadata:", error);
-    throw new Error(`Failed to fetch user metadata: ${error}`);
-  }
-}
-
-/**
- * Promotes a user to admin
- */
-export async function promoteToAdmin(clerkUserId: string) {
-  return setUserRole(clerkUserId, "ADMIN");
-}
-
-/**
- * Demotes a user from admin
- */
-export async function demoteFromAdmin(clerkUserId: string) {
-  return setUserRole(clerkUserId, "USER");
-}
-
-/**
- * Sets user role to pilot
- */
-export async function setPilotRole(clerkUserId: string) {
-  return setUserRole(clerkUserId, "PILOT");
-}

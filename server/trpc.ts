@@ -1,36 +1,27 @@
-import { initTRPC, TRPCError } from '@trpc/server';
-import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
-import superjson from 'superjson';
-import { ZodError } from 'zod';
+
+import { initTRPC, TRPCError } from "@trpc/server";
+import superjson from "superjson";
+import { ZodError } from "zod";
+import { auth } from "@clerk/nextjs/server"; // <--- IMPORT THIS
+import { db } from "@/lib/db"; // Ensure this matches your db path
 
 /**
- * Create tRPC context
- * This runs for every request and provides auth & db to all procedures
+ * 1. CONTEXT
+ * This section defines the "contexts" that are available in the backend API.
  */
-export const createTRPCContext = async () => {
+export const createTRPCContext = async (opts: { headers: Headers }) => {
+  // Get the session from Clerk
   const session = await auth();
-  const userId = session?.userId ?? null;
-  
-  // Fetch user from database if authenticated
-  let user = null;
-  if (userId) {
-    user = await db.user.findUnique({
-      where: { clerkId: userId },
-      select: { id: true, email: true, role: true, firstName: true, lastName: true },
-    });
-  }
-  
+
   return {
     db,
-    auth: session,
-    userId,
-    user,
+    session, // session is now the resolved object
+    ...opts,
   };
 };
 
 /**
- * Initialize tRPC with context
+ * 2. INITIALIZATION
  */
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -47,42 +38,45 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 });
 
 /**
- * Export reusable router and procedure helpers
+ * 3. ROUTER & PROCEDURE (Helpers)
  */
 export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
-/**
- * Protected procedure - requires authentication
- */
-export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
-  if (!ctx.userId) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
+// PROTECTED PROCEDURE
+// This is likely where your 401 is coming from. 
+// It checks if session.userId exists.
+
+export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
+  const session = ctx.session;
+  if (!session || !session.userId) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-  
   return next({
     ctx: {
-      ...ctx,
-      userId: ctx.userId, // Type-safe userId (non-null)
+      session: { ...session, user: session.userId },
     },
   });
 });
 
 /**
- * Admin-only procedure - requires authentication and admin role
- * Checks role from database User model
+ * Admin Procedure (Logged in + Admin Role)
  */
-const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.user || ctx.user.role !== 'ADMIN') {
-    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Admin access required' });
+export const adminProcedure = t.procedure.use(async ({ ctx, next }) => {
+  const session = ctx.session;
+  // 1. Ensure user is logged in
+  if (!session || !session.userId) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
+  // 2. (Optional) Check for Admin Role
+  // If you store roles in Clerk metadata, check it here.
+  // const role = session.claims?.metadata?.role;
+  // if (role !== 'admin') { throw new TRPCError({ code: "FORBIDDEN" }); }
 
   return next({
     ctx: {
-      // infers the `user` as non-nullable with ADMIN role
-      user: ctx.user,
+      session: { ...session, user: session.userId },
     },
   });
 });
-
-export const adminProcedure = protectedProcedure.use(enforceUserIsAdmin);

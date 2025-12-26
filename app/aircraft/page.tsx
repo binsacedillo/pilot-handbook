@@ -1,0 +1,146 @@
+"use client";
+
+import AppHeader from "@/components/AppHeader";
+import AppFooter from "@/components/AppFooter";
+import Footer from "@/components/landing/Footer";
+import { trpc } from "@/trpc/client";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { DeleteDialog } from "@/components/DeleteDialog";
+import { Trash2, Edit2 } from "lucide-react";
+import { useState } from "react";
+
+interface Aircraft {
+  id: string;
+  registration: string;
+  make: string;
+  model: string;
+  status: string;
+  imageUrl: string | null;
+}
+
+export default function AircraftPage() {
+  const { data: aircraft, isLoading } = trpc.aircraft.getAll.useQuery();
+  const deleteMutation = trpc.aircraft.delete.useMutation();
+
+  // State for optimistic updates
+  const [optimisticAircraft, setOptimisticAircraft] = useState<string[]>([]);
+  const [deleteDialogState, setDeleteDialogState] = useState<{
+    open: boolean;
+    aircraftId: string | null;
+    aircraftRegistration: string | null;
+  }>({ open: false, aircraftId: null, aircraftRegistration: null });
+
+  const displayedAircraft = (aircraft ?? []).filter(
+    (a) => !optimisticAircraft.includes(a.id)
+  );
+
+  const handleDeleteClick = (aircraftId: string, registration: string) => {
+    setDeleteDialogState({
+      open: true,
+      aircraftId,
+      aircraftRegistration: registration,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteDialogState.aircraftId) return;
+
+    const aircraftId = deleteDialogState.aircraftId;
+
+    // Optimistic update: immediately remove from UI
+    setOptimisticAircraft((prev) => [...prev, aircraftId]);
+
+    try {
+      // Send delete request to server
+      await deleteMutation.mutateAsync({ id: aircraftId });
+      // Success - optimistic update is complete, dialog closes
+    } catch (error) {
+      // Rollback on error
+      setOptimisticAircraft((prev) => prev.filter((id) => id !== aircraftId));
+      console.error("Failed to delete aircraft:", error);
+      throw error;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <AppHeader />
+      <main className="max-w-6xl mx-auto p-6 md:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold">Aircraft</h1>
+          <Link href="/aircraft/new">
+            <Button>Add Aircraft</Button>
+          </Link>
+        </div>
+
+        <DeleteDialog
+          open={deleteDialogState.open}
+          onOpenChange={(open) =>
+            setDeleteDialogState((prev) => ({ ...prev, open }))
+          }
+          title="Delete Aircraft"
+          description="Are you sure you want to delete this aircraft? This action cannot be undone."
+          itemName={deleteDialogState.aircraftRegistration || ""}
+          isLoading={deleteMutation.isPending}
+          onConfirm={handleConfirmDelete}
+        />
+
+        {displayedAircraft.length === 0 ? (
+          <div className="bg-card text-foreground rounded-lg border border-border shadow p-8 text-center">
+            <p className="text-muted-foreground mb-4">No aircraft yet.</p>
+            <Link href="/aircraft/new">
+              <Button>Add your first aircraft</Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {displayedAircraft.map((a) => (
+              <div key={a.id} className="bg-card text-foreground rounded-lg border border-border shadow p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-semibold">{a.registration}</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
+                    {a.status}
+                  </span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  {a.make} {a.model}
+                </p>
+                {a.imageUrl ? (
+                  <img
+                    src={a.imageUrl}
+                    alt={a.registration}
+                    className="mt-4 rounded-md max-h-40 object-cover w-full mb-4"
+                  />
+                ) : null}
+                <div className="flex gap-2 pt-4 border-t border-border">
+                  <Link href={`/aircraft/${a.id}/edit`} className="flex-1">
+                    <Button
+                      variant="ghost"
+                      className="w-full text-primary hover:bg-muted"
+                      title="Edit aircraft"
+                    >
+                      <Edit2 className="w-4 h-4 mr-2" />
+                      Edit
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    className="flex-1 text-destructive hover:bg-destructive/10"
+                    onClick={() => handleDeleteClick(a.id, a.registration)}
+                    disabled={deleteMutation.isPending}
+                    title="Delete aircraft"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+      <AppFooter />
+    </div>
+  );
+}

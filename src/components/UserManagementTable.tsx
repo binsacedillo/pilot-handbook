@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { trpc } from '@/trpc/client';
+import { useRouter } from 'next/navigation';
 
 const UserManagementTable = () => {
   const [search, setSearch] = useState('');
@@ -10,17 +11,27 @@ const UserManagementTable = () => {
     search,
   });
 
+  const router = useRouter();
+
+  const promoteDemoteMutation = trpc.admin.promoteDemoteUser.useMutation({
+    onSuccess: () => router.refresh(),
+  });
+  const verifyPilotMutation = trpc.admin.verifyPilot.useMutation({
+    onSuccess: () => router.refresh(),
+  });
+
   const handleChangeRole = (userId: string, role: 'ADMIN' | 'USER') => {
-    // Placeholder: wire up mutation to change roles
-    void { userId, role };
+    promoteDemoteMutation.mutate({ userId, newRole: role });
   };
 
   const handleTogglePilotVerification = (
     userId: string,
     action: 'verify' | 'unverify'
   ) => {
-    // Placeholder: wire up mutation to verify/unverify pilot
-    void { userId, action };
+    verifyPilotMutation.mutate({
+      userId,
+      action: action === 'verify' ? 'approve' : 'reject',
+    });
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -85,8 +96,8 @@ const UserManagementTable = () => {
         </tbody>
       </table>
       <div className="mt-4">
-        <button onClick={() => setPage((prev) => Math.max(prev - 1, 0))} disabled={page === 0} className="mr-2 p-2 bg-blue-500 text-white rounded">Previous</button>
-        <button onClick={() => setPage((prev) => prev + 1)} disabled={(data?.users?.length ?? 0) < 10} className="p-2 bg-blue-500 text-white rounded">Next</button>
+        <button onClick={() => setPage((prev) => Math.max(prev - 1, 0))} disabled={page === 0} className="mr-2 p-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600 transition disabled:cursor-not-allowed disabled:opacity-60">Previous</button>
+        <button onClick={() => setPage((prev) => prev + 1)} disabled={(data?.users?.length ?? 0) < 10} className="p-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600 transition disabled:cursor-not-allowed disabled:opacity-60">Next</button>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import "server-only";
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser, auth } from "@clerk/nextjs/server";
 import { db } from "./db";
 
 /**
@@ -8,42 +8,22 @@ import { db } from "./db";
 export type UserRole = "ADMIN" | "PILOT" | "USER";
 
 /**
- * Gets the current user's role from Clerk public metadata
- * This is the recommended way to access roles
- */
-export async function getUserRole(): Promise<UserRole | null> {
-  const user = await currentUser();
-  
-  if (!user) {
-    return null;
-  }
-
-  const role = user.publicMetadata?.role as UserRole | undefined;
-  return role || "USER"; // Default to USER if no role is set
-}
-
-/**
  * Checks if the current user is an admin
+ * Queries the database to get the current user's role
  */
 export async function isCurrentUserAdmin(): Promise<boolean> {
-  const role = await getUserRole();
-  return role === "ADMIN";
-}
-
-/**
- * Gets a user's role by their Clerk ID
- * Useful for server-to-server operations
- */
-export async function getUserRoleByClerkId(clerkId: string): Promise<UserRole | null> {
-  try {
-    const user = await db.user.findUnique({
-      where: { clerkId },
-      select: { role: true },
-    });
-    return (user?.role as UserRole) || null;
-  } catch {
-    return null;
+  const { userId } = await auth();
+  
+  if (!userId) {
+    return false;
   }
+
+  const user = await db.user.findUnique({
+    where: { clerkId: userId },
+    select: { role: true },
+  });
+
+  return user?.role === "ADMIN";
 }
 
 /**
@@ -88,7 +68,7 @@ export async function syncClerkUserToPrisma(
     update: {}, // No updates needed if already exists
     create: {
       userId: user.id,
-      // Defaults are set in schema: darkMode=false, unitSystem=KG, currency=USD
+      // Defaults are set in schema: theme=SYSTEM, unitSystem=METRIC, currency=USD
     },
   });
 

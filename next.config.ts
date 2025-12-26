@@ -9,8 +9,15 @@ const nextConfig: NextConfig = {
     //   { protocol: "https", hostname: "images.example.com" },
     // ],
   },
-  // Opt-in place for future instrumentation (OpenTelemetry, logging).
-  // instrumentationHook: true, // Uncomment when adding instrumentation.ts
+
+  productionBrowserSourceMaps: false,
+  turbopack: {}, // Silence Turbopack + Webpack config conflict
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.devtool = false; // Disable source maps in dev
+    }
+    return config;
+  },
 };
 
-export default nextConfig;
+  export default nextConfig;

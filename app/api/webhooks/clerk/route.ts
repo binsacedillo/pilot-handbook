@@ -1,6 +1,7 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { syncClerkUserToPrisma } from "@/lib/clerk-roles";
+import { db } from "@/lib/db";
 
 /**
  * Clerk Webhook Handler
@@ -10,7 +11,7 @@ import { syncClerkUserToPrisma } from "@/lib/clerk-roles";
  * Setup Instructions:
  * 1. Go to Clerk Dashboard → Webhooks
  * 2. Create new endpoint pointing to: https://yourdomain.com/api/webhooks/clerk
- * 3. Subscribe to events: user.created, user.updated
+ * 3. Subscribe to events: user.created, user.updated, user.deleted
  * 4. Copy the signing secret and add to .env.local as CLERK_WEBHOOK_SECRET
  */
 
@@ -64,6 +65,10 @@ export async function POST(req: Request) {
         last_name: data.last_name,
         public_metadata: data.public_metadata,
       });
+    } else if (evt.type === "user.deleted") {
+      const clerkId = evt.data.id;
+      // Use deleteMany to avoid throwing if the user doesn't exist
+      await db.user.deleteMany({ where: { clerkId } });
     }
 
     return new Response("Webhook processed", { status: 200 });

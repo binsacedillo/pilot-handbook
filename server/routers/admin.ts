@@ -1,120 +1,65 @@
 import { z } from "zod";
-import { adminProcedure, createTRPCRouter } from "../trpc";
-import { paginationSchema } from "@/src/lib/shared-schemas";
-import { Prisma } from "@prisma/client";
-import { TRPCError } from "@trpc/server";
-import { currentUser } from "@clerk/nextjs/server";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  adminProcedure,
+} from "../trpc";
+
+// Define schema for pagination if you use it, or remove this input if not needed
+const paginationSchema = z.object({
+  skip: z.number().optional(),
+  take: z.number().optional(),
+});
 
 export const adminRouter = createTRPCRouter({
-  // Full user list with pagination/search for admin table
+  // 1. Get System Stats
+  getStats: adminProcedure.query(async ({ ctx }) => {
+    const totalUsers = await ctx.db.user.count();
+    const totalFlights = await ctx.db.flight.count();
+    const totalAircraft = await ctx.db.aircraft.count();
+
+    return {
+      totalUsers,
+      totalFlights,
+      totalAircraft,
+    };
+  }),
+
+  // 2. Get Recent Users
+  recentUsers: adminProcedure.query(async ({ ctx }) => {
+    return ctx.db.user.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+    });
+  }),
+
+  // 3. Get All Users (Table)
   getAllUsers: adminProcedure
     .input(paginationSchema)
     .query(async ({ ctx, input }) => {
-      const whereFilter = input.search
-        ? {
-            OR: [
-              {
-                firstName: {
-                  contains: input.search,
-                  mode: Prisma.QueryMode.insensitive,
-                },
-              },
-              {
-                lastName: {
-                  contains: input.search,
-                  mode: Prisma.QueryMode.insensitive,
-                },
-              },
-              {
-                email: {
-                  contains: input.search,
-                  mode: Prisma.QueryMode.insensitive,
-                },
-              },
-            ],
-          }
-        : {};
+      const skip = input?.skip || 0;
+      const take = input?.take || 10;
 
-      const [users, totalCount] = await Promise.all([
-        ctx.db.user.findMany({
-          where: whereFilter,
-          skip: input.skip,
-          take: input.take,
-          orderBy: { createdAt: "desc" },
-        }),
-        ctx.db.user.count({ where: whereFilter }),
-      ]);
+      const users = await ctx.db.user.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      });
 
-      return { users, totalCount };
+      const total = await ctx.db.user.count();
+
+      return { users, total };
     }),
 
-  // 1. Get Dashboard Stats - with double verification
-  getStats: adminProcedure.query(async ({ ctx }) => {
-    // Security Check: Double verify they are admin via Clerk
-    const clerkUser = await currentUser();
-    const role = clerkUser?.publicMetadata?.role as string | undefined;
-    
-    if (role !== "ADMIN") {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
-    }
-
-    const [userCount, pilotCount, pendingCount] = await Promise.all([
-      ctx.db.user.count(),
-      ctx.db.user.count({ where: { role: "PILOT" } }),
-      ctx.db.user.count({
-        where: { role: "USER", license: { not: null } },
-      }), // Users with licenses uploaded
-    ]);
-
-    return { userCount, pilotCount, pendingCount };
-  }),
-
-  // 2. Approve/Reject Pilot
+  // 4. Verify Pilot
   verifyPilot: adminProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        action: z.enum(["approve", "reject"]),
-      })
-    )
+    .input(z.object({ userId: z.string(), verified: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
-      // Security check via adminProcedure middleware
-      const clerkUser = await currentUser();
-      const role = clerkUser?.publicMetadata?.role as string | undefined;
-
-      if (role !== "ADMIN") {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-
-      if (input.action === "approve") {
-        return ctx.db.user.update({
-          where: { id: input.userId },
-          data: { role: "PILOT" },
-        });
-      } else {
-        return ctx.db.user.update({
-          where: { id: input.userId },
-          data: { license: null }, // Clear the rejected license
-        });
-      }
+      // Logic to update user verification
+      // If you don't have a 'verified' field, you might be using roles
+      return ctx.db.user.update({
+        where: { id: input.userId },
+        data: { role: input.verified ? "PILOT" : "USER" },
+      });
     }),
-
-  // Recent users list
-  recentUsers: adminProcedure.query(async ({ ctx }) => {
-    const users = await ctx.db.user.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 10,
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-    return users;
-  }),
 });
-
-export type AdminRouter = typeof adminRouter;

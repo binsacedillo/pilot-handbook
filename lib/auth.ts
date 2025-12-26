@@ -1,7 +1,8 @@
 import "server-only";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "./db";
 import { redirect } from "next/navigation";
+import { isCurrentUserAdmin } from "./clerk-roles";
 
 /**
  * Gets the current authenticated user from the database
@@ -35,52 +36,16 @@ export async function requireAuth() {
 
 /**
  * Ensures the current user is an admin or redirects
+ * Uses the authoritative role check from clerk-roles.ts
  */
 export async function requireAdmin() {
-  const user = await requireAuth();
+  await requireAuth();
   
-  const clerkUser = await currentUser();
-  const clerkRole = clerkUser?.publicMetadata?.role as string | undefined;
+  const isAdmin = await isCurrentUserAdmin();
   
-  // Check both Clerk metadata AND database role
-  // This handles cases where webhook hasn't fired yet or session is cached
-  const isAdminInClerk = clerkRole === "ADMIN";
-  const isAdminInDb = user?.role === "ADMIN";
-  
-  if (!isAdminInClerk && !isAdminInDb) {
+  if (!isAdmin) {
     redirect("/dashboard");
   }
-  
-  return clerkUser;
-}
-
-/**
- * Convenience helper to check admin role (server-only)
- * Checks both Clerk metadata and database for redundancy
- */
-export async function isAdmin() {
-  const { userId } = await auth();
-  
-  if (!userId) {
-    return false;
-  }
-  
-  // Check Clerk metadata
-  const clerkUser = await currentUser();
-  const clerkRole = clerkUser?.publicMetadata?.role as string | undefined;
-  
-  if (clerkRole === "ADMIN") {
-    return true;
-  }
-  
-  // Fallback to database check (in case webhook hasn't fired or session is cached)
-  const dbUser = await db.user.findUnique({
-    where: { clerkId: userId },
-    select: { role: true },
-  });
-  
-  return dbUser?.role === "ADMIN";
-}
 
 /**
  * Gets the current user with their flights

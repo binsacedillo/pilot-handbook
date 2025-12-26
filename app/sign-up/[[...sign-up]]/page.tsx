@@ -84,6 +84,7 @@ export default async function SignUpPage() {
 
 					<SignUp
 						routing="hash"
+						afterSignUpUrl="/dashboard"
 						appearance={{
 							elements: {
 								rootBox: "w-full",
