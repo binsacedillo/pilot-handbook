@@ -7,6 +7,8 @@ import { ClerkProvider } from "@clerk/nextjs";
 
 import { TRPCProvider } from "@/trpc/Provider";
 import ClientNavBar from "@/components/ClientNavBar";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeWrapper } from "@/components/ThemeWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,11 +24,17 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={`font-sans ${inter.variable}`}>
-          <TRPCProvider>
-            {children}
-          </TRPCProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className={`font-sans ${inter.variable} flex flex-col min-h-screen`}>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <TRPCProvider>
+              <ThemeWrapper>
+                <div className="flex flex-col min-h-screen">
+                  {children}
+                </div>
+              </ThemeWrapper>
+            </TRPCProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

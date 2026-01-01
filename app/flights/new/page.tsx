@@ -7,10 +7,10 @@ import FlightForm from "@/components/FlightForm";
 
 export default function NewFlightPage() {
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <AppHeader />
-      <main className="max-w-2xl mx-auto p-6 md:p-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">
+      <main className="flex-1 max-w-2xl mx-auto p-6 md:p-8 w-full">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">
           Log New Flight
         </h1>
         <FlightForm />

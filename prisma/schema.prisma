@@ -6,6 +6,85 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id              String           @id @default(uuid())
+  clerkId         String           @unique
+  email           String           @unique
+  firstName       String?
+  lastName        String?
+  license         String?
+  licenseExpiry   DateTime?
+  role            UserRole         @default(USER)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  aircraft        Aircraft[]
+  flights         Flight[]
+  Preferences     Preferences?
+  userPreferences UserPreferences?
+}
+
+model Aircraft {
+  id           String   @id @default(uuid())
+  make         String
+  model        String
+  registration String
+  imageUrl     String?
+  status       String   @default("operational")
+  flightHours  Int      @default(0)
+  userId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flights      Flight[]
+
+  @@unique([userId, registration])
+}
+
+model Flight {
+  id            String   @id @default(uuid())
+  date          DateTime
+  departureCode String
+  arrivalCode   String
+  duration      Int
+  picTime       Int
+  dualTime      Int
+  landings      Int      @default(1)
+  remarks       String?
+  aircraftId    String
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  aircraft      Aircraft @relation(fields: [aircraftId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+}
+
+model UserPreferences {
+  id                String     @id @default(cuid())
+  userId            String     @unique
+  darkMode          Boolean    @default(false)
+  defaultAircraftId String?
+  unitSystem        UnitSystem @default(METRIC)
+  currency          String     @default("USD")
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  theme             Theme      @default(SYSTEM)
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model Preferences {
+  id            String   @id
+  userId        String   @unique
+  theme         String   @default("light")
+  notifications Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+  User          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 enum UserRole {
   ADMIN
   PILOT
@@ -21,82 +100,4 @@ enum Theme {
   LIGHT
   DARK
   SYSTEM
-}
-
-model User {
-  id            String    @id @default(uuid())
-  clerkId       String    @unique
-  email         String    @unique
-  firstName     String?
-  lastName      String?
-  license       String?
-  licenseExpiry DateTime?
-  role          UserRole  @default(USER)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  flights          Flight[]
-  aircraft         Aircraft[]
-  userPreferences  UserPreferences?
-}
-
-model Aircraft {
-  id           String  @id @default(uuid())
-  make         String
-  model        String
-  registration String
-  imageUrl     String?
-  status       String  @default("operational")
-  flightHours  Int     @default(0)
-
-  userId  String
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  flights Flight[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([userId, registration])
-}
-
-model Flight {
-  id            String   @id @default(uuid())
-  date          DateTime
-  departureCode String
-  arrivalCode   String
-
-  duration Int
-  picTime  Int
-  dualTime Int
-
-  landings Int     @default(1)
-  remarks  String? @db.Text
-
-  aircraftId String
-  aircraft   Aircraft @relation(fields: [aircraftId], references: [id])
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId, date])
-}
-
-model UserPreferences {
-  id                String     @id @default(cuid())
-  userId            String     @unique
-  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  defaultAircraftId String?
-  theme             Theme      @default(SYSTEM)
-  unitSystem        UnitSystem @default(METRIC)
-  currency          String     @default("USD")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("user_preferences")
 }

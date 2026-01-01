@@ -3,6 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { trpc } from "@/trpc/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -155,7 +162,7 @@ export default function FlightForm({ initialData }: FlightFormProps) {
   const isPending = createFlight.isPending || updateFlight.isPending;
 
   return (
-    <form onSubmit={onSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+    <form onSubmit={onSubmit} className="bg-card text-card-foreground rounded-lg border border-border shadow p-6 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="date">Date</Label>
@@ -169,20 +176,21 @@ export default function FlightForm({ initialData }: FlightFormProps) {
         </div>
         <div>
           <Label htmlFor="aircraft">Aircraft</Label>
-          <select
-            id="aircraft"
-            required
-            className="w-full border rounded-md h-10 px-3"
+          <Select
             value={form.aircraftId}
-            onChange={(e) => setForm({ ...form, aircraftId: e.target.value })}
+            onValueChange={(value) => setForm({ ...form, aircraftId: value })}
           >
-            <option value="">Select aircraft…</option>
-            {(aircraft ?? []).map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.registration} • {a.make} {a.model}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id="aircraft" className="w-full">
+              <SelectValue placeholder="Select aircraft…" />
+            </SelectTrigger>
+            <SelectContent>
+              {(aircraft ?? []).map((a) => (
+                <SelectItem key={a.id} value={a.id}>
+                  {a.registration} • {a.make} {a.model}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

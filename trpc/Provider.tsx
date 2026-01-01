@@ -19,6 +19,15 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             staleTime: 5 * 1000,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            retry: (failureCount, error: any) => {
+              // Retry UNAUTHORIZED errors once (handles auth race condition)
+              if (error?.data?.code === 'UNAUTHORIZED' && failureCount < 1) {
+                return true;
+              }
+              return failureCount < 3;
+            },
+            retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
           },
         },
       })
@@ -30,6 +39,12 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,
           transformer: superjson,
+          headers() {
+            return {
+              // Ensure cookies are sent with requests for auth
+              credentials: 'include',
+            };
+          },
         }),
       ],
     })

@@ -21,9 +21,17 @@ export default function HowItWorks() {
 
 					<div className="grid md:grid-cols-3 gap-8">
 						{steps.map((step) => (
-							<div key={step.number} className="text-center">
-								<div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-									<span className="text-xl font-bold text-white">{step.number}</span>
+							<div
+								key={step.number}
+								className="relative flex flex-col items-center rounded-2xl border border-border/60 bg-card/80 p-6 text-center shadow-sm"
+							>
+								<div className="relative mb-4">
+									<div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#235ff6] bg-white shadow-sm">
+										<step.icon className="h-7 w-7 text-[#235ff6]" />
+									</div>
+									<span className="absolute -top-2 -right-3 flex h-7 w-7 items-center justify-center rounded-full bg-[#235ff6] text-xs font-semibold uppercase tracking-wide text-white shadow-sm">
+										{step.number}
+									</span>
 								</div>
 								<h3 className="text-xl font-semibold text-foreground mb-2">
 									{step.title}
@@ -48,7 +56,7 @@ export default function HowItWorks() {
 							<Link href="/dashboard">
 								<Button
 									size="lg"
-									className="px-8 bg-blue-600 hover:bg-blue-700"
+									className="px-8 border-2 border-[#235ff6] bg-white text-[#235ff6] transition-colors hover:bg-[#235ff6] hover:text-white"
 								>
 									Continue to Dashboard
 								</Button>

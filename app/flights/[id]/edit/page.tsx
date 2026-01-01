@@ -15,12 +15,12 @@ export default function EditFlightPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
         <AppHeader />
-        <main className="max-w-2xl mx-auto p-6 md:p-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">Edit Flight</h1>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-slate-600">Loading flight data...</p>
+        <main className="flex-1 max-w-2xl mx-auto p-6 md:p-8 w-full">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6">Edit Flight</h1>
+          <div className="bg-card text-card-foreground rounded-lg border border-border shadow p-6">
+            <p className="text-muted-foreground">Loading flight data...</p>
           </div>
         </main>
         <AppFooter />
@@ -30,15 +30,15 @@ export default function EditFlightPage() {
 
   if (error || !flight) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
         <AppHeader />
-        <main className="max-w-2xl mx-auto p-6 md:p-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">Edit Flight</h1>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-red-600">Flight not found or you don&apos;t have permission to edit it.</p>
+        <main className="flex-1 max-w-2xl mx-auto p-6 md:p-8 w-full">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6">Edit Flight</h1>
+          <div className="bg-card text-card-foreground rounded-lg border border-border shadow p-6">
+            <p className="text-destructive">Flight not found or you don&apos;t have permission to edit it.</p>
             <button
               onClick={() => router.push("/flights")}
-              className="mt-4 text-blue-600 hover:underline"
+              className="mt-4 text-primary hover:underline"
             >
               ← Back to Flights
             </button>
@@ -50,10 +50,10 @@ export default function EditFlightPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <AppHeader />
-      <main className="max-w-2xl mx-auto p-6 md:p-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">Edit Flight</h1>
+      <main className="flex-1 max-w-2xl mx-auto p-6 md:p-8 w-full">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">Edit Flight</h1>
         <FlightForm initialData={flight} />
       </main>
       <AppFooter />

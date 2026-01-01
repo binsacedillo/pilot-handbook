@@ -3,10 +3,10 @@
 
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
-import Footer from "@/components/landing/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/trpc/client";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -65,11 +65,11 @@ export default function EditAircraftPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
+		<div className="min-h-screen bg-background text-foreground flex flex-col">
 			<AppHeader />
-			<main className="max-w-2xl mx-auto p-6 md:p-8">
-				<h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">Edit Aircraft</h1>
-				<form onSubmit={onSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+			<main className="flex-1 max-w-2xl mx-auto p-6 md:p-8 w-full">
+				<h1 className="text-2xl md:text-3xl font-bold mb-6">Edit Aircraft</h1>
+				<form onSubmit={onSubmit} className="bg-card text-card-foreground rounded-lg border border-border shadow p-6 space-y-6">
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div>
 							<Label htmlFor="make">Make</Label>
@@ -87,7 +87,19 @@ export default function EditAircraftPage() {
 						</div>
 						<div>
 							<Label htmlFor="status">Status</Label>
-							<Input id="status" required value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} />
+							<Select
+								value={form.status}
+								onValueChange={(value) => setForm({ ...form, status: value })}
+							>
+								<SelectTrigger id="status" className="w-full">
+									<SelectValue placeholder="Select status" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="operational">Operational</SelectItem>
+									<SelectItem value="maintenance">Maintenance</SelectItem>
+									<SelectItem value="retired">Retired</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 					</div>
 					<div>

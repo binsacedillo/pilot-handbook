@@ -1,4 +1,14 @@
-import { Clock, BookOpen, TrendingUp, Shield, Plane, CheckCircle, LucideIcon } from "lucide-react";
+import {
+	Clock,
+	BookOpen,
+	TrendingUp,
+	BarChart3,
+	Plane,
+	Shield,
+	UserPlus,
+	ClipboardList,
+	LucideIcon,
+} from "lucide-react";
 
 export interface Feature {
 	icon: LucideIcon;
@@ -9,33 +19,33 @@ export interface Feature {
 export const features: Feature[] = [
 	{
 		icon: Clock,
-		title: "Accurate Time Tracking",
-		description: "Log flight hours with precision. Track PIC, dual, cross-country, night, and instrument time automatically.",
+		title: "Precise Flight Logging",
+		description: "Log every flight with departure/arrival codes, duration, landings, and remarks. Track PIC and dual instruction time separately.",
 	},
 	{
 		icon: BookOpen,
-		title: "Aircraft Management",
-		description: "Maintain detailed records of all aircraft you've flown. Track make, model, and registration numbers.",
+		title: "Aircraft Fleet Management",
+		description: "Maintain detailed records of all aircraft you've flown. Track make, model, registration, and operational status.",
 	},
 	{
-		icon: TrendingUp,
-		title: "Career Insights",
-		description: "Visualize your progress with charts and reports. Track your journey towards certifications and ratings.",
-	},
-	{
-		icon: Shield,
-		title: "CAAP Compliant",
-		description: "Meet all regulatory requirements with confidence. Export reports for checkrides and interviews.",
+		icon: BarChart3,
+		title: "Advanced Analytics",
+		description: "Visualize your progress with interactive charts. View hours by aircraft type, monthly trends, and comprehensive flight statistics.",
 	},
 	{
 		icon: Plane,
-		title: "Cloud Sync",
-		description: "Access your logbook from anywhere. Your data is securely backed up and always available.",
+		title: "Cloud-Based Storage",
+		description: "Access your logbook from any device. Your data is securely stored in the cloud and automatically synced.",
 	},
 	{
-		icon: CheckCircle,
-		title: "Easy Import",
-		description: "Migrate from paper or other digital logbooks seamlessly. Import your existing flight history.",
+		icon: Shield,
+		title: "Secure & Private",
+		description: "Role-based access control and authentication powered by Clerk. Your flight data is protected and isolated per user.",
+	},
+	{
+		icon: TrendingUp,
+		title: "Real-Time Statistics",
+		description: "Track total hours, average flight duration, and recent activity. Monitor your flight currency with 90-day recency calculations.",
 	},
 ];
 
@@ -43,6 +53,7 @@ export interface Step {
 	number: number;
 	title: string;
 	description: string;
+	icon: LucideIcon;
 }
 
 export const steps: Step[] = [
@@ -50,16 +61,19 @@ export const steps: Step[] = [
 		number: 1,
 		title: "Create Your Account",
 		description: "Sign up in seconds with your email. No complex setup required.",
+		icon: UserPlus,
 	},
 	{
 		number: 2,
 		title: "Add Your Aircraft",
 		description: "Set up your aircraft fleet with make, model, and registration details.",
+		icon: Plane,
 	},
 	{
 		number: 3,
 		title: "Log Your Flights",
 		description: "Start recording your flight hours and watch your career progress.",
+		icon: ClipboardList,
 	},
 ];
 
@@ -75,19 +89,19 @@ export interface FooterSection {
 
 export const footerSections: FooterSection[] = [
 	{
-		title: "Product",
-		links: [
-			{ label: "Features", href: "/sign-up" },
-			{ label: "Pricing", href: "/sign-up" },
-			{ label: "FAQ", href: "/sign-up" },
-		],
-	},
-	{
 		title: "Company",
 		links: [
 			{ label: "About", href: "/sign-up" },
 			{ label: "Blog", href: "/sign-up" },
 			{ label: "Contact", href: "/sign-up" },
+		],
+	},
+	{
+		title: "Product",
+		links: [
+			{ label: "Features", href: "/sign-up" },
+			{ label: "Pricing", href: "/sign-up" },
+			{ label: "FAQ", href: "/sign-up" },
 		],
 	},
 	{

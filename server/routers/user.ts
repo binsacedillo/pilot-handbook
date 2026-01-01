@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 import { currentUser } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -5,8 +6,11 @@ import { z } from 'zod';
 export const userRouter = createTRPCRouter({
   // Get current user profile
   getProfile: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.user) {
+      return null;
+    }
     const user = await ctx.db.user.findUnique({
-      where: { clerkId: ctx.session.user },
+      where: { id: ctx.user.id },
       include: {
         userPreferences: true,
       },
@@ -16,8 +20,12 @@ export const userRouter = createTRPCRouter({
 
   // Get or create user (called on sign-in)
   getOrCreate: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.user) {
+      return null;
+    }
+    
     let user = await ctx.db.user.findUnique({
-      where: { clerkId: ctx.session.user },
+      where: { id: ctx.user.id },
       include: {
         userPreferences: true,
       },
@@ -29,22 +37,13 @@ export const userRouter = createTRPCRouter({
     const clerkLastName = clerkUser?.lastName ?? null;
 
     if (!user) {
-      // User doesn't exist yet, create from Clerk
-      user = await ctx.db.user.create({
-        data: {
-          clerkId: ctx.session.user,
-          email: clerkEmail,
-          firstName: clerkFirstName,
-          lastName: clerkLastName,
-        },
-        include: {
-          userPreferences: true,
-        },
-      });
+      // This shouldn't happen since protectedProcedure creates user
+      // But just in case, return ctx.user
+      return ctx.user;
     } else if (!user.firstName || !user.lastName || !user.email) {
       // User exists but is missing name/email - update from Clerk
       user = await ctx.db.user.update({
-        where: { clerkId: ctx.session.user },
+        where: { id: ctx.user.id },
         data: {
           email: user.email || clerkEmail,
           firstName: user.firstName || clerkFirstName,
@@ -74,8 +73,11 @@ export const userRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.user) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
+      }
       const user = await ctx.db.user.update({
-        where: { clerkId: ctx.session.user },
+        where: { id: ctx.user.id },
         data: {
           firstName: input.firstName,
           lastName: input.lastName,

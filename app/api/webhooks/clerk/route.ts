@@ -1,6 +1,6 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { syncClerkUserToPrisma } from "@/lib/clerk-roles";
+import { syncClerkUserToPrisma, syncPrismaRoleToClerk } from "@/lib/clerk-roles";
 import { db } from "@/lib/db";
 
 /**
@@ -59,12 +59,15 @@ export async function POST(req: Request) {
   try {
     if (evt.type === "user.created" || evt.type === "user.updated") {
       const data = evt.data;
+      // Sync from Clerk to database
       await syncClerkUserToPrisma(data.id, {
         email_addresses: data.email_addresses,
         first_name: data.first_name,
         last_name: data.last_name,
         public_metadata: data.public_metadata,
       });
+      // Then sync database role back to Clerk metadata
+      await syncPrismaRoleToClerk(data.id);
     } else if (evt.type === "user.deleted") {
       const clerkId = evt.data.id;
       // Use deleteMany to avoid throwing if the user doesn't exist
@@ -76,6 +79,7 @@ export async function POST(req: Request) {
     console.error("Error processing webhook:", error);
     return new Response("Error processing webhook", { status: 500 });
   }
+}
 }
 
 interface ClerkWebhookEvent {

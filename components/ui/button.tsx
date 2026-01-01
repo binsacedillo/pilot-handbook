@@ -3,7 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { twMerge } from "tailwind-merge";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-	variant?: "default" | "outline" | "ghost" | "secondary";
+	variant?: "default" | "outline" | "ghost" | "secondary" | "destructive";
 	size?: "default" | "sm" | "lg";
 	asChild?: boolean;
 }
@@ -25,6 +25,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 				"bg-transparent text-slate-900 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800",
 			secondary:
 				"bg-slate-200 text-slate-900 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700",
+			destructive:
+				"bg-destructive text-destructive-foreground hover:bg-destructive/90",
 		};
 
 		const sizeStyles = {

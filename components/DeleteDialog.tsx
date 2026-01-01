@@ -49,13 +49,18 @@ export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
 
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent ref={ref} className="sm:max-w-[425px]">
+        <DialogContent
+          ref={ref}
+          className="sm:max-w-[425px] bg-card text-card-foreground"
+        >
           <DialogHeader>
-            <DialogTitle className="text-red-600">{title}</DialogTitle>
+            <DialogTitle className="text-destructive">{title}</DialogTitle>
           </DialogHeader>
           <DialogDescription className="py-4">
             {description}
-            {itemName && <span className="font-semibold text-slate-900"> &quot;{itemName}&quot;</span>}
+            {itemName && (
+              <span className="font-semibold text-foreground"> &quot;{itemName}&quot;</span>
+            )}
             {itemName && <span>?</span>}
           </DialogDescription>
           <DialogFooter className="gap-2 sm:gap-0">
@@ -67,10 +72,9 @@ export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
               Cancel
             </Button>
             <Button
-              variant="secondary"
+              variant="destructive"
               onClick={handleDelete}
               disabled={isDeleting || isLoading}
-              className="bg-red-600 text-white hover:bg-red-700"
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </Button>

@@ -74,3 +74,30 @@ export async function syncClerkUserToPrisma(
 
   return user;
 }
+
+/**
+ * Syncs database user role to Clerk public metadata
+ * Call this after changing a user's role in the database
+ * 
+ * @param clerkUserId - The Clerk user ID
+ */
+export async function syncPrismaRoleToClerk(clerkUserId: string): Promise<void> {
+  // Get the user's role from database
+  const user = await db.user.findUnique({
+    where: { clerkId: clerkUserId },
+    select: { role: true },
+  });
+
+  if (!user) {
+    throw new Error(`User not found: ${clerkUserId}`);
+  }
+
+  // Import here to avoid circular dependencies at module load time
+  const { clerkClient } = await import("@clerk/nextjs/server");
+  const client = await clerkClient();
+
+  // Sync role to Clerk's public metadata
+  await client.users.updateUser(clerkUserId, {
+    publicMetadata: { role: user.role },
+  });
+}

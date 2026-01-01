@@ -15,7 +15,8 @@ export default function StatsPage() {
   const { data, isLoading } = trpc.stats.getHoursByMonth.useQuery();
 
   return (
-    <Card className="max-w-2xl mx-auto mt-10 p-6">
+    <section aria-label="Flight statistics" className="max-w-2xl mx-auto mt-10 p-6">
+    <Card role="region" aria-live="polite" aria-label="Monthly flight hours chart">
       <h2 className="text-xl font-bold mb-4">Hours per Month</h2>
       {isLoading ? (
         <Skeleton className="h-64 w-full" />
@@ -32,5 +33,6 @@ export default function StatsPage() {
         </div>
       )}
     </Card>
+    </section>
   );
 }

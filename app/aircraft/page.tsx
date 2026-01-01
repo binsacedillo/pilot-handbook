@@ -64,9 +64,9 @@ export default function AircraftPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <AppHeader />
-      <main className="max-w-6xl mx-auto p-6 md:p-8">
+      <main className="flex-1 max-w-6xl mx-auto p-6 md:p-8 w-full">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">Aircraft</h1>
           <Button asChild>

@@ -6,7 +6,7 @@ export default function Footer() {
 	return (
 		<footer className="border-t border-border bg-card">
 			<div className="container mx-auto px-4 py-8">
-				<div className="grid md:grid-cols-4 gap-8 mb-8">
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
 					<div>
 						<div className="flex items-center gap-2 mb-3">
 							<Plane className="w-5 h-5 text-blue-600" />

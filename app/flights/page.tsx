@@ -1,7 +1,7 @@
 "use client";
 
 import AppHeader from "@/components/AppHeader";
-import AppFooter from "@/components/AppFooter"; 
+import AppFooter from "@/components/AppFooter";
 import { trpc } from "@/trpc/client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -63,9 +63,9 @@ export default function FlightsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <AppHeader />
-      <main className="max-w-6xl mx-auto p-6 md:p-8">
+      <main className="flex-1 max-w-6xl mx-auto p-6 md:p-8 w-full">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">Flights</h1>
           <Button asChild>

@@ -12,10 +12,22 @@ import { SignedOut } from "@clerk/nextjs";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server"; // 1. Import Auth
 import { redirect } from "next/navigation";   // 2. Import Redirect
+import { db } from "@/lib/db";
 
-
+async function getTotalFlightHours() {
+  try {
+    const result = await db.flight.aggregate({
+      _sum: { duration: true },
+    });
+    return Math.round(result._sum.duration || 0);
+  } catch (error) {
+    console.error("Error fetching flight stats:", error);
+    return 0;
+  }
+}
 
 export default async function Home() {
+  const totalHours = await getTotalFlightHours();
   // 3. THE GUARD CLAUSE
   // Check immediately: Is this person logged in?
   // const { userId } = await auth();
@@ -27,24 +39,9 @@ export default async function Home() {
   return (
     <main className="min-h-screen flex flex-col bg-background">
       <Navigation />
-      <Hero />
+      <Hero totalFlightHours={totalHours} />
       <Features />
       <HowItWorks />
-      {/* Publicly visible sign-up CTA for signed-out users */}
-      <SignedOut>
-        <section className="flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-xl w-full text-center bg-white/80 rounded-xl shadow-lg p-8 border border-blue-100">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-blue-900">Ready to get started?</h2>
-            <p className="mb-6 text-blue-700">Sign up now to access your pilot handbook and manage your flights with ease.</p>
-            <Link
-              href="/sign-up"
-              className="inline-block px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-            >
-              Create your free account
-            </Link>
-          </div>
-        </section>
-      </SignedOut>
       <CTASection />
       <Footer />
     </main>

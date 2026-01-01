@@ -19,17 +19,12 @@ const updatePreferencesSchema = z.object({
 
 export const preferencesRouter = createTRPCRouter({
   getPreferences: protectedProcedure.query(async ({ ctx }) => {
-    const user = await ctx.db.user.findUnique({
-      where: { clerkId: ctx.session.user },
-      select: { id: true },
-    });
-
-    if (!user) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
+    if (!ctx.user) {
+      throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
     }
 
     const prefs = await ctx.db.userPreferences.findUnique({
-      where: { userId: user.id },
+      where: { userId: ctx.user.id },
     });
 
     return prefs ?? defaultPreferences;
@@ -38,20 +33,16 @@ export const preferencesRouter = createTRPCRouter({
   updatePreferences: protectedProcedure
     .input(updatePreferencesSchema)
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({
-        where: { clerkId: ctx.session.user },
-        select: { id: true, clerkId: true },
-      });
-
-      if (!user) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
+      if (!ctx.user) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
       }
 
       // Update Clerk public metadata for theme/units
       try {
         // Only run on server
         const { clerkClient } = await import('@clerk/nextjs/server');
-        await clerkClient.users.updateUser(user.clerkId, {
+        const client = await clerkClient();
+        await client.users.updateUser(ctx.session.userId, {
           publicMetadata: {
             theme: input.theme,
             unitSystem: input.unitSystem,
@@ -63,10 +54,10 @@ export const preferencesRouter = createTRPCRouter({
       }
 
       return ctx.db.userPreferences.upsert({
-        where: { userId: user.id },
+        where: { userId: ctx.user.id },
         update: input,
         create: {
-          userId: user.id,
+          userId: ctx.user.id,
           theme: input.theme ?? defaultPreferences.theme,
           unitSystem: input.unitSystem ?? defaultPreferences.unitSystem,
           currency: input.currency ?? defaultPreferences.currency,

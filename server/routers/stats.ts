@@ -3,14 +3,14 @@ import { createTRPCRouter, protectedProcedure } from '../trpc';
 export const statsRouter = createTRPCRouter({
   // Get hours by aircraft type (Pie chart data)
   getHoursByType: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.session?.user) {
+      if (!ctx.user) {
         return [];
       }
 
       const stats = await ctx.db.flight.groupBy({
         by: ['aircraftId'],
         _sum: { duration: true },
-        where: { userId: ctx.session.user },
+        where: { userId: ctx.user.id },
       });
 
     // Join with aircraft to get aircraft names
@@ -33,7 +33,7 @@ export const statsRouter = createTRPCRouter({
 
   // Get hours by month (Bar chart data - last 12 months)
   getHoursByMonth: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.session?.user) {
+      if (!ctx.user) {
         return [];
       }
 
@@ -42,7 +42,7 @@ export const statsRouter = createTRPCRouter({
 
       const flights = await ctx.db.flight.findMany({
         where: {
-          userId: ctx.session.user,
+          userId: ctx.user.id,
           date: {
             gte: twelveMonthsAgo,
           },
@@ -80,7 +80,7 @@ export const statsRouter = createTRPCRouter({
 
   // Get total stats summary
   getSummary: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.session?.user) {
+      if (!ctx.user) {
         return {
           totalHours: 0,
           totalFlights: 0,
@@ -89,7 +89,7 @@ export const statsRouter = createTRPCRouter({
       }
 
       const flights = await ctx.db.flight.findMany({
-        where: { userId: ctx.session.user },
+        where: { userId: ctx.user.id },
         select: { duration: true, date: true },
       });
 

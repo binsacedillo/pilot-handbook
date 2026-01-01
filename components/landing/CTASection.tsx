@@ -23,12 +23,6 @@ export default function CTASection() {
 					</div>
 
 					<div className="relative z-10 text-center max-w-3xl mx-auto">
-						<div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6">
-							<div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-							<span className="text-sm font-medium text-blue-100">
-								Free Trial Available
-							</span>
-						</div>
 
 						<h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
 							Ready to Take Off?
@@ -39,29 +33,29 @@ export default function CTASection() {
 						</p>
 
 						<SignedOut>
-							<Link href="/sign-up">
+							<Link href="/sign-up" className="w-full sm:w-auto">
 								<Button
 									size="lg"
 									variant="secondary"
-									className="text-lg px-10 py-6 bg-white text-blue-700 hover:bg-blue-50 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 rounded-2xl font-semibold"
+									className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-10 md:px-12 py-5 sm:py-6 md:py-7 bg-white text-blue-700 hover:bg-blue-50 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 rounded-2xl font-semibold"
 								>
-									Create Free Account
+									Claim Your Free Trial Now
 								</Button>
 							</Link>
 						</SignedOut>
 						<SignedIn>
-							<Link href="/dashboard">
+							<Link href="/dashboard" className="w-full sm:w-auto">
 								<Button
 									size="lg"
 									variant="secondary"
-									className="text-lg px-10 py-6 bg-white text-blue-700 hover:bg-blue-50 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 rounded-2xl font-semibold"
+									className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-10 md:px-12 py-5 sm:py-6 md:py-7 bg-white text-blue-700 hover:bg-blue-50 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 rounded-2xl font-semibold"
 								>
-									Go to Dashboard
+									Claim Your Free Trial Now
 								</Button>
 							</Link>
 						</SignedIn>
 
-						<p className="text-sm text-blue-200 mt-6">
+						<p className="text-base md:text-lg text-blue-50 mt-7 font-semibold">
 							✓ No credit card required • ✓ Setup in under 2 minutes • ✓ Cancel
 							anytime
 						</p>
