@@ -4,22 +4,61 @@ import { createTRPCRouter, protectedProcedure } from '../trpc';
 import { idSchema, createFlightSchema, updateFlightSchema } from '@/src/lib/shared-schemas';
 
 export const flightRouter = createTRPCRouter({
-  // Get all flights for the current user
-  getAll: protectedProcedure.query(async ({ ctx }) => {
-    // Ensure user exists in database first
-    if (!ctx.user) {
-      return [];
-    }
-    
-    const flights = await ctx.db.flight.findMany({
-      where: { userId: ctx.user.id },
-      include: {
-        aircraft: true,
-      },
-      orderBy: { date: 'desc' },
-    });
-    return flights;
-  }),
+  // Get all flights for the current user with optional filters
+  getAll: protectedProcedure
+    .input(
+      z.object({
+        search: z.string().optional(),
+        startDate: z.coerce.date().optional(),
+        endDate: z.coerce.date().optional(),
+        flightType: z.enum(['PIC', 'DUAL', 'SOLO']).optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      if (!ctx.user) {
+        return [];
+      }
+
+      const filters: any = {
+        userId: ctx.user.id,
+      };
+
+      if (input.search) {
+        filters.OR = [
+          { departureCode: { contains: input.search, mode: 'insensitive' } },
+          { arrivalCode: { contains: input.search, mode: 'insensitive' } },
+          { remarks: { contains: input.search, mode: 'insensitive' } },
+          { aircraft: { id: { contains: input.search, mode: 'insensitive' } } },
+        ];
+      }
+
+      if (input.startDate || input.endDate) {
+        filters.date = {};
+        if (input.startDate) filters.date.gte = input.startDate;
+        if (input.endDate) filters.date.lte = input.endDate;
+      }
+
+      if (input.flightType) {
+        switch (input.flightType) {
+          case 'PIC':
+            filters.picTime = { gt: 0 };
+            break;
+          case 'DUAL':
+            filters.dualTime = { gt: 0 };
+            break;
+          case 'SOLO':
+            filters.picTime = { gt: 0 };
+            filters.dualTime = { equals: 0 };
+            break;
+        }
+      }
+
+      return ctx.db.flight.findMany({
+        where: filters,
+        orderBy: { date: 'desc' },
+        include: { aircraft: true },
+      });
+    }),
 
   // Get a single flight by ID
   getById: protectedProcedure
@@ -113,6 +152,28 @@ export const flightRouter = createTRPCRouter({
       });
 
       return flight;
+    }),
+
+  // Get recent flights (last 10) for the current user
+  getRecent: protectedProcedure
+    .input(
+      z.object({
+        limit: z.number().default(10),
+      }).optional(),
+    )
+    .query(async ({ ctx, input }) => {
+      if (!ctx.user) {
+        return [];
+      }
+
+      const limit = input?.limit ?? 10;
+
+      return ctx.db.flight.findMany({
+        where: { userId: ctx.user.id },
+        orderBy: { date: 'desc' },
+        take: limit,
+        include: { aircraft: true },
+      });
     }),
 
   // Get flight statistics

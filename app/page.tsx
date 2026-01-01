@@ -25,7 +25,7 @@ export default async function Home() {
   //   redirect("/dashboard");
   // }
   return (
-    <main className="bg-linear-to-br from-blue-50 to-blue-200 min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col bg-background">
       <Navigation />
       <Hero />
       <Features />

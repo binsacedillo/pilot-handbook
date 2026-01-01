@@ -22,9 +22,9 @@ export default function AdminDashboard() {
     );
   }
 
-  const totalUsers = stats?.userCount ?? 0;
-  const pilotCount = stats?.pilotCount ?? 0;
-  const pendingCount = stats?.pendingCount ?? 0;
+  const totalUsers = stats?.totalUsers ?? 0;
+  const totalFlights = stats?.totalFlights ?? 0;
+  const totalAircraft = stats?.totalAircraft ?? 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,20 +43,14 @@ export default function AdminDashboard() {
               <p className="mt-4 text-4xl font-bold text-blue-600 dark:text-blue-400">{totalUsers}</p>
             </Card>
             <Card className="p-8 text-center">
-              <p className="text-sm uppercase tracking-wide text-muted-foreground">Pilots</p>
-              <p className="mt-4 text-4xl font-bold text-green-600 dark:text-green-400">{pilotCount}</p>
+              <p className="text-sm uppercase tracking-wide text-muted-foreground">Total Flights</p>
+              <p className="mt-4 text-4xl font-bold text-green-600 dark:text-green-400">{totalFlights}</p>
             </Card>
             <Card className="p-8 text-center">
-              <p className="text-sm uppercase tracking-wide text-muted-foreground">Pending Actions</p>
-              <p className="mt-4 text-4xl font-bold text-orange-600 dark:text-orange-400">{pendingCount}</p>
+              <p className="text-sm uppercase tracking-wide text-muted-foreground">Total Aircraft</p>
+              <p className="mt-4 text-4xl font-bold text-orange-600 dark:text-orange-400">{totalAircraft}</p>
             </Card>
           </div>
-
-          <Card className="mt-12 p-6">
-            <p className="text-lg text-muted-foreground">
-              Admin panel is active. Start building user management, verifications, etc.
-            </p>
-          </Card>
         </div>
       </div>
       <AppFooter />

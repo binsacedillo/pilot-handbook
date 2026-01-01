@@ -69,9 +69,9 @@ export default function AircraftPage() {
       <main className="max-w-6xl mx-auto p-6 md:p-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">Aircraft</h1>
-          <Link href="/aircraft/new">
-            <Button>Add Aircraft</Button>
-          </Link>
+          <Button asChild>
+            <Link href="/aircraft/new">Add Aircraft</Link>
+          </Button>
         </div>
 
         <DeleteDialog
@@ -89,9 +89,9 @@ export default function AircraftPage() {
         {displayedAircraft.length === 0 ? (
           <div className="bg-card text-foreground rounded-lg border border-border shadow p-8 text-center">
             <p className="text-muted-foreground mb-4">No aircraft yet.</p>
-            <Link href="/aircraft/new">
-              <Button>Add your first aircraft</Button>
-            </Link>
+            <Button asChild>
+              <Link href="/aircraft/new">Add your first aircraft</Link>
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

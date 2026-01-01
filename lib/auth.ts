@@ -34,18 +34,18 @@ export async function requireAuth() {
   return user;
 }
 
+
 /**
  * Ensures the current user is an admin or redirects
  * Uses the authoritative role check from clerk-roles.ts
  */
 export async function requireAdmin() {
   await requireAuth();
-  
   const isAdmin = await isCurrentUserAdmin();
-  
   if (!isAdmin) {
     redirect("/dashboard");
   }
+}
 
 /**
  * Gets the current user with their flights

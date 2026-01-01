@@ -1,8 +1,7 @@
 "use client";
 
 import AppHeader from "@/components/AppHeader";
-import AppFooter from "@/components/AppFooter";
-import Footer from "@/components/landing/Footer";
+import AppFooter from "@/components/AppFooter"; 
 import { trpc } from "@/trpc/client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -10,26 +9,20 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { DeleteDialog } from "@/components/DeleteDialog";
 import { Trash2, Edit2 } from "lucide-react";
-
-
-interface Flight {
-  id: string;
-  date: string | Date;
-  departureCode: string;
-  arrivalCode: string;
-  duration: number;
-  picTime: number;
-  dualTime: number;
-  landings: number;
-  aircraft?: {
-    id: string;
-    registration: string;
-  };
-}
-
+import { useSearchParams } from "next/navigation";
+import { FlightFilterBar } from "@/src/components/flights/FlightFilterBar";
 
 export default function FlightsPage() {
-  const { data: flights } = trpc.flight.getAll.useQuery();
+  const searchParams = useSearchParams();
+
+  const filters = {
+    search: searchParams.get("search") || undefined,
+    startDate: searchParams.get("startDate") || undefined,
+    endDate: searchParams.get("endDate") || undefined,
+    flightType: (searchParams.get("flightType") as any) || undefined,
+  };
+
+  const { data: flights } = trpc.flight.getAll.useQuery(filters);
   const deleteMutation = trpc.flight.delete.useMutation();
   const queryClient = useQueryClient();
 
@@ -41,21 +34,11 @@ export default function FlightsPage() {
     flightRoute: string | null;
   }>({ open: false, flightId: null, flightRoute: null });
 
-  // Filter state
-  const [filterDate, setFilterDate] = useState("");
-
   const filteredRows = useMemo(() => {
     if (!flights) return [];
     let result = flights.filter((f) => !optimisticFlights.includes(f.id));
-    if (filterDate) {
-      result = result.filter((f) => {
-        const d = typeof f.date === "string" ? f.date : f.date.toISOString();
-        return d.startsWith(filterDate);
-      });
-    }
     return result;
-  }, [flights, optimisticFlights, filterDate]);
-
+  }, [flights, optimisticFlights]);
 
   const handleDeleteClick = (flightId: string, route: string) => {
     setDeleteDialogState({
@@ -85,22 +68,14 @@ export default function FlightsPage() {
       <main className="max-w-6xl mx-auto p-6 md:p-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">Flights</h1>
-          <Link href="/flights/new">
-            <Button>Log New Flight</Button>
-          </Link>
+          <Button asChild>
+            <Link href="/flights/new">Log New Flight</Link>
+          </Button>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium mb-1">Date</label>
-            <input
-              type="date"
-              className="border rounded px-2 py-1"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
-            />
-          </div>
+        <div className="mb-6">
+          <FlightFilterBar />
         </div>
 
         <DeleteDialog
@@ -118,9 +93,9 @@ export default function FlightsPage() {
         {filteredRows.length === 0 ? (
           <div className="bg-card text-foreground rounded-lg border border-border shadow p-8 text-center">
             <p className="text-muted-foreground mb-4">No flights yet.</p>
-            <Link href="/flights/new">
-              <Button>Log your first flight</Button>
-            </Link>
+            <Button asChild>
+              <Link href="/flights/new">Log your first flight</Link>
+            </Button>
           </div>
         ) : (
           <div className="bg-card text-foreground rounded-lg border border-border shadow overflow-x-auto">

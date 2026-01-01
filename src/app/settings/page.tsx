@@ -1,4 +1,8 @@
+
 import { UserProfile } from '@clerk/nextjs';
+import dynamic from "next/dynamic";
+
+const AdminTools = dynamic(() => import("./AdminTools"), { ssr: false });
 
 export default function SettingsPage() {
   return (
@@ -7,6 +11,7 @@ export default function SettingsPage() {
       <div className="w-full max-w-md">
         <UserProfile />
       </div>
+      <AdminTools />
     </main>
   );
 }

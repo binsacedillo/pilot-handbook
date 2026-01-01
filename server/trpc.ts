@@ -23,7 +23,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
 /**
  * 2. INITIALIZATION
  */
-const t = initTRPC.context<typeof createTRPCContext>().create({
+export const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
     return {

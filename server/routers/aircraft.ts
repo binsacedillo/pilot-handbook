@@ -9,9 +9,17 @@ export const aircraftRouter = createTRPCRouter({
     if (!ctx.user) {
       return [];
     }
-    
+    // Only select minimal fields needed for dashboard
     const aircraft = await ctx.db.aircraft.findMany({
       where: { userId: ctx.user.id },
+      select: {
+        id: true,
+        registration: true,
+        make: true,
+        model: true,
+        status: true,
+        imageUrl: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
     return aircraft;

@@ -1,4 +1,5 @@
 import { createTRPCRouter } from '../trpc';
+import { t } from '../trpc';
 import { flightRouter } from './flight';
 import { aircraftRouter } from './aircraft';
 import { userRouter } from './user';
@@ -20,4 +21,5 @@ export const appRouter = createTRPCRouter({
 });
 
 // Export type definition of the API
+export const createCaller = t.createCallerFactory(appRouter);
 export type AppRouter = typeof appRouter;

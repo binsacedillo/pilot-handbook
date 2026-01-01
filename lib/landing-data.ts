@@ -24,7 +24,7 @@ export const features: Feature[] = [
 	},
 	{
 		icon: Shield,
-		title: "FAA Compliant",
+		title: "CAAP Compliant",
 		description: "Meet all regulatory requirements with confidence. Export reports for checkrides and interviews.",
 	},
 	{
