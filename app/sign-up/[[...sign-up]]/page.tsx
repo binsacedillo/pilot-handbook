@@ -1,21 +1,34 @@
+"use client";
+
 import { SignUp } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { Plane, CheckCircle } from "lucide-react";
+import Link from "next/link";
+import { Plane, CheckCircle, ArrowLeft } from "lucide-react";
+import { useTheme } from "next-themes";
+import { dark } from "@clerk/themes";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function SignUpPage() {
-	const { userId } = await auth();
+export default function SignUpPage() {
+	const { theme } = useTheme();
+	const { isSignedIn } = useUser();
+	const router = useRouter();
 
-	// Skip rendering sign-up when already signed in to avoid the single-session modal warning
-	if (userId) redirect("/");
+	useEffect(() => {
+		if (isSignedIn) {
+			router.push("/");
+		}
+	}, [isSignedIn, router]);
+
+	if (isSignedIn) return null;
 
 	return (
-		<div className="flex min-h-screen">
+		<div className="flex min-h-screen bg-linear-to-br from-gray-900 via-blue-900 to-blue-800">
 			{/* Left Side - Branding */}
-			<div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-indigo-600 via-purple-700 to-blue-800 p-12 flex-col justify-between relative overflow-hidden">
+			<div className="hidden lg:flex lg:w-1/2 p-12 flex-col justify-between relative overflow-hidden">
 				<div className="absolute inset-0 opacity-10">
 					<div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
-					<div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-300 rounded-full blur-3xl"></div>
+					<div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-600 rounded-full blur-3xl"></div>
 				</div>
 
 				<div className="relative z-10">
@@ -32,7 +45,7 @@ export default async function SignUpPage() {
 							<br />
 							Journey Today
 						</h1>
-						<p className="text-xl text-purple-100 max-w-md mb-8">
+<p className="text-xl text-blue-200 max-w-md mb-8">
 							Join thousands of pilots tracking their flight hours and building
 							their aviation career.
 						</p>
@@ -59,7 +72,7 @@ export default async function SignUpPage() {
 				</div>
 
 				<div className="relative z-10">
-					<p className="text-purple-200 text-sm">
+					<p className="text-blue-300 text-sm">
 						&ldquo;This logbook has transformed how I track my hours. It&rsquo;s intuitive,
 						reliable, and exactly what I needed.&rdquo;
 					</p>
@@ -70,25 +83,53 @@ export default async function SignUpPage() {
 			</div>
 
 			{/* Right Side - Sign Up Form */}
-			<div className="flex-1 flex items-center justify-center p-8 bg-zinc-50">
+			<div className="flex-1 flex items-center justify-center p-8">
 				<div className="w-full max-w-md">
+					<Link href="/" className="inline-flex items-center gap-2 text-sm text-blue-300 hover:text-white transition-colors mb-6">
+						<ArrowLeft className="h-4 w-4" aria-hidden />
+						Back to home
+					</Link>
 					<div className="lg:hidden mb-8 text-center">
 						<div className="flex items-center justify-center gap-2 mb-4">
-							<Plane className="w-6 h-6 text-indigo-600" />
-							<span className="text-2xl font-bold text-gray-900">
+							<Plane className="w-6 h-6 text-blue-600" />
+							<span className="text-2xl font-bold text-foreground">
 								Pilot Logbook
 							</span>
 						</div>
-						<p className="text-gray-600">Start tracking your flight hours</p>
+						<p className="text-muted-foreground">Start tracking your flight hours</p>
 					</div>
 
 					<SignUp
 						routing="hash"
-						afterSignUpUrl="/dashboard"
+						fallbackRedirectUrl="/dashboard"
 						appearance={{
+							baseTheme: theme === "dark" ? dark : undefined,
+							variables: {
+								colorPrimary: "#2563eb",
+								borderRadius: "0.75rem",
+								fontSize: "15px",
+							},
 							elements: {
 								rootBox: "w-full",
-								card: "shadow-xl border-0",
+								card: "shadow-xl border border-border bg-card",
+								headerTitle: "text-foreground",
+								headerSubtitle: "text-muted-foreground",
+								socialButtonsBlockButton: "border-border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground",
+								socialButtonsIconButton: "border-border bg-card text-card-foreground hover:bg-accent",
+								formButtonPrimary: "bg-blue-600 hover:bg-blue-700 text-white normal-case shadow-sm",
+								formFieldInput: "bg-card border-border text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+								formFieldLabel: "text-foreground",
+								identityPreviewText: "text-foreground",
+								identityPreviewEditButton: "text-muted-foreground hover:text-foreground",
+								formFieldInputShowPasswordButton: "text-muted-foreground hover:text-foreground",
+								otpCodeFieldInput: "bg-card border-border text-foreground",
+								formResendCodeLink: "text-blue-600 hover:text-blue-700",
+								footerActionLink: "text-blue-600 hover:text-blue-700",
+								formHeaderTitle: "text-foreground",
+								formHeaderSubtitle: "text-muted-foreground",
+								dividerLine: "bg-border",
+								dividerText: "text-muted-foreground",
+								logoImage: "brightness-100 dark:brightness-100",
 							},
 						}}
 					/>
