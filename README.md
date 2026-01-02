@@ -24,10 +24,19 @@ A comprehensive flight logging and pilot management application built with the T
 - **Secure Authentication**: Powered by Clerk for robust user authentication
 
 ### 🔐 Admin Dashboard
-- **User Statistics**: View total users, pilots, and pending actions
-- **User Management**: Promote users to different roles (Admin/Pilot)
+- **System Statistics**: View total users, flights, and aircraft counts
+- **Pilot Verifications**: Dedicated page to verify/revoke pilot accounts
+- **User Management**: View all users with role management and deletion
+- **User Deletion**: Safely delete users with confirmation requirements
+- **Role Management**: Promote users to Pilot or Admin roles
 - **Recent Activity**: Monitor recent user registrations and activity
-- **System Overview**: Get insights into platform usage and metrics
+
+### 🎨 User Experience
+- **Dark/Light Theme**: System-aware theme with manual override
+- **Theme Persistence**: Saved preferences synced across devices
+- **Responsive Design**: Mobile-first design that works on all devices
+- **Accessibility**: ARIA labels and semantic HTML throughout
+- **Loading States**: Skeleton loaders and loading indicators
 
 ## Tech Stack
 
@@ -39,7 +48,10 @@ A comprehensive flight logging and pilot management application built with the T
 - **API Layer**: [tRPC](https://trpc.io/) for type-safe APIs
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: Custom components with [Lucide React](https://lucide.dev/) icons
+- **Theming**: [next-themes](https://github.com/pacocoursey/next-themes) for dark/light mode
 - **State Management**: [TanStack Query](https://tanstack.com/query/latest) (React Query)
+- **Testing**: [Vitest](https://vitest.dev/) with 70+ comprehensive unit tests
+- **Charts**: [Recharts](https://recharts.org/) for data visualization
 
 ## Prerequisites
 
@@ -134,8 +146,12 @@ You can find your Clerk user ID in the Clerk Dashboard or in your browser's deve
 - `npm run build` - Build the application for production
 - `npm start` - Start the production server
 - `npm run lint` - Run ESLint to check code quality
+- `npm run test` - Run all tests with Vitest
+- `npm run test:ui` - Run tests with interactive UI
+- `npm run test:coverage` - Generate test coverage report
 - `npm run typecheck` - Run TypeScript type checking
 - `npm run make:admin <clerkUserId>` - Promote a user to admin role
+- `npm run sync:admin-role` - Sync admin roles from database to Clerk metadata
 
 ## Project Structure
 
@@ -144,19 +160,26 @@ pilothandbook/
 ├── app/                    # Next.js App Router pages
 │   ├── api/               # API routes (tRPC, webhooks)
 │   ├── admin/             # Admin dashboard pages
+│   │   ├── users/        # User management
+│   │   └── verifications/ # Pilot verifications
 │   ├── dashboard/         # User dashboard
-│   ├── sign-in/           # Authentication pages
+│   ├── flights/          # Flight logging pages
+│   ├── aircraft/         # Aircraft management
+│   ├── settings/         # User settings & preferences
+│   ├── sign-in/          # Authentication pages
 │   └── sign-up/
 ├── components/            # React components
 │   ├── admin/            # Admin-specific components
 │   ├── landing/          # Landing page components
 │   └── ui/               # Reusable UI components
 ├── lib/                   # Utility functions and configurations
+│   └── hooks/            # Custom React hooks
 ├── prisma/               # Prisma schema and migrations
 ├── server/               # tRPC server configuration
 │   └── routers/          # tRPC routers
 ├── trpc/                 # tRPC client setup
-└── scripts/              # Utility scripts
+├── scripts/              # Utility scripts
+└── __tests__/            # Test files (70+ tests)
 ```
 
 ## Database Schema
@@ -166,9 +189,25 @@ The application uses the following main models:
 - **User**: User accounts with role-based permissions
 - **Aircraft**: Aircraft registry with specifications
 - **Flight**: Flight log entries with detailed information
-- **Preferences**: User preferences and settings
+- **UserPreferences**: User preferences including theme and settings
 
 See `prisma/schema.prisma` for the complete schema definition.
+
+## Testing
+
+The application includes a comprehensive test suite with **70+ tests** covering:
+
+- **Flight Router**: CRUD operations, filtering, time calculations
+- **Aircraft Router**: Fleet management, validation, statistics
+- **Stats Router**: Analytics, 90-day recency, summary calculations
+- **Security**: Authorization, user isolation, RBAC enforcement
+
+Run tests with:
+```bash
+npm run test          # Run all tests
+npm run test:ui       # Interactive test UI
+npm run test:coverage # Coverage report
+```
 
 ## Deployment
 
