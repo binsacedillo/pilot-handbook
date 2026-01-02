@@ -10,7 +10,7 @@ import { deriveRoleFromClerkUser } from "@/lib/admin-config";
  * 1. CONTEXT
  * This section defines the "contexts" that are available in the backend API.
  */
-export const createTRPCContext = async (opts: { headers: Headers }) => {
+export const createTRPCContext = async (opts: { req: Request }) => {
   // Get the session from Clerk
   const { userId } = await auth();
 
@@ -19,7 +19,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
     session: {
       userId: userId || null,
     },
-    ...opts,
+    headers: opts.req.headers,
   };
 };
 
