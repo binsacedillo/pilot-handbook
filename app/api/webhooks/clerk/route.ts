@@ -80,7 +80,6 @@ export async function POST(req: Request) {
     return new Response("Error processing webhook", { status: 500 });
   }
 }
-}
 
 interface ClerkWebhookEvent {
   type: "user.created" | "user.updated" | string;
