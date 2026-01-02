@@ -19,10 +19,9 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             staleTime: 5 * 1000,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            retry: (failureCount, error: any) => {
+            retry: (failureCount, error: unknown) => {
               // Retry UNAUTHORIZED errors once (handles auth race condition)
-              if (error?.data?.code === 'UNAUTHORIZED' && failureCount < 1) {
+              if ((error as { data?: { code?: string } })?.data?.code === 'UNAUTHORIZED' && failureCount < 1) {
                 return true;
               }
               return failureCount < 3;
