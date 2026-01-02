@@ -19,7 +19,7 @@ export const flightRouter = createTRPCRouter({
         return [];
       }
 
-      const filters: any = {
+      const filters: Record<string, unknown> = {
         userId: ctx.user.id,
       };
 
