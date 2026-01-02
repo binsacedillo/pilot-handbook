@@ -14,9 +14,9 @@ import { useState, useEffect } from "react";
 export default function EditAircraftPage() {
 	const router = useRouter();
 	const params = useParams();
-	const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
+	const id = typeof params.id === "string" ? params.id : (Array.isArray(params.id) ? params.id[0] : "") || "";
 	const utils = trpc.useUtils();
-	const { data: aircraft, isLoading } = trpc.aircraft.getById.useQuery({ id }, { enabled: !!id });
+	const { data: aircraft, isLoading } = trpc.aircraft.getById.useQuery({ id: id! }, { enabled: !!id });
 	const updateAircraft = trpc.aircraft.update.useMutation({
 		onSuccess: async () => {
 			await utils.aircraft.getAll.invalidate();
