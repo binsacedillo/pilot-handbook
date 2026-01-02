@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'production') {
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   datasource: {
-    // Use DIRECT_URL for migrations (Session Mode - Port 5432)
-    url: env('DIRECT_URL'),
+    // Use DATABASE_URL for production, fallback to DIRECT_URL for development
+    url: env('DATABASE_URL') || env('DIRECT_URL'),
   },
 })
