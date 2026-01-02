@@ -37,76 +37,115 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                 
                 {/* Stats Cards */}
                 <section aria-label="Flight Statistics" className="mb-8">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                        {/* Total Aircraft */}
-                        <Card role="status" aria-live="polite" aria-label="Total aircraft count">
+                    {/* Mobile: Simple List View */}
+                    <Card className="sm:hidden">
+                        <CardContent className="p-4">
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-3">Flight Statistics</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between py-2 border-b">
+                                    <div className="flex items-center gap-2">
+                                        <Plane className="h-4 w-4 text-blue-500" />
+                                        <span className="text-sm">Aircraft</span>
+                                    </div>
+                                    <span className="text-lg font-bold">{aircraft?.length ?? 0}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b">
+                                    <div className="flex items-center gap-2">
+                                        <TrendingUp className="h-4 w-4 text-green-500" />
+                                        <span className="text-sm">Total Flights</span>
+                                    </div>
+                                    <span className="text-lg font-bold">{stats.totalFlights ?? 0}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b">
+                                    <div className="flex items-center gap-2">
+                                        <Clock className="h-4 w-4 text-orange-500" />
+                                        <span className="text-sm">Flight Hours</span>
+                                    </div>
+                                    <span className="text-lg font-bold">{stats.totalHours?.toFixed(1) ?? "0.0"}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b">
+                                    <span className="text-sm">PIC Hours</span>
+                                    <span className="text-lg font-bold">{stats.totalPicHours?.toFixed(1) ?? "0.0"}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b">
+                                    <span className="text-sm">Dual Hours</span>
+                                    <span className="text-lg font-bold">{stats.totalDualHours?.toFixed(1) ?? "0.0"}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2">
+                                    <span className="text-sm">Total Landings</span>
+                                    <span className="text-lg font-bold">{stats.totalLandings ?? 0}</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Tablet & Desktop: Grid Cards */}
+                    <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <Card>
                             <CardHeader className="pb-2">
                                 <div className="flex items-center gap-2">
-                                    <Plane className="h-4 w-4 text-blue-500" aria-hidden="true" />
-                                    <CardTitle className="text-xs sm:text-sm">Aircraft</CardTitle>
+                                    <Plane className="h-4 w-4 text-blue-500" />
+                                    <CardTitle className="text-sm">Aircraft</CardTitle>
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <span className="text-2xl sm:text-3xl font-semibold" aria-describedby="aircraft-label">{aircraft?.length ?? 0}</span>
-                                <p id="aircraft-label" className="text-xs text-muted-foreground mt-1">Total</p>
+                                <div className="text-2xl font-bold">{aircraft?.length ?? 0}</div>
+                                <p className="text-xs text-muted-foreground mt-1">Total</p>
                             </CardContent>
                         </Card>
 
-                        {/* Total Flights */}
-                        <Card role="status" aria-live="polite" aria-label="Total flights count">
+                        <Card>
                             <CardHeader className="pb-2">
                                 <div className="flex items-center gap-2">
-                                    <TrendingUp className="h-4 w-4 text-green-500" aria-hidden="true" />
-                                    <CardTitle className="text-xs sm:text-sm">Flights</CardTitle>
+                                    <TrendingUp className="h-4 w-4 text-green-500" />
+                                    <CardTitle className="text-sm">Flights</CardTitle>
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <span className="text-2xl sm:text-3xl font-semibold" aria-describedby="flights-label">{stats.totalFlights ?? 0}</span>
-                                <p id="flights-label" className="text-xs text-muted-foreground mt-1">Total</p>
+                                <div className="text-2xl font-bold">{stats.totalFlights ?? 0}</div>
+                                <p className="text-xs text-muted-foreground mt-1">Total</p>
                             </CardContent>
                         </Card>
 
-                        {/* Total Hours */}
-                        <Card role="status" aria-live="polite" aria-label="Total flight hours" className="sm:col-span-2 lg:col-span-1">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-xs sm:text-sm font-medium">Flight Hours</CardTitle>
-                                <Clock className="h-4 w-4 text-orange-500" aria-hidden="true" />
+                        <Card className="sm:col-span-2 lg:col-span-1">
+                            <CardHeader className="pb-2">
+                                <div className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4 text-orange-500" />
+                                    <CardTitle className="text-sm">Flight Hours</CardTitle>
+                                </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl sm:text-3xl font-bold">{stats.totalHours?.toFixed(1) ?? "0.0"}</div>
+                                <div className="text-2xl font-bold">{stats.totalHours?.toFixed(1) ?? "0.0"}</div>
                                 <p className="text-xs text-muted-foreground mt-1">hrs</p>
                             </CardContent>
                         </Card>
 
-                        {/* PIC Hours */}
-                        <Card role="status" aria-live="polite" aria-label="Pilot in command hours">
+                        <Card>
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-xs sm:text-sm">PIC</CardTitle>
+                                <CardTitle className="text-sm">PIC</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <span className="text-2xl sm:text-3xl font-semibold">{stats.totalPicHours?.toFixed(1) ?? "0.0"}</span>
+                                <div className="text-2xl font-bold">{stats.totalPicHours?.toFixed(1) ?? "0.0"}</div>
                                 <p className="text-xs text-muted-foreground mt-1">hrs</p>
                             </CardContent>
                         </Card>
 
-                        {/* Dual Hours */}
-                        <Card role="status" aria-live="polite" aria-label="Dual instruction hours">
+                        <Card>
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-xs sm:text-sm">Dual</CardTitle>
+                                <CardTitle className="text-sm">Dual</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <span className="text-2xl sm:text-3xl font-semibold">{stats.totalDualHours?.toFixed(1) ?? "0.0"}</span>
+                                <div className="text-2xl font-bold">{stats.totalDualHours?.toFixed(1) ?? "0.0"}</div>
                                 <p className="text-xs text-muted-foreground mt-1">hrs</p>
                             </CardContent>
                         </Card>
 
-                        {/* Landings */}
-                        <Card role="status" aria-live="polite" aria-label="Total landings">
+                        <Card>
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-xs sm:text-sm">Landings</CardTitle>
+                                <CardTitle className="text-sm">Landings</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <span className="text-2xl sm:text-3xl font-semibold">{stats.totalLandings ?? 0}</span>
+                                <div className="text-2xl font-bold">{stats.totalLandings ?? 0}</div>
                                 <p className="text-xs text-muted-foreground mt-1">total</p>
                             </CardContent>
                         </Card>
