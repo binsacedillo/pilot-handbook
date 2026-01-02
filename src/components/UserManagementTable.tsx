@@ -4,10 +4,18 @@ import { trpc } from '@/trpc/client';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DeleteDialog } from '@/components/DeleteDialog';
+import { Trash2 } from 'lucide-react';
 
 const UserManagementTable = () => {
   // Only pagination is used; search argument removed as backend does not support it
   const [page, setPage] = useState(0);
+  const [deleteDialogState, setDeleteDialogState] = useState<{
+    open: boolean;
+    userId: string | null;
+    userName: string | null;
+  }>({ open: false, userId: null, userName: null });
+
   const { data, isLoading } = trpc.admin.getAllUsers.useQuery({
     skip: page * 10,
     take: 10,
@@ -29,6 +37,16 @@ const UserManagementTable = () => {
     },
   });
 
+  const deleteUserMutation = trpc.admin.deleteUser.useMutation({
+    onSuccess: () => {
+      router.refresh();
+      setDeleteDialogState({ open: false, userId: null, userName: null });
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+
   // Role change is not implemented, so we do not handle it here
 
   const handleTogglePilotVerification = (
@@ -40,6 +58,19 @@ const UserManagementTable = () => {
       userId,
       verified: action === 'verify',
     });
+  };
+
+  const handleDeleteClick = (userId: string, userName: string) => {
+    setDeleteDialogState({
+      open: true,
+      userId,
+      userName,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteDialogState.userId) return;
+    deleteUserMutation.mutate({ userId: deleteDialogState.userId });
   };
 
   if (isLoading) {
@@ -86,24 +117,34 @@ const UserManagementTable = () => {
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <select
-                    className="border border-input bg-background px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer hover:bg-muted/50 transition"
-                    defaultValue=""
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (!value) return;
-                      if (value === 'verify') {
-                        handleTogglePilotVerification(user.id, 'verify');
-                      } else if (value === 'unverify') {
-                        handleTogglePilotVerification(user.id, 'unverify');
-                      }
-                      e.target.value = '';
-                    }}
-                  >
-                    <option value="">Select action</option>
-                    <option value="verify">Verify Pilot</option>
-                    <option value="unverify">Unverify Pilot</option>
-                  </select>
+                  <div className="flex items-center gap-2">
+                    <select
+                      className="border border-input bg-background px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer hover:bg-muted/50 transition"
+                      defaultValue=""
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (!value) return;
+                        if (value === 'verify') {
+                          handleTogglePilotVerification(user.id, 'verify');
+                        } else if (value === 'unverify') {
+                          handleTogglePilotVerification(user.id, 'unverify');
+                        }
+                        e.target.value = '';
+                      }}
+                    >
+                      <option value="">Select action</option>
+                      <option value="verify">Verify Pilot</option>
+                      <option value="unverify">Unverify Pilot</option>
+                    </select>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteClick(user.id, `${user.firstName} ${user.lastName}`)}
+                      title="Delete user"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                   {/*
                     Promote/Demote Admin button and mutation are commented out for now.
                     Uncomment and implement when backend is ready.
@@ -144,6 +185,17 @@ const UserManagementTable = () => {
           </Button>
         </div>
       </div>
+
+      <DeleteDialog
+        open={deleteDialogState.open}
+        onOpenChange={(open) => setDeleteDialogState({ open, userId: null, userName: null })}
+        title="Delete User"
+        description="⚠️ CRITICAL: This will permanently delete this user's account and ALL their flight data. This includes all flight hours, aircraft records, and logbook entries. This action CANNOT be undone and may affect the pilot's legal records."
+        itemName={deleteDialogState.userName || undefined}
+        isLoading={deleteUserMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        requireConfirmText="DELETE"
+      />
     </Card>
   );
 };

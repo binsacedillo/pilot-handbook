@@ -62,4 +62,19 @@ export const adminRouter = createTRPCRouter({
         data: { role: input.verified ? "PILOT" : "USER" },
       });
     }),
+
+  // 5. Delete User
+  deleteUser: adminProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      // Prevent admin from deleting themselves
+      if (ctx.user.id === input.userId) {
+        throw new Error("Cannot delete your own account");
+      }
+
+      // Delete user and cascade delete their related data (flights, aircraft)
+      return ctx.db.user.delete({
+        where: { id: input.userId },
+      });
+    }),
 });
