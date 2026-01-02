@@ -1,25 +1,21 @@
 
-import { appRouter } from "@/server/routers/_app";
-import { createTRPCContext } from "@/server/trpc";
-import { requireAuth } from "@/lib/auth";
+import { getCurrentUserFull } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import DashboardClient from "./dashboard-client";
 
 export default async function Page() {
-  // 0. Ensure user is authenticated and exists in database
-  await requireAuth();
+  // 1. Ensure user is authenticated and exists in database
+  const user = await getCurrentUserFull();
+  
+  if (!user) {
+    redirect("/sign-in");
+  }
 
-  // 1. Create tRPC context for the server with a valid Request object
-  const context = await createTRPCContext({ req: new Request("http://localhost:3000") });
-  const caller = appRouter.createCaller(context);
+  // 2. Use the user's relations directly instead of calling tRPC
+  const flights = user.flights || [];
+  const aircraft = user.aircraft || [];
 
-  // 2. Fetch data using tRPC server helpers
-  const [flights, aircraft] = await Promise.all([
-    caller.flight.getAll({}),
-    caller.aircraft.getAll(),
-  ]);
-
-
-  // 3. Calculate stats as before
+  // 3. Calculate stats from user data
   const totalFlights = flights.length;
   const totalHours = flights.reduce((sum, f) => sum + (f.duration || 0), 0);
   const totalPicHours = flights.reduce((sum, f) => sum + (f.picTime || 0), 0);
@@ -34,6 +30,6 @@ export default async function Page() {
     totalLandings,
   };
 
-  // 4. Pass data to client component with new prop names
+  // 4. Pass data to client component
   return <DashboardClient initialStats={stats} initialFlights={flights} initialAircraft={aircraft} />;
 }
