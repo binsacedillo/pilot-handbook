@@ -8,6 +8,8 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 export interface DeleteDialogProps {
   open: boolean;
@@ -17,6 +19,8 @@ export interface DeleteDialogProps {
   itemName?: string;
   isLoading?: boolean;
   onConfirm: () => Promise<void> | void;
+  /** Require user to type this text to confirm deletion (e.g., "DELETE") */
+  requireConfirmText?: string;
 }
 
 export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
@@ -29,10 +33,21 @@ export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
       itemName,
       isLoading = false,
       onConfirm,
+      requireConfirmText,
     },
     ref
   ) => {
     const [isDeleting, setIsDeleting] = React.useState(false);
+    const [confirmText, setConfirmText] = React.useState("");
+
+    // Reset confirmation text when dialog opens/closes
+    React.useEffect(() => {
+      if (!open) {
+        setConfirmText("");
+      }
+    }, [open]);
+
+    const isConfirmTextValid = !requireConfirmText || confirmText === requireConfirmText;
 
     const handleDelete = async () => {
       try {
@@ -63,6 +78,23 @@ export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
             )}
             {itemName && <span>?</span>}
           </DialogDescription>
+
+          {requireConfirmText && (
+            <div className="space-y-2 pb-4">
+              <Label htmlFor="confirm-text" className="text-sm font-medium">
+                Type <span className="font-bold text-destructive">{requireConfirmText}</span> to confirm:
+              </Label>
+              <Input
+                id="confirm-text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder={requireConfirmText}
+                className="font-mono"
+                autoComplete="off"
+              />
+            </div>
+          )}
+
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
@@ -74,7 +106,7 @@ export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
             <Button
               variant="destructive"
               onClick={handleDelete}
-              disabled={isDeleting || isLoading}
+              disabled={isDeleting || isLoading || !isConfirmTextValid}
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </Button>
