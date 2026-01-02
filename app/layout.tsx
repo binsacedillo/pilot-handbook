@@ -15,6 +15,18 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Pilot Handbook",
   description: "Your personal pilot logbook",
+  icons: {
+    icon: [
+      {
+        url: "/favicon.ico",
+        sizes: "any",
+      },
+      {
+        url: "/logo.png",
+        type: "image/png",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
