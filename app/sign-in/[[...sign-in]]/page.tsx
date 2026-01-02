@@ -86,7 +86,9 @@ export default function SignInPage() {
 					</div>
 
 					<SignIn
-						routing="hash"
+						routing="path"
+						path="/sign-in"
+						signUpUrl="/sign-up"
 						fallbackRedirectUrl="/dashboard"
 						appearance={{
 							baseTheme: theme === "dark" ? dark : undefined,

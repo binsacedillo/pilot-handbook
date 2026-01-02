@@ -8,6 +8,10 @@ import {
 	UserPlus,
 	ClipboardList,
 	LucideIcon,
+	Check,
+	FileText,
+	Headphones,
+	Cloud,
 } from "lucide-react";
 
 export interface Feature {
@@ -110,6 +114,66 @@ export const footerSections: FooterSection[] = [
 			{ label: "Privacy", href: "/sign-up" },
 			{ label: "Terms", href: "/sign-up" },
 			{ label: "Security", href: "/sign-up" },
+		],
+	},
+];
+
+export interface PricingFeature {
+	name: string;
+	included: boolean;
+}
+
+export interface PricingPlan {
+	name: string;
+	description: string;
+	price: string;
+	period: string;
+	features: PricingFeature[];
+	cta: string;
+	ctaHref: string;
+	highlighted: boolean;
+	badge?: string;
+}
+
+export const pricingPlans: PricingPlan[] = [
+	{
+		name: "Free",
+		description: "Perfect for student pilots and flight training in the Philippines",
+		price: "Free",
+		period: "Forever",
+		highlighted: false,
+		badge: undefined,
+		cta: "Get Started",
+		ctaHref: "/sign-up",
+		features: [
+			{ name: "Unlimited flight logging", included: true },
+			{ name: "Aircraft fleet management", included: true },
+			{ name: "Flight statistics & analytics", included: true },
+			{ name: "Cloud backup (7 days)", included: true },
+			{ name: "90-day recency tracking", included: true },
+			{ name: "PDF export (CAAP-ready)", included: false },
+			{ name: "Priority support", included: false },
+			{ name: "Advanced reporting", included: false },
+		],
+	},
+	{
+		name: "Pro",
+		description: "For commercial pilots and flight schools across the Philippines",
+		price: "₱549",
+		period: "per month",
+		highlighted: true,
+		badge: "Coming Soon",
+		cta: "Learn More",
+		ctaHref: "/sign-up",
+		features: [
+			{ name: "Unlimited flight logging", included: true },
+			{ name: "Aircraft fleet management", included: true },
+			{ name: "Flight statistics & analytics", included: true },
+			{ name: "Cloud backup (unlimited)", included: true },
+			{ name: "90-day recency tracking", included: true },
+			{ name: "PDF export (CAAP-ready)", included: true },
+			{ name: "Priority support (PH time zone)", included: true },
+			{ name: "Advanced reporting", included: true },
 		],
 	},
 ];

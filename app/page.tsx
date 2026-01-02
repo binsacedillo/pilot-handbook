@@ -6,6 +6,7 @@ import Navigation from "@/components/landing/Navigation";
 import Hero from "@/components/landing/Hero";
 import Features from "@/components/landing/Features";
 import HowItWorks from "@/components/landing/HowItWorks";
+import Pricing from "@/components/landing/Pricing";
 import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
 import { SignedOut } from "@clerk/nextjs";
@@ -42,6 +43,7 @@ export default async function Home() {
       <Hero totalFlightHours={totalHours} />
       <Features />
       <HowItWorks />
+      <Pricing />
       <CTASection />
       <Footer />
     </main>

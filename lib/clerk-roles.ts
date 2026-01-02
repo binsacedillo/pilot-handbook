@@ -1,6 +1,7 @@
 import "server-only";
 import { currentUser, auth } from "@clerk/nextjs/server";
 import { db } from "./db";
+import { deriveRoleFromClerkUser } from "./admin-config";
 
 /**
  * User role type from Clerk public metadata
@@ -43,7 +44,21 @@ export async function syncClerkUserToPrisma(
   }
 ) {
   const primaryEmail = userData.email_addresses?.[0]?.email_address || "";
-  const role = (userData.public_metadata?.role as UserRole) || "USER";
+
+  // Preserve existing role if present; otherwise derive from metadata/env allowlist
+  const existing = await db.user.findUnique({
+    where: { clerkId: clerkUserId },
+    select: { role: true },
+  });
+
+  const metadataRole = (userData.public_metadata?.role as UserRole) || undefined;
+  const derivedRole = metadataRole ?? existing?.role ?? deriveRoleFromClerkUser({
+    id: clerkUserId,
+    emailAddresses: [{ emailAddress: primaryEmail }],
+    privateMetadata: userData.public_metadata ?? {},
+    publicMetadata: userData.public_metadata ?? {},
+  } as any);
+  const role = derivedRole || "USER";
 
   const user = await db.user.upsert({
     where: { clerkId: clerkUserId },
