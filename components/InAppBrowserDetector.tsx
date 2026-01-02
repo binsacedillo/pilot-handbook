@@ -1,30 +1,31 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 
-export function InAppBrowserDetector() {
-  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
+// Detect common in-app browsers
+const detectInAppBrowser = () => {
+  if (typeof window === 'undefined') return false;
+  
+  const userAgent = navigator.userAgent || navigator.vendor;
+  const inAppBrowserPatterns = [
+    /FBAN|FBAV/i,        // Facebook
+    /Instagram/i,         // Instagram
+    /Messenger/i,         // Messenger
+    /Line\//i,           // Line
+    /Twitter/i,          // Twitter
+    /MicroMessenger/i,   // WeChat
+    /Snapchat/i,         // Snapchat
+    /TikTok/i,           // TikTok
+  ];
+  
+  return inAppBrowserPatterns.some(pattern => pattern.test(userAgent));
+};
 
-  useEffect(() => {
-    const userAgent = navigator.userAgent || navigator.vendor;
-    
-    // Detect common in-app browsers
-    const inAppBrowserPatterns = [
-      /FBAN|FBAV/i,        // Facebook
-      /Instagram/i,         // Instagram
-      /Messenger/i,         // Messenger
-      /Line\//i,           // Line
-      /Twitter/i,          // Twitter
-      /MicroMessenger/i,   // WeChat
-      /Snapchat/i,         // Snapchat
-      /TikTok/i,           // TikTok
-    ];
-    
-    const isInApp = inAppBrowserPatterns.some(pattern => pattern.test(userAgent));
-    setIsInAppBrowser(isInApp);
-  }, []);
+export function InAppBrowserDetector() {
+  // Use lazy initializer to detect on mount without effect
+  const [isInAppBrowser] = useState(detectInAppBrowser);
 
   if (!isInAppBrowser) return null;
 
