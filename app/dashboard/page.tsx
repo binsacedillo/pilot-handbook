@@ -1,15 +1,18 @@
 
 import { appRouter } from "@/server/routers/_app";
 import { createTRPCContext } from "@/server/trpc";
+import { requireAuth } from "@/lib/auth";
 import DashboardClient from "./dashboard-client";
 
 export default async function Page() {
-  // 1. Create tRPC context for the server (headers must be a valid Headers object)
-  const context = await createTRPCContext({ headers: new Headers() });
+  // 0. Ensure user is authenticated and exists in database
+  await requireAuth();
+
+  // 1. Create tRPC context for the server with a valid Request object
+  const context = await createTRPCContext({ req: new Request("http://localhost:3000") });
   const caller = appRouter.createCaller(context);
 
   // 2. Fetch data using tRPC server helpers
-
   const [flights, aircraft] = await Promise.all([
     caller.flight.getAll({}),
     caller.aircraft.getAll(),
