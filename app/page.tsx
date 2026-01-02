@@ -1,6 +1,5 @@
-
-
-
+// Force dynamic rendering to ensure real-time flight stats
+export const dynamic = 'force-dynamic';
 
 import Navigation from "@/components/landing/Navigation";
 import Hero from "@/components/landing/Hero";
