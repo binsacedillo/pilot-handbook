@@ -19,7 +19,6 @@ model User {
   updatedAt       DateTime         @updatedAt
   aircraft        Aircraft[]
   flights         Flight[]
-  Preferences     Preferences?
   userPreferences UserPreferences?
 }
 
@@ -75,15 +74,7 @@ model UserPreferences {
   @@map("user_preferences")
 }
 
-model Preferences {
-  id            String   @id
-  userId        String   @unique
-  theme         String   @default("light")
-  notifications Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime
-  User          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
+
 
 enum UserRole {
   ADMIN
