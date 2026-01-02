@@ -1,5 +1,6 @@
 import "server-only";
-import { currentUser, auth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
+import type { User as ClerkUser } from "@clerk/nextjs/server";
 import { db } from "./db";
 import { deriveRoleFromClerkUser } from "./admin-config";
 
@@ -57,7 +58,7 @@ export async function syncClerkUserToPrisma(
     emailAddresses: [{ emailAddress: primaryEmail }],
     privateMetadata: userData.public_metadata ?? {},
     publicMetadata: userData.public_metadata ?? {},
-  } as any);
+  } as Partial<ClerkUser>);
   const role = derivedRole || "USER";
 
   const user = await db.user.upsert({
