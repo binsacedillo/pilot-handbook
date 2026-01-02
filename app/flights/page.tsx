@@ -19,7 +19,7 @@ export default function FlightsPage() {
     search: searchParams.get("search") || undefined,
     startDate: searchParams.get("startDate") || undefined,
     endDate: searchParams.get("endDate") || undefined,
-    flightType: (searchParams.get("flightType") as any) || undefined,
+    flightType: searchParams.get("flightType") || undefined,
   };
 
   const { data: flights } = trpc.flight.getAll.useQuery(filters);
