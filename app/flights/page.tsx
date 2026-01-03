@@ -15,11 +15,16 @@ import { FlightFilterBar } from "@/src/components/flights/FlightFilterBar";
 export default function FlightsPage() {
   const searchParams = useSearchParams();
 
+  const flightTypeValue = searchParams.get("flightType");
+  const isValidFlightType = (value: string | null): value is "PIC" | "DUAL" | "SOLO" => {
+    return value === "PIC" || value === "DUAL" || value === "SOLO";
+  };
+  
   const filters = {
     search: searchParams.get("search") || undefined,
     startDate: searchParams.get("startDate") || undefined,
     endDate: searchParams.get("endDate") || undefined,
-    flightType: searchParams.get("flightType") || undefined,
+    flightType: isValidFlightType(flightTypeValue) ? flightTypeValue : undefined,
   };
 
   const { data: flights } = trpc.flight.getAll.useQuery(filters);

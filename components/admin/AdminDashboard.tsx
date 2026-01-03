@@ -8,6 +8,13 @@ export default function AdminDashboard() {
   const { data: stats, isLoading: statsLoading } = trpc.admin.getStats.useQuery();
   const { data: users, isLoading: usersLoading } = trpc.admin.recentUsers.useQuery();
 
+  // Map totalUsers to display
+  const userCount = stats?.totalUsers ?? 0;
+  // Calculate pilot count from stats (users with at least one flight)
+  const pilotCount = 0; // TODO: Add proper calculation from stats
+  // Calculate pending from stats
+  const pendingCount = 0; // TODO: Add proper calculation from stats
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -24,19 +31,19 @@ export default function AdminDashboard() {
         <div className="rounded-lg border p-4">
           <div className="text-sm text-slate-500">Users</div>
           <div className="text-3xl font-semibold">
-            {statsLoading ? "—" : stats?.userCount ?? 0}
+            {statsLoading ? "—" : userCount}
           </div>
         </div>
         <div className="rounded-lg border p-4">
           <div className="text-sm text-slate-500">Pilots</div>
           <div className="text-3xl font-semibold">
-            {statsLoading ? "—" : stats?.pilotCount ?? 0}
+            {statsLoading ? "—" : pilotCount}
           </div>
         </div>
         <div className="rounded-lg border p-4">
           <div className="text-sm text-slate-500">Pending</div>
           <div className="text-3xl font-semibold">
-            {statsLoading ? "—" : stats?.pendingCount ?? 0}
+            {statsLoading ? "—" : pendingCount}
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
 import DevWarningBanner from "@/components/DevWarningBanner";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Pilot Handbook",

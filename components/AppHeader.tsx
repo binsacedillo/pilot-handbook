@@ -12,7 +12,7 @@ export default function AppHeader() {
 	const { user, isLoaded } = useUser();
 	const isAdmin =
 		user?.publicMetadata?.role === "ADMIN" ||
-		user?.privateMetadata?.role === "ADMIN";
+		(user?.publicMetadata as any)?.role === "ADMIN";
 	const pathname = usePathname();
 	const isAdminPage = pathname?.startsWith("/admin");
 	// ...removed theme logic

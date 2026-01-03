@@ -1,7 +1,7 @@
 "use client";
 
 import { trpc } from "@/trpc/client";
-import type { RouterOutputs } from "@/trpc/shared";
+import type { RouterOutputs } from "@/src/trpc/shared";
 import BackButton from "@/components/BackToDashboardButton";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 

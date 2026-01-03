@@ -54,18 +54,21 @@ export default function FlightForm({ initialData }: FlightFormProps) {
     // Optimistic update
     onMutate: async (newFlight) => {
       await utils.flight.getAll.cancel();
-      const previousFlights = utils.flight.getAll.getData();
+      const previousFlights = utils.flight.getAll.getData({} as any);
       if (previousFlights) {
-        utils.flight.getAll.setData(undefined, [
-          { ...newFlight, id: "optimistic", aircraft: aircraft?.find(a => a.id === newFlight.aircraftId) },
-          ...previousFlights,
-        ]);
+        const selectedAircraft = aircraft?.find(a => a.id === newFlight.aircraftId);
+        if (selectedAircraft) {
+          utils.flight.getAll.setData({} as any, [
+            { ...newFlight, id: "optimistic", aircraft: selectedAircraft } as any,
+            ...previousFlights,
+          ]);
+        }
       }
       return { previousFlights };
     },
     onError: (_err, _newFlight, context) => {
       if (context?.previousFlights) {
-        utils.flight.getAll.setData(undefined, context.previousFlights);
+        utils.flight.getAll.setData({} as any, context.previousFlights);
       }
     },
     onSettled: async () => {
@@ -81,15 +84,15 @@ export default function FlightForm({ initialData }: FlightFormProps) {
     // Optimistic update
     onMutate: async (updatedFlight) => {
       await utils.flight.getAll.cancel();
-      const previousFlights = utils.flight.getAll.getData();
+      const previousFlights = utils.flight.getAll.getData({} as any);
       if (previousFlights) {
-        utils.flight.getAll.setData(undefined, previousFlights.map(f => f.id === updatedFlight.id ? { ...f, ...updatedFlight } : f));
+        utils.flight.getAll.setData({} as any, previousFlights.map(f => f.id === updatedFlight.id ? { ...f, ...updatedFlight } : f));
       }
       return { previousFlights };
     },
     onError: (_err, _updatedFlight, context) => {
       if (context?.previousFlights) {
-        utils.flight.getAll.setData(undefined, context.previousFlights);
+        utils.flight.getAll.setData({} as any, context.previousFlights);
       }
     },
     onSettled: async () => {

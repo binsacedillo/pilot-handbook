@@ -33,9 +33,9 @@ export const flightRouter = createTRPCRouter({
       }
 
       if (input.startDate || input.endDate) {
-        filters.date = {};
-        if (input.startDate) filters.date.gte = input.startDate;
-        if (input.endDate) filters.date.lte = input.endDate;
+        filters.date = {} as any;
+        if (input.startDate) (filters.date as any).gte = input.startDate;
+        if (input.endDate) (filters.date as any).lte = input.endDate;
       }
 
       if (input.flightType) {

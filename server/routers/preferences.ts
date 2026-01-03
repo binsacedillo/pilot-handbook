@@ -42,7 +42,7 @@ export const preferencesRouter = createTRPCRouter({
         // Only run on server
         const { clerkClient } = await import('@clerk/nextjs/server');
         const client = await clerkClient();
-        await client.users.updateUser(ctx.session.userId, {
+        await client.users.updateUser(ctx.session.userId || "", {
           publicMetadata: {
             theme: input.theme,
             unitSystem: input.unitSystem,

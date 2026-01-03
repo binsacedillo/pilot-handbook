@@ -30,6 +30,14 @@ export default async function Page() {
     totalLandings,
   };
 
-  // 4. Pass data to client component
-  return <DashboardClient initialStats={stats} initialFlights={flights} initialAircraft={aircraft} />;
+  // 4. Pass data to client component with proper aircraft relations (filter out nulls)
+  const flightsWithAircraft = flights.map((f) => {
+    const foundAircraft = aircraft.find((a) => a.id === f.aircraftId);
+    if (!foundAircraft) return null;
+    return {
+      ...f,
+      aircraft: foundAircraft,
+    };
+  }).filter((f) => f !== null) as any[];
+  return <DashboardClient initialStats={stats} initialFlights={flightsWithAircraft} initialAircraft={aircraft} />;
 }
