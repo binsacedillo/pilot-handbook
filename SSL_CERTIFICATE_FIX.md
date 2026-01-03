@@ -132,15 +132,37 @@ Make sure these are set in your Vercel deployment:
 ```bash
 # Connection string using Supabase pooler (port 6543)
 # This uses the self-signed certificate
-DATABASE_URL="postgresql://[user]:[password]@db.supabase.co:6543/postgres?schema=public&sslmode=require"
+DATABASE_URL="postgresql://[user]:[password]@db.supabase.co:6543/postgres?pgbouncer=true&sslmode=require"
 
 # For migrations only - uses direct connection (port 5432)
 # This also requires SSL but is temporary
-DIRECT_URL="postgresql://[user]:[password]@db.supabase.co:5432/postgres?schema=public&sslmode=require"
+DIRECT_URL="postgresql://[user]:[password]@db.supabase.co:5432/postgres?sslmode=require"
 
 # Must be production for the fix to apply
 NODE_ENV=production
 ```
+
+### Prisma Configuration (✅ IMPLEMENTED - Prisma 7)
+
+Your [prisma.config.ts](prisma.config.ts) is configured for automatic migration routing:
+
+```typescript
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  datasource: {
+    // Migrations use DIRECT_URL (port 5432 - direct connection)
+    // Runtime uses DATABASE_URL (port 6543 - pgBouncer) via lib/db.ts
+    url: env('DIRECT_URL') || env('DATABASE_URL'),
+  },
+})
+```
+
+**Note:** Prisma 7 moved URL configuration from `schema.prisma` to `prisma.config.ts`.
+
+With this configuration:
+- Prisma CLI (migrations) uses `DIRECT_URL` (port 5432 - direct)
+- Application runtime uses `DATABASE_URL` (port 6543 - pgBouncer) via lib/db.ts
+- No need to manually override environment variables for migrations
 
 **Important:**
 - `sslmode=require` in connection strings ensures SSL is used
