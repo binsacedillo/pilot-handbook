@@ -10,9 +10,9 @@ const nextConfig: NextConfig = {
     // ],
   },
 
-  // ⚠️ TEMPORARY: Ignore type errors to get a build out
+  // TypeScript strict error checking enabled
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 
   productionBrowserSourceMaps: false,

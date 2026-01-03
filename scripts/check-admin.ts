@@ -44,7 +44,13 @@ async function main() {
     console.error("❌ Error:", error);
   } finally {
     await db.$disconnect();
+    await pool.end();
   }
 }
 
-main();
+main().catch(async (error) => {
+  console.error("Fatal error:", error);
+  await db.$disconnect();
+  await pool.end();
+  process.exit(1);
+});
