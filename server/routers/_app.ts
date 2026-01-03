@@ -6,6 +6,7 @@ import { userRouter } from './user';
 import { adminRouter } from './admin';
 import { preferencesRouter } from './preferences';
 import { statsRouter } from './stats';
+import { weatherRouter } from './weather';
 
 /**
  * Main tRPC router
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   admin: adminRouter,
   preferences: preferencesRouter,
   stats: statsRouter,
+  weather: weatherRouter,
 });
 
 // Export type definition of the API
