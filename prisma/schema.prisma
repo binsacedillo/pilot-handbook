@@ -69,6 +69,7 @@ model UserPreferences {
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
   theme             Theme      @default(SYSTEM)
+  favoriteAirport   String?    @default("KJFK")
   user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_preferences")
