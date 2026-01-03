@@ -17,6 +17,7 @@ const preferencesSchema = z.object({
     unitSystem: z.nativeEnum(UnitSystem),
     currency: z.string().length(3, 'Currency must be 3 letters'),
     defaultAircraftId: z.string().nullable(),
+    favoriteAirport: z.string().min(4).max(4).toUpperCase().nullable(),
 });
 
 type PreferencesForm = {
@@ -24,6 +25,7 @@ type PreferencesForm = {
     unitSystem: UnitSystem;
     currency: string;
     defaultAircraftId: string | null;
+    favoriteAirport: string | null;
 };
 
 type UserPreferences = {
@@ -31,6 +33,7 @@ type UserPreferences = {
     unitSystem: UnitSystem;
     currency: string;
     defaultAircraftId: string | null;
+    favoriteAirport: string | null;
     id?: string;
     userId?: string;
     createdAt?: Date;
@@ -58,6 +61,7 @@ export function SettingsForm({ initialData, aircraft }: SettingsFormProps) {
         theme: initialData.theme,
         unitSystem: initialData.unitSystem,
         currency: initialData.currency,
+        favoriteAirport: initialData.favoriteAirport,
         defaultAircraftId: initialData.defaultAircraftId,
     });
 
@@ -98,6 +102,7 @@ export function SettingsForm({ initialData, aircraft }: SettingsFormProps) {
         form.theme !== initialData.theme ||
         form.unitSystem !== initialData.unitSystem ||
         form.currency !== initialData.currency ||
+        form.favoriteAirport !== initialData.favoriteAirport ||
         form.defaultAircraftId !== initialData.defaultAircraftId
     );
 
@@ -182,6 +187,25 @@ export function SettingsForm({ initialData, aircraft }: SettingsFormProps) {
                         {formErrors.defaultAircraftId && <p className="text-xs text-red-600">{formErrors.defaultAircraftId}</p>}
                     </div>
 
+                    {/* Favorite Airport */}
+                    <div className="space-y-2">
+                        <Label htmlFor="favoriteAirport">Favorite Airport (Weather Widget)</Label>
+                        <Input
+                            id="favoriteAirport"
+                            type="text"
+                            value={form.favoriteAirport || ''}
+                            onChange={(e) => handleChange('favoriteAirport', e.target.value.toUpperCase() || null)}
+                            placeholder="KJFK"
+                            maxLength={4}
+                            className="uppercase"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Enter 4-letter ICAO airport code (e.g., KJFK, EGLL, YSSY)
+                        </p>
+                        {formErrors.favoriteAirport && <p className="text-xs text-red-600">{formErrors.favoriteAirport}</p>}
+                    </div>
+
+                    {/* 
                     {/* Save Button */}
                     <div className="pt-4">
                         <Button

@@ -1,5 +1,10 @@
-import { Cloud, CloudRain, Sun, Wind, Eye, Thermometer } from "lucide-react";
+'use client';
+
+import { Cloud, CloudRain, Sun, Wind, Eye, Thermometer, Search } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface WeatherWidgetProps {
   metar: {
@@ -27,6 +32,8 @@ interface WeatherWidgetProps {
   };
   isLoading?: boolean;
   error?: string | null;
+  onAirportChange?: (icao: string) => void;
+  isFavorite?: boolean;
 }
 
 // Flight category colors (FAA standard)
@@ -60,7 +67,22 @@ const getCategoryBgColor = (category: string): string => {
   }
 };
 
-export function WeatherWidget({ metar, isLoading, error }: WeatherWidgetProps) {
+export function WeatherWidget({ metar, isLoading, error, onAirportChange, isFavorite = false }: WeatherWidgetProps) {
+  const [inputValue, setInputValue] = useState("");
+
+  const handleSearch = () => {
+    if (inputValue.length === 4 && onAirportChange) {
+      onAirportChange(inputValue.toUpperCase());
+      setInputValue("");
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -98,18 +120,49 @@ export function WeatherWidget({ metar, isLoading, error }: WeatherWidgetProps) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Cloud className="h-4 w-4" />
-            {metar.icao} - {metar.station}
-          </CardTitle>
-          <div
-            className={`px-2 py-1 rounded text-xs font-bold ${getCategoryBgColor(
-              metar.flightCategory
-            )} ${getCategoryColor(metar.flightCategory)}`}
-          >
-            {metar.flightCategory}
+        <div className="space-y-3">
+          <div className="flex items-start justify-between">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Cloud className="h-4 w-4" />
+              {metar.icao} - {metar.station}
+            </CardTitle>
+            <div
+              className={`px-2 py-1 rounded text-xs font-bold ${getCategoryBgColor(
+                metar.flightCategory
+              )} ${getCategoryColor(metar.flightCategory)}`}
+            >
+              {metar.flightCategory}
+            </div>
           </div>
+          
+          {/* Quick Airport Search */}
+          {onAirportChange && (
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Enter ICAO code..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value.toUpperCase())}
+                onKeyPress={handleKeyPress}
+                maxLength={4}
+                className="h-8 text-xs uppercase"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleSearch}
+                disabled={inputValue.length !== 4}
+                className="h-8 px-3"
+              >
+                <Search className="h-3 w-3" />
+              </Button>
+            </div>
+          )}
+          {isFavorite && (
+            <p className="text-xs text-muted-foreground">
+              💙 Your default airport • Change in <a href="/settings" className="underline">Settings</a>
+            </p>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-3">

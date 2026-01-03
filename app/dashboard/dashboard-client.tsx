@@ -9,6 +9,7 @@ import AppFooter from "../../components/AppFooter";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import type { RouterOutputs } from "@/src/trpc/shared";
 import { trpc } from "@/src/trpc/client";
+import { useState } from "react";
 
 type StatsData = RouterOutputs["flight"]["getStats"];
 type FlightsData = RouterOutputs["flight"]["getAll"];
@@ -22,9 +23,52 @@ interface DashboardClientProps {
 
 function DashboardClient({ initialStats, initialFlights, initialAircraft }: DashboardClientProps) {
     const { data: aircraft } = trpc.aircraft.getAll.useQuery(undefined, { initialData: initialAircraft });
-    const { data: metar, isLoading: metarLoading, error: metarError } = trpc.weather.getFavoriteAirportMetar.useQuery();
+    const [customIcao, setCustomIcao] = useState<string | null>(null);
+    
+    // Get favorite airport weather (default)
+    const { data: favoriteMetar, isLoading: favoriteLoading, error: favoriteError } = 
+        trpc.weather.getFavoriteAirportMetar.useQuery(undefined, {
+            enabled: !customIcao, // Only fetch when no custom ICAO is set
+            keepPreviousData: true, // Keep showing previous data while loading
+            staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
+            cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+            refetchOnWindowFocus: false, // Don't refetch when user returns to tab
+            refetchOnReconnect: false, // Don't refetch on network reconnect
+            refetchInterval: 15 * 60 * 1000, // Auto-refresh every 15 minutes only
+        });
+    
+    // Get custom airport weather (when user searches)
+    const { data: customMetar, isLoading: customLoading, error: customError } = 
+        trpc.weather.getMetar.useQuery(
+            { icao: customIcao! },
+            { 
+                enabled: !!customIcao, // Only fetch when custom ICAO is set
+                keepPreviousData: true, // Keep showing previous data while loading
+                staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
+                cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+                refetchOnWindowFocus: false, // Don't refetch when user returns to tab
+                refetchOnReconnect: false, // Don't refetch on network reconnect
+                refetchInterval: 15 * 60 * 1000, // Auto-refresh every 15 minutes only
+            }
+        );
+    
     const flights = initialFlights;
     const stats = initialStats;
+
+    // Determine which METAR to display
+    const metar = customIcao ? customMetar : favoriteMetar;
+    // Only show loading if we don't have any data yet
+    const metarLoading = (customIcao ? customLoading : favoriteLoading) && !metar;
+    const metarError = customIcao ? customError : favoriteError;
+    const isFavorite = !customIcao;
+
+    const handleAirportChange = (icao: string) => {
+        setCustomIcao(icao);
+    };
+
+    const handleResetToFavorite = () => {
+        setCustomIcao(null);
+    };
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -157,12 +201,26 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                 {/* Weather Widget */}
                 {metar && (
                     <section aria-label="Weather Information" className="mb-8">
-                        <h2 className="text-xl font-semibold mb-4">Airport Weather</h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-semibold">Airport Weather</h2>
+                            {customIcao && (
+                                <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    onClick={handleResetToFavorite}
+                                    className="text-xs"
+                                >
+                                    ← Back to favorite
+                                </Button>
+                            )}
+                        </div>
                         <div className="max-w-2xl">
                             <WeatherWidget 
                                 metar={metar} 
                                 isLoading={metarLoading}
                                 error={metarError?.message || null}
+                                onAirportChange={handleAirportChange}
+                                isFavorite={isFavorite}
                             />
                         </div>
                     </section>

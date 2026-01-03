@@ -15,6 +15,7 @@ const updatePreferencesSchema = z.object({
   unitSystem: z.nativeEnum(UnitSystem).optional(),
   currency: z.string().min(1).optional(),
   defaultAircraftId: z.string().optional().nullable(),
+  favoriteAirport: z.string().min(4).max(4).toUpperCase().optional().nullable(),
 });
 
 export const preferencesRouter = createTRPCRouter({
@@ -62,6 +63,7 @@ export const preferencesRouter = createTRPCRouter({
           unitSystem: input.unitSystem ?? defaultPreferences.unitSystem,
           currency: input.currency ?? defaultPreferences.currency,
           defaultAircraftId: input.defaultAircraftId ?? defaultPreferences.defaultAircraftId,
+          favoriteAirport: input.favoriteAirport ?? 'KJFK',
         },
       });
     }),
