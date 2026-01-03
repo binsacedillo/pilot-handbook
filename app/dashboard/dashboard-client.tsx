@@ -29,7 +29,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
     const { data: favoriteMetar, isLoading: favoriteLoading, error: favoriteError } = 
         trpc.weather.getFavoriteAirportMetar.useQuery(undefined, {
             enabled: !customIcao, // Only fetch when no custom ICAO is set
-            keepPreviousData: true, // Keep showing previous data while loading
+            placeholderData: (prev) => prev, // Keep showing previous data while loading
             staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
             cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
             refetchOnWindowFocus: false, // Don't refetch when user returns to tab
@@ -43,7 +43,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
             { icao: customIcao! },
             { 
                 enabled: !!customIcao, // Only fetch when custom ICAO is set
-                keepPreviousData: true, // Keep showing previous data while loading
+                placeholderData: (prev) => prev, // Keep showing previous data while loading
                 staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
                 cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
                 refetchOnWindowFocus: false, // Don't refetch when user returns to tab
