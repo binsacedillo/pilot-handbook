@@ -8,6 +8,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { TRPCProvider } from "@/trpc/Provider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
+import DevWarningBanner from "@/components/DevWarningBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -41,6 +42,7 @@ export default function RootLayout({
             <TRPCProvider>
               <ThemeWrapper>
                 <div className="flex flex-col min-h-screen">
+                  <DevWarningBanner />
                   {children}
                 </div>
               </ThemeWrapper>
