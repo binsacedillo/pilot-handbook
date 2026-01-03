@@ -222,19 +222,18 @@ File: `vercel.build-output.js` or your build script:
 
 ---
 
-## Admin Role Sync Not Working
+## Admin Role Issues
 
 ### Error Message
 ```
-Command failed: npm run sync:admin-role
-User is admin in Clerk but not in database
-User is admin in database but not in Clerk
+User can't access admin panel after promotion
+Admin status is inconsistent
 ```
 
 ### When It Happens
 - You manually promote a user to admin
 - User still can't access admin panel
-- Admin status is inconsistent between Clerk and Supabase
+- Admin status is inconsistent between Clerk and database
 
 ### Root Cause
 Admin role data lives in **two places**:
@@ -353,7 +352,7 @@ If something is broken, check in this order:
 | App won't start | `DATABASE_URL` is set? |
 | Migrations fail | `DIRECT_URL` is set? |
 | Users not syncing | `CLERK_WEBHOOK_SECRET` is set? |
-| Admin can't access panel | Run `npm run sync:admin-role` |
+| Admin can't access panel | Use `npm run make:admin <clerkUserId>` to promote user |
 | Data is stale | Page has `export const dynamic = "force-dynamic"`? |
 | SSL certificate error | Check [lib/db.ts](lib/db.ts) has NODE_TLS_REJECT_UNAUTHORIZED fix |
 

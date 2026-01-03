@@ -151,7 +151,6 @@ You can find your Clerk user ID in the Clerk Dashboard or in your browser's deve
 - `npm run test:coverage` - Generate test coverage report
 - `npm run typecheck` - Run TypeScript type checking
 - `npm run make:admin <clerkUserId>` - Promote a user to admin role
-- `npm run sync:admin-role` - Sync admin roles from database to Clerk metadata
 
 ## Project Structure
 

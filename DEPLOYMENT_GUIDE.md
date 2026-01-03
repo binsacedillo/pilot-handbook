@@ -93,14 +93,14 @@ Clerk needs to notify your app when users are created:
 3. You should be redirected to `/dashboard`
 4. Check database: new user appears in `public."User"` table
 
-### ✅ Step 4: Sync Admin Role (Optional)
-If you have admin users:
+### ✅ Step 4: Set Up Admin Users (Optional)
+If you need admin users:
 
 ```bash
-npm run sync:admin-role
+npm run make:admin <clerkUserId>
 ```
 
-This syncs Clerk metadata with database admin roles.
+This promotes a user to admin role in both Clerk and the database.
 
 ---
 
