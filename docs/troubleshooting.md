@@ -89,24 +89,24 @@ DIRECT_URL = postgresql://user:password@host.supabase.co:5432/postgres?schema=pu
 NODE_ENV = production
 ```
 
-**In [prisma.config.ts](prisma.config.ts):**
+**In [prisma.config.ts](../prisma.config.ts) (✅ NOW CONFIGURED):**
 ```typescript
-import { defineConfig } from '@prisma/internals';
-
 export default defineConfig({
-  datasources: {
-    db: {
-      url: process.env.DIRECT_URL || process.env.DATABASE_URL,
-    },
+  schema: 'prisma/schema.prisma',
+  datasource: {
+    // Prisma CLI uses DIRECT_URL for migrations (port 5432)
+    // Application uses DATABASE_URL for queries (port 6543)
+    url: env('DIRECT_URL') || env('DATABASE_URL'),
   },
-});
+})
 ```
 
-**Why it works:**
-- `DATABASE_URL` uses pgBouncer (port 6543) for connection pooling in serverless
-- `DIRECT_URL` uses direct connection (port 5432) for schema operations
-- Prisma migrations use `DIRECT_URL` to avoid pooler connection limits
-- Application runtime uses `DATABASE_URL` for best performance
+**Why it works (Prisma 7 approach):**
+- Prisma CLI commands (migrate, generate) use `DIRECT_URL` (port 5432 - direct)
+- Application runtime queries use `DATABASE_URL` (port 6543 - pgBouncer) via lib/db.ts
+- `DATABASE_URL` uses pgBouncer for connection pooling in serverless
+- `DIRECT_URL` uses direct connection for schema operations
+- No manual port overrides needed anymore!
 
 ### Verification
 1. Check Vercel logs during deployment
@@ -194,14 +194,18 @@ DATABASE_URL = postgresql://pooler...    # port 6543
 DIRECT_URL = postgresql://direct...      # port 5432
 ```
 
-**Set Prisma to Use DIRECT_URL for Migrations:**
+**Ensure Prisma Config Routes to DIRECT_URL (✅ ALREADY CONFIGURED):**
 
-File: [prisma.config.ts](prisma.config.ts)
+File: [prisma.config.ts](../prisma.config.ts)
 ```typescript
-datasources:
-  db:
-    url: env("DIRECT_URL") || env("DATABASE_URL")
+export default defineConfig({
+  datasource: {
+    url: env('DIRECT_URL') || env('DATABASE_URL'),  // Migrations use port 5432
+  },
+})
 ```
+
+**Note:** Prisma 7 uses `prisma.config.ts` instead of `url`/`directUrl` in schema.prisma.
 
 **Skip Migrations if DIRECT_URL is Missing (Optional Safety):**
 
