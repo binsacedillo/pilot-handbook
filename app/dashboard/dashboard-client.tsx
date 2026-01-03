@@ -31,7 +31,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
             enabled: !customIcao, // Only fetch when no custom ICAO is set
             placeholderData: (prev) => prev, // Keep showing previous data while loading
             staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
-            cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+            gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
             refetchOnWindowFocus: false, // Don't refetch when user returns to tab
             refetchOnReconnect: false, // Don't refetch on network reconnect
             refetchInterval: 15 * 60 * 1000, // Auto-refresh every 15 minutes only
@@ -45,7 +45,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                 enabled: !!customIcao, // Only fetch when custom ICAO is set
                 placeholderData: (prev) => prev, // Keep showing previous data while loading
                 staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
-                cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+                gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
                 refetchOnWindowFocus: false, // Don't refetch when user returns to tab
                 refetchOnReconnect: false, // Don't refetch on network reconnect
                 refetchInterval: 15 * 60 * 1000, // Auto-refresh every 15 minutes only
