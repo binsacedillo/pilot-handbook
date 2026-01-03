@@ -23,7 +23,9 @@ function createPrismaClient() {
     idleTimeoutMillis: 30000,    // Close idle connections after 30s
     connectionTimeoutMillis: 2000, // Fail fast if unable to connect
     allowExitOnIdle: true,       // Allow process to exit when no active connections
-    // SSL configuration for Supabase Pooler self-signed certificate
+    // FIX: Supabase Transaction Pooler (Port 6543) uses a self-signed cert.
+    // We must set rejectUnauthorized: false to avoid "self-signed certificate" errors
+    // during Vercel deployment. (Fixed Jan 2026)
     ssl: {
       rejectUnauthorized: false, // Accept self-signed certificates from Supabase Pooler
     },
