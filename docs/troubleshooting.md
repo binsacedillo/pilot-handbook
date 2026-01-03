@@ -247,10 +247,10 @@ They must stay in sync. If one updates without the other, inconsistency happens.
 
 **Step 1: Run the Sync Script**
 ```bash
-npm run sync:admin-role
+npm run make:admin
 ```
 
-File: [scripts/sync-admin-role.ts](scripts/sync-admin-role.ts)
+File: [lib/clerk-admin-tools.ts](lib/clerk-admin-tools.ts)
 
 **Step 2: Verify in Database**
 ```sql
