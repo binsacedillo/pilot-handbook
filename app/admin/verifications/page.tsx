@@ -5,19 +5,44 @@ import AppHeader from '@/components/AppHeader';
 import AppFooter from '@/components/AppFooter';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 import { CheckCircle, XCircle } from 'lucide-react';
 
 export default function VerificationsPage() {
-  const router = useRouter();
+  const utils = trpc.useUtils();
   const { data: users, isLoading } = trpc.admin.getAllUsers.useQuery({
     skip: 0,
     take: 100, // Get all users for verification view
   });
 
   const verifyPilotMutation = trpc.admin.verifyPilot.useMutation({
-    onSuccess: () => {
-      router.refresh();
+    onMutate: async ({ userId, verified }) => {
+      // Optimistically update the cache
+      await utils.admin.getAllUsers.cancel();
+      const previousData = utils.admin.getAllUsers.getData({ skip: 0, take: 100 });
+      if (previousData) {
+        utils.admin.getAllUsers.setData(
+          { skip: 0, take: 100 },
+          {
+            ...previousData,
+            users: previousData.users.map(user => 
+              user.id === userId 
+                ? { ...user, role: verified ? 'PILOT' : 'USER' as const }
+                : user
+            ),
+          }
+        );
+      }
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousData) {
+        utils.admin.getAllUsers.setData({ skip: 0, take: 100 }, context.previousData);
+      }
+      alert(`Failed to update user: ${err.message}`);
+    },
+    onSettled: async () => {
+      await utils.admin.getAllUsers.invalidate();
+      await utils.admin.getStats.invalidate();
     },
   });
 

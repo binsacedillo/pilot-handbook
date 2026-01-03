@@ -100,14 +100,24 @@ export const adminProcedure = t.procedure.use(async ({ ctx, next }) => {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
-  // 2. (Optional) Check for Admin Role
-  // If you store roles in Clerk metadata, check it here.
-  // const role = session.claims?.metadata?.role;
-  // if (role !== 'admin') { throw new TRPCError({ code: "FORBIDDEN" }); }
+  // 2. Fetch user from database to ensure they're an admin
+  const user = await ctx.db.user.findUnique({
+    where: { clerkId: session.userId },
+    select: { id: true, role: true, email: true },
+  });
+
+  if (!user) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "User not found in database" });
+  }
+
+  if (user.role !== "ADMIN") {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+  }
 
   return next({
     ctx: {
-      session: { ...session, user: session.userId },
+      session,
+      user, // Database user object with id, role, email
     },
   });
 });

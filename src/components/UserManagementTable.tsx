@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from 'react';
 import { trpc } from '@/trpc/client';
-import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DeleteDialog } from '@/components/DeleteDialog';
@@ -16,34 +15,91 @@ const UserManagementTable = () => {
     userName: string | null;
   }>({ open: false, userId: null, userName: null });
 
+  const utils = trpc.useUtils();
   const { data, isLoading } = trpc.admin.getAllUsers.useQuery({
     skip: page * 10,
     take: 10,
   });
 
-  const router = useRouter();
-  // promoteDemoteUser functionality is not implemented; button and mutation commented out for now.
-  // Example for future implementation:
-  // const promoteDemoteMutation = trpc.admin.promoteDemoteUser.useMutation({
-  //   onSuccess: () => {
-  //     router.refresh();
-  //   },
-  // });
+  // Verify pilot mutation with proper cache invalidation
   const verifyPilotMutation = trpc.admin.verifyPilot.useMutation({
-    onSuccess: () => {
-      // Refetch users after mutation
-      // If you want to use refetch, you can add it to the query above and call refetch() here
-      router.refresh();
+    onMutate: async ({ userId, verified }) => {
+      // Cancel outgoing refetches to avoid race conditions
+      await utils.admin.getAllUsers.cancel();
+      
+      // Optimistically update the cache
+      const previousData = utils.admin.getAllUsers.getData({ skip: page * 10, take: 10 });
+      if (previousData) {
+        utils.admin.getAllUsers.setData(
+          { skip: page * 10, take: 10 },
+          {
+            ...previousData,
+            users: previousData.users.map(user => 
+              user.id === userId 
+                ? { ...user, role: verified ? 'PILOT' : 'USER' as const }
+                : user
+            ),
+          }
+        );
+      }
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        utils.admin.getAllUsers.setData(
+          { skip: page * 10, take: 10 },
+          context.previousData
+        );
+      }
+      alert(`Failed to update user: ${err.message}`);
+    },
+    onSettled: async () => {
+      // Refetch to sync with server
+      await utils.admin.getAllUsers.invalidate();
+      await utils.admin.getStats.invalidate();
+      await utils.admin.recentUsers.invalidate();
     },
   });
 
+  // Delete user mutation with proper cache invalidation
   const deleteUserMutation = trpc.admin.deleteUser.useMutation({
+    onMutate: async ({ userId }) => {
+      // Cancel outgoing refetches
+      await utils.admin.getAllUsers.cancel();
+      
+      // Optimistically remove from cache
+      const previousData = utils.admin.getAllUsers.getData({ skip: page * 10, take: 10 });
+      if (previousData) {
+        utils.admin.getAllUsers.setData(
+          { skip: page * 10, take: 10 },
+          {
+            ...previousData,
+            users: previousData.users.filter(user => user.id !== userId),
+            total: previousData.total - 1,
+          }
+        );
+      }
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        utils.admin.getAllUsers.setData(
+          { skip: page * 10, take: 10 },
+          context.previousData
+        );
+      }
+      alert(`Failed to delete user: ${err.message}`);
+    },
     onSuccess: () => {
-      router.refresh();
       setDeleteDialogState({ open: false, userId: null, userName: null });
     },
-    onError: (error) => {
-      alert(error.message);
+    onSettled: async () => {
+      // Invalidate all admin queries to sync with server
+      await utils.admin.getAllUsers.invalidate();
+      await utils.admin.getStats.invalidate();
+      await utils.admin.recentUsers.invalidate();
     },
   });
 
