@@ -107,4 +107,4 @@ export default function Hero({ totalFlightHours }: HeroProps) {
 			</div>
 		</section>
 	);
-}z
+}
