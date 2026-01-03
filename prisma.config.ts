@@ -9,7 +9,8 @@ if (process.env.NODE_ENV !== 'production') {
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   datasource: {
-    // Use DATABASE_URL for production, fallback to DIRECT_URL for development
-    url: env('DATABASE_URL') || env('DIRECT_URL'),
+    // Runtime: Uses DATABASE_URL (port 6543 - pgBouncer pooler)
+    // Migrations: Uses DIRECT_URL (port 5432 - direct connection)
+    url: env('DIRECT_URL') || env('DATABASE_URL'),
   },
 })
