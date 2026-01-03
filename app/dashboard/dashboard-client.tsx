@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plane, Clock, TrendingUp } from "lucide-react";
@@ -28,13 +28,13 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
     // Get favorite airport weather (default)
     const { data: favoriteMetar, isLoading: favoriteLoading, error: favoriteError } = 
         trpc.weather.getFavoriteAirportMetar.useQuery(undefined, {
-            enabled: !customIcao, // Only fetch when no custom ICAO is set
-            placeholderData: (prev) => prev, // Keep showing previous data while loading
-            staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
-            gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
-            refetchOnWindowFocus: false, // Don't refetch when user returns to tab
-            refetchOnReconnect: false, // Don't refetch on network reconnect
-            refetchInterval: 15 * 60 * 1000, // Auto-refresh every 15 minutes only
+            enabled: !customIcao,
+            placeholderData: (prev) => prev,
+            staleTime: 10 * 60 * 1000,
+            gcTime: 30 * 60 * 1000,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            refetchInterval: 15 * 60 * 1000,
         });
     
     // Get custom airport weather (when user searches)
@@ -42,13 +42,13 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
         trpc.weather.getMetar.useQuery(
             { icao: customIcao! },
             { 
-                enabled: !!customIcao, // Only fetch when custom ICAO is set
-                placeholderData: (prev) => prev, // Keep showing previous data while loading
-                staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
-                gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
-                refetchOnWindowFocus: false, // Don't refetch when user returns to tab
-                refetchOnReconnect: false, // Don't refetch on network reconnect
-                refetchInterval: 15 * 60 * 1000, // Auto-refresh every 15 minutes only
+                enabled: !!customIcao,
+                placeholderData: (prev) => prev,
+                staleTime: 10 * 60 * 1000,
+                gcTime: 30 * 60 * 1000,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+                refetchInterval: 15 * 60 * 1000,
             }
         );
     
@@ -225,29 +225,15 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                     </div>
 
                     {metar && (
-                        <div className="flex flex-col rounded-lg border bg-card text-card-foreground shadow-sm min-w-0">
-                            <div className="flex items-center justify-between border-b px-4 py-3">
-                                <h2 className="text-lg font-semibold">Airport Weather</h2>
-                                {customIcao && (
-                                    <Button 
-                                        size="sm" 
-                                        variant="ghost" 
-                                        onClick={handleResetToFavorite}
-                                        className="text-xs"
-                                    >
-                                        ← Back to favorite
-                                    </Button>
-                                )}
-                            </div>
-                            <div className="p-4">
-                                <WeatherWidget 
-                                    metar={metar} 
-                                    isLoading={metarLoading}
-                                    error={metarError?.message || null}
-                                    onAirportChange={handleAirportChange}
-                                    isFavorite={isFavorite}
-                                />
-                            </div>
+                        <div className="min-w-0">
+                            <WeatherWidget
+                                metar={metar}
+                                isLoading={metarLoading}
+                                error={metarError?.message || null}
+                                onAirportChange={handleAirportChange}
+                                onResetToFavorite={customIcao ? handleResetToFavorite : undefined}
+                                isFavorite={isFavorite}
+                            />
                         </div>
                     )}
                 </section>
