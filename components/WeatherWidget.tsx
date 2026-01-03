@@ -1,6 +1,15 @@
 'use client';
 
-import { Cloud, CloudRain, Wind, Search } from "lucide-react";
+import { Cloud, CloudRain, Search, Wind, Eye, CloudSun, ThermometerSun } from "lucide-react";
+/**
+ * @component
+ * @name Wind
+ * @description Lucide SVG icon component, renders SVG Element with children.
+ * @preview img - https://lucide.dev/icons/wind
+ * @see https://lucide.dev/guide/packages/lucide-react - Documentation
+ * @param props Lucide icons props and any valid SVG attribute
+ * @returns JSX Element
+ */
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -99,11 +108,17 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
   const updatedTime = metar.time ? new Date(metar.time).toLocaleTimeString() : "—";
 
   if (isLoading) {
+    // Suggestion: The class `bg-gradient-to-br` can be written as `bg-linear-to-br` (suggestCanonicalClasses)
+    // .bg-gradient-to-br {
+    //   --tw-gradient-position: to bottom right in oklab;
+    //   background-image: linear-gradient(var(--tw-gradient-stops));
+    // }
     return (
-      <Card className="rounded-xl border bg-gradient-to-br from-slate-900/80 via-slate-900/60 to-slate-900/20 text-white shadow-lg">
+      <Card className="rounded-xl border bg-linear-to-br from-slate-900/80 via-slate-900/60 to-slate-900/20 text-white shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <Cloud className="h-4 w-4" />
+            <Wind className="h-4 w-4" />
             Airport Weather
           </CardTitle>
         </CardHeader>
@@ -118,7 +133,7 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
 
   if (error) {
     return (
-      <Card className="rounded-xl border bg-gradient-to-br from-slate-900/80 via-slate-900/60 to-slate-900/20 text-white shadow-lg">
+      <Card className="rounded-xl border bg-linear-to-br from-slate-900/80 via-slate-900/60 to-slate-900/20 text-white shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <CloudRain className="h-4 w-4" />
@@ -133,7 +148,7 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
   }
 
   return (
-    <Card className="rounded-xl border bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-slate-900/30 text-white shadow-lg">
+    <Card className="rounded-xl border bg-linear-to-br from-slate-900/90 via-slate-900/70 to-slate-900/30 text-white shadow-lg">
       <CardHeader className="pb-0">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -196,19 +211,27 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
 
           <div className="grid grid-cols-2 gap-3 text-sm text-slate-100">
             <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <div className="text-xs text-slate-300">Visibility</div>
+              <div className="flex items-center gap-1 text-xs text-slate-300">
+                <Eye className="h-4 w-4 inline-block" /> Visibility
+              </div>
               <div className="text-base font-semibold">{visibility}</div>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <div className="text-xs text-slate-300">Ceiling</div>
+              <div className="flex items-center gap-1 text-xs text-slate-300">
+                <CloudSun className="h-4 w-4 inline-block" /> Ceiling
+              </div>
               <div className="text-base font-semibold">{ceiling}</div>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <div className="text-xs text-slate-300">Wind</div>
+              <div className="flex items-center gap-1 text-xs text-slate-300">
+                <Wind className="h-4 w-4 inline-block" /> Wind
+              </div>
               <div className="text-base font-semibold">{windDirection} @ {windSpeed}{windGust}</div>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <div className="text-xs text-slate-300">Temp / Dew</div>
+              <div className="flex items-center gap-1 text-xs text-slate-300">
+                <ThermometerSun className="h-4 w-4 inline-block" /> Temp / Dew
+              </div>
               <div className="text-base font-semibold">{temperature} / {dewpoint}</div>
             </div>
           </div>

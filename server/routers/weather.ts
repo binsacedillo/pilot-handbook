@@ -123,8 +123,6 @@ interface MetarData {
 const AVWX_BASE_URL = "https://avwx.rest/api";
 const AVWX_KEY = process.env.AVWX_API_KEY || ""; // Get free key from https://avwx.rest
 
-// Fallback: Use NOAA Aviation Weather (no auth required, but slower)
-const NOAA_BASE_URL = "https://www.aviationweather.gov/adds/dataserver_current/httpparam";
 
 async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
   try {

@@ -25,7 +25,7 @@ export default function Hero({ totalFlightHours }: HeroProps) {
 	const parallaxOffset = scrollY * 0.5;
 
 	return (
-		<section className="relative overflow-hidden bg-gradient-to-b from-slate-900 to-blue-900 min-h-[700px] md:min-h-[850px] pb-20">
+			<section className="relative overflow-hidden bg-linear-to-b from-slate-900 to-blue-900 min-h-175 md:min-h-212.5 pb-20">
 			{/* Parallax Background Image - More Subtle */}
 			<div
 				className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-10"
@@ -37,7 +37,7 @@ export default function Hero({ totalFlightHours }: HeroProps) {
 			/>
 
 			{/* Gradient Overlay */}
-			<div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-blue-900/50 to-slate-900/70" />
+			<div className="absolute inset-0 bg-linear-to-b from-slate-900/70 via-blue-900/50 to-slate-900/70" />
 
 			{/* Accessibility: Black overlay for improved contrast ratio (WCAG AA 4.5:1) */}
 			<div className="absolute inset-0 bg-black/30" />
