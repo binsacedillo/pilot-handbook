@@ -6,10 +6,8 @@ import { ClerkProvider } from "@clerk/nextjs";
 // ...existing code...
 
 import { TRPCProvider } from "@/trpc/Provider";
-import ClientNavBar from "@/components/ClientNavBar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
-import { InAppBrowserDetector } from "@/components/InAppBrowserDetector";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,7 +40,6 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <TRPCProvider>
               <ThemeWrapper>
-                <InAppBrowserDetector />
                 <div className="flex flex-col min-h-screen">
                   {children}
                 </div>
