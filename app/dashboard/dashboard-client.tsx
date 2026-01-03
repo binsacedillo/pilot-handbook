@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plane, Clock, TrendingUp } from "lucide-react";
 import AppHeader from "../../components/AppHeader";
 import AppFooter from "../../components/AppFooter";
+import { WeatherWidget } from "@/components/WeatherWidget";
 import type { RouterOutputs } from "@/src/trpc/shared";
 import { trpc } from "@/src/trpc/client";
 
@@ -21,6 +22,7 @@ interface DashboardClientProps {
 
 function DashboardClient({ initialStats, initialFlights, initialAircraft }: DashboardClientProps) {
     const { data: aircraft } = trpc.aircraft.getAll.useQuery(undefined, { initialData: initialAircraft });
+    const { data: metar, isLoading: metarLoading, error: metarError } = trpc.weather.getFavoriteAirportMetar.useQuery();
     const flights = initialFlights;
     const stats = initialStats;
 
@@ -151,6 +153,20 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                         </Card>
                     </div>
                 </section>
+
+                {/* Weather Widget */}
+                {metar && (
+                    <section aria-label="Weather Information" className="mb-8">
+                        <h2 className="text-xl font-semibold mb-4">Airport Weather</h2>
+                        <div className="max-w-2xl">
+                            <WeatherWidget 
+                                metar={metar} 
+                                isLoading={metarLoading}
+                                error={metarError?.message || null}
+                            />
+                        </div>
+                    </section>
+                )}
 
                 {/* Recent Flights */}
                 <section aria-label="Recent flights" className="mt-12">
