@@ -1,10 +1,10 @@
 'use client';
 
-import { Cloud, CloudRain, Sun, Wind, Eye, Thermometer, Search } from "lucide-react";
+import { Cloud, CloudRain, Wind, Search } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 
 interface WeatherWidgetProps {
   metar: {
@@ -33,6 +33,7 @@ interface WeatherWidgetProps {
   isLoading?: boolean;
   error?: string | null;
   onAirportChange?: (icao: string) => void;
+  onResetToFavorite?: () => void;
   isFavorite?: boolean;
 }
 
@@ -67,7 +68,7 @@ const getCategoryBgColor = (category: string): string => {
   }
 };
 
-export function WeatherWidget({ metar, isLoading, error, onAirportChange, isFavorite = false }: WeatherWidgetProps) {
+export function WeatherWidget({ metar, isLoading, error, onAirportChange, onResetToFavorite, isFavorite = false }: WeatherWidgetProps) {
   const [inputValue, setInputValue] = useState("");
 
   const handleSearch = () => {
@@ -77,15 +78,29 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, isFavo
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
       handleSearch();
     }
   };
 
+  const category = metar.flightCategory || "UNKNOWN";
+  const windDirection =
+    metar.wind.direction !== null && metar.wind.direction !== undefined
+      ? `${metar.wind.direction.toString().padStart(3, "0")}°`
+      : "VRB";
+  const windSpeed = metar.wind.speed !== null && metar.wind.speed !== undefined ? `${metar.wind.speed} ${metar.wind.unit}` : "Calm";
+  const windGust = metar.wind.gust ? ` G${metar.wind.gust}` : "";
+  const visibility =
+    metar.visibility.value !== null && metar.visibility.value !== undefined ? `${metar.visibility.value} ${metar.visibility.unit}` : "—";
+  const ceiling = metar.ceiling.value !== null && metar.ceiling.value !== undefined ? `${metar.ceiling.value} ${metar.ceiling.unit}` : "Unlimited";
+  const temperature = metar.temperature !== null && metar.temperature !== undefined ? `${metar.temperature}°C` : "—";
+  const dewpoint = metar.dewpoint !== null && metar.dewpoint !== undefined ? `${metar.dewpoint}°C` : "—";
+  const updatedTime = metar.time ? new Date(metar.time).toLocaleTimeString() : "—";
+
   if (isLoading) {
     return (
-      <Card>
+      <Card className="rounded-xl border bg-gradient-to-br from-slate-900/80 via-slate-900/60 to-slate-900/20 text-white shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <Cloud className="h-4 w-4" />
@@ -93,8 +108,8 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, isFavo
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center h-24">
-            <div className="animate-pulse text-muted-foreground">Loading...</div>
+          <div className="flex items-center justify-center h-28">
+            <div className="animate-pulse text-slate-200">Loading weather...</div>
           </div>
         </CardContent>
       </Card>
@@ -103,7 +118,7 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, isFavo
 
   if (error) {
     return (
-      <Card>
+      <Card className="rounded-xl border bg-gradient-to-br from-slate-900/80 via-slate-900/60 to-slate-900/20 text-white shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <CloudRain className="h-4 w-4" />
@@ -111,122 +126,96 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, isFavo
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-xs text-red-600">{error}</div>
+          <div className="text-xs text-red-300">{error}</div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="space-y-3">
-          <div className="flex items-start justify-between">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Cloud className="h-4 w-4" />
+    <Card className="rounded-xl border bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-slate-900/30 text-white shadow-lg">
+      <CardHeader className="pb-0">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <CardTitle className="text-base font-semibold leading-tight">
               {metar.icao} - {metar.station}
             </CardTitle>
-            <div
-              className={`px-2 py-1 rounded text-xs font-bold ${getCategoryBgColor(
-                metar.flightCategory
-              )} ${getCategoryColor(metar.flightCategory)}`}
+            <span
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${getCategoryBgColor(category)} ${getCategoryColor(category)}`}
             >
-              {metar.flightCategory}
-            </div>
+              {category}
+            </span>
           </div>
-          
-          {/* Quick Airport Search */}
+
           {onAirportChange && (
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="Enter ICAO code..."
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value.toUpperCase())}
-                onKeyPress={handleKeyPress}
-                maxLength={4}
-                className="h-8 text-xs uppercase"
-              />
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleSearch}
-                disabled={inputValue.length !== 4}
-                className="h-8 px-3"
-              >
-                <Search className="h-3 w-3" />
-              </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  placeholder="ICAO"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value.toUpperCase())}
+                  onKeyDown={handleKeyDown}
+                  maxLength={4}
+                  className="h-9 w-24 text-xs uppercase bg-white/10 border-white/20 text-white placeholder:text-slate-300"
+                />
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={handleSearch}
+                  disabled={inputValue.length !== 4}
+                  className="h-9 px-3 text-xs"
+                >
+                  <Search className="h-3 w-3" />
+                  <span className="ml-1">Change</span>
+                </Button>
+              </div>
+              {onResetToFavorite && !isFavorite && (
+                <Button size="sm" variant="ghost" className="text-xs text-white/80" onClick={onResetToFavorite}>
+                  Back to favorite
+                </Button>
+              )}
             </div>
-          )}
-          {isFavorite && (
-            <p className="text-xs text-muted-foreground">
-              💙 Your default airport • Change in <a href="/settings" className="underline">Settings</a>
-            </p>
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {/* Temperature & Dewpoint */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2">
-            <Thermometer className="h-4 w-4 text-orange-500" />
-            <div className="text-sm">
-              <div className="text-xs text-muted-foreground">Temp</div>
-              <div className="font-semibold">{metar.temperature ?? "N/A"}°C</div>
-            </div>
+
+      <CardContent className="pt-4">
+        <div className="grid gap-4 md:grid-cols-[1.1fr_1fr]">
+          <div className="space-y-3">
+            <div className="text-4xl font-semibold leading-tight">{temperature}</div>
+            <p className="text-sm text-slate-200">Dewpoint {dewpoint}</p>
+            <p className="text-sm text-slate-200">
+              Wind {windDirection} @ {windSpeed}
+              {windGust} | Vis {visibility}
+            </p>
+            <p className="text-sm text-slate-200">Ceiling {ceiling}</p>
+            <p className="text-xs text-slate-300">Updated {updatedTime}</p>
+            {isFavorite && <p className="text-xs text-slate-300">Favorite airport • Change in Settings</p>}
           </div>
-          <div className="flex items-center gap-2">
-            <Thermometer className="h-4 w-4 text-blue-500" />
-            <div className="text-sm">
-              <div className="text-xs text-muted-foreground">Dew</div>
-              <div className="font-semibold">{metar.dewpoint ?? "N/A"}°C</div>
+
+          <div className="grid grid-cols-2 gap-3 text-sm text-slate-100">
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <div className="text-xs text-slate-300">Visibility</div>
+              <div className="text-base font-semibold">{visibility}</div>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <div className="text-xs text-slate-300">Ceiling</div>
+              <div className="text-base font-semibold">{ceiling}</div>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <div className="text-xs text-slate-300">Wind</div>
+              <div className="text-base font-semibold">{windDirection} @ {windSpeed}{windGust}</div>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <div className="text-xs text-slate-300">Temp / Dew</div>
+              <div className="text-base font-semibold">{temperature} / {dewpoint}</div>
             </div>
           </div>
         </div>
 
-        {/* Wind */}
-        <div className="flex items-center gap-2 border-t pt-3">
-          <Wind className="h-4 w-4 text-cyan-600" />
-          <div className="text-sm flex-1">
-            <div className="text-xs text-muted-foreground">Wind</div>
-            <div className="font-semibold">
-              {metar.wind.direction ? `${metar.wind.direction.toString().padStart(3, "0")}°` : "VAR"} @{" "}
-              {metar.wind.speed ?? "?"} {metar.wind.unit}
-              {metar.wind.gust && ` G${metar.wind.gust}`}
-            </div>
-          </div>
-        </div>
-
-        {/* Visibility & Ceiling */}
-        <div className="grid grid-cols-2 gap-3 border-t pt-3">
-          <div className="flex items-center gap-2">
-            <Eye className="h-4 w-4 text-gray-600" />
-            <div className="text-sm">
-              <div className="text-xs text-muted-foreground">Vis</div>
-              <div className="font-semibold">
-                {metar.visibility.value ?? "?"} {metar.visibility.unit}
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <CloudRain className="h-4 w-4 text-slate-600" />
-            <div className="text-sm">
-              <div className="text-xs text-muted-foreground">Ceil</div>
-              <div className="font-semibold">
-                {metar.ceiling.value ? `${metar.ceiling.value} ${metar.ceiling.unit}` : "OVR"}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Raw METAR */}
-        <div className="border-t pt-3 text-xs bg-muted p-2 rounded font-mono text-muted-foreground break-words">
-          {metar.raw}
-        </div>
-
-        {/* Last Updated */}
-        <div className="text-xs text-muted-foreground text-right">
-          Updated: {new Date(metar.time).toLocaleTimeString()}
+        <div className="mt-4 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-xs font-mono overflow-x-auto">
+          {metar.raw || "No METAR available"}
         </div>
       </CardContent>
     </Card>
