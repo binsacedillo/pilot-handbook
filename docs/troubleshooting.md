@@ -108,11 +108,32 @@ export default defineConfig({
 - `DIRECT_URL` uses direct connection for schema operations
 - No manual port overrides needed anymore!
 
+**Port Usage Summary:**
+
+| Port | Service | Used By | Purpose |
+|------|---------|---------|---------|
+| **6543** | pgBouncer Pooler | Application runtime (DATABASE_URL) | Connection pooling for serverless |
+| **5432** | Direct PostgreSQL | Prisma CLI (DIRECT_URL) | Migrations & schema operations |
+
 ### Verification
 1. Check Vercel logs during deployment
 2. Look for: `"Migrations executed"` (no errors)
 3. Visit deployed app → should load dashboard or sign-in page
 4. Check Supabase dashboard → connection count should be low (<5)
+
+**Test Prisma migrations locally:**
+```bash
+# Check migration status (should use port 5432)
+npx prisma migrate status
+
+# Generate Prisma client
+npx prisma generate
+
+# Run a migration (if needed)
+npx prisma migrate dev --name test_migration
+
+# All commands should work without manual DATABASE_URL overrides
+```
 
 ---
 
