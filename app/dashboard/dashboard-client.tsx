@@ -198,53 +198,57 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                     </div>
                 </section>
 
-                {/* Weather Widget */}
-                {metar && (
-                    <section aria-label="Weather Information" className="mb-8">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-semibold">Airport Weather</h2>
-                            {customIcao && (
-                                <Button 
-                                    size="sm" 
-                                    variant="ghost" 
-                                    onClick={handleResetToFavorite}
-                                    className="text-xs"
-                                >
-                                    ← Back to favorite
-                                </Button>
-                            )}
-                        </div>
-                        <div className="max-w-2xl">
-                            <WeatherWidget 
-                                metar={metar} 
-                                isLoading={metarLoading}
-                                error={metarError?.message || null}
-                                onAirportChange={handleAirportChange}
-                                isFavorite={isFavorite}
-                            />
-                        </div>
-                    </section>
-                )}
+                {/* Recent Flights + Weather */}
+                <section
+                    aria-label="Recent flights and weather"
+                    className={`mt-12 grid gap-6 ${metar ? "lg:grid-cols-[minmax(0,1.7fr)_minmax(320px,1fr)]" : ""}`}
+                >
+                    <div>
+                        <h2 className="text-xl font-semibold mb-4">Recent Flights</h2>
+                        {flights && flights.length > 0 ? (
+                            <div className="space-y-2">
+                                {flights.slice(0, 5).map((flight) => (
+                                    <Card key={flight.id} className="flex-row flex items-center justify-between gap-4 p-4">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="font-medium truncate">{flight.aircraft?.model || "Aircraft"}</div>
+                                            <div className="text-sm text-muted-foreground">{new Date(flight.date).toLocaleDateString()}</div>
+                                        </div>
+                                        <div className="text-right whitespace-nowrap">
+                                            <span className="text-sm font-semibold">{flight.duration ?? 0} hrs</span>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-muted-foreground">No flights found.</div>
+                        )}
+                    </div>
 
-                {/* Recent Flights */}
-                <section aria-label="Recent flights" className="mt-12">
-                    <h2 className="text-xl font-semibold mb-4">Recent Flights</h2>
-                    {flights && flights.length > 0 ? (
-                        <div className="space-y-2">
-                            {flights.slice(0, 5).map((flight) => (
-                                <Card key={flight.id} className="flex-row flex items-center justify-between gap-4 p-4">
-                                    <div className="flex-1 min-w-0">
-                                        <div className="font-medium truncate">{flight.aircraft?.model || "Aircraft"}</div>
-                                        <div className="text-sm text-muted-foreground">{new Date(flight.date).toLocaleDateString()}</div>
-                                    </div>
-                                    <div className="text-right whitespace-nowrap">
-                                        <span className="text-sm font-semibold">{flight.duration ?? 0} hrs</span>
-                                    </div>
-                                </Card>
-                            ))}
+                    {metar && (
+                        <div className="flex flex-col rounded-lg border bg-card text-card-foreground shadow-sm min-w-0">
+                            <div className="flex items-center justify-between border-b px-4 py-3">
+                                <h2 className="text-lg font-semibold">Airport Weather</h2>
+                                {customIcao && (
+                                    <Button 
+                                        size="sm" 
+                                        variant="ghost" 
+                                        onClick={handleResetToFavorite}
+                                        className="text-xs"
+                                    >
+                                        ← Back to favorite
+                                    </Button>
+                                )}
+                            </div>
+                            <div className="p-4">
+                                <WeatherWidget 
+                                    metar={metar} 
+                                    isLoading={metarLoading}
+                                    error={metarError?.message || null}
+                                    onAirportChange={handleAirportChange}
+                                    isFavorite={isFavorite}
+                                />
+                            </div>
                         </div>
-                    ) : (
-                        <div className="text-muted-foreground">No flights found.</div>
                     )}
                 </section>
             </main>
