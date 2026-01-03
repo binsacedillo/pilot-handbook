@@ -8,6 +8,7 @@ const defaultPreferences = {
   unitSystem: UnitSystem.METRIC,
   currency: 'USD' as const,
   defaultAircraftId: null as string | null,
+  favoriteAirport: 'KJFK' as string | null,
 };
 
 const updatePreferencesSchema = z.object({
