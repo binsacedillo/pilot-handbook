@@ -1,6 +1,7 @@
 "use client";
 
 import { SignIn } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plane, CheckCircle, ArrowLeft } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -8,9 +9,31 @@ import { dark } from "@clerk/themes";
 
 export default function SignInPage() {
 	const { theme } = useTheme();
+	const [isEmbedded, setIsEmbedded] = useState(false);
+
+	useEffect(() => {
+		// Detect embedded browsers/webviews
+		const ua = navigator.userAgent || navigator.vendor || window.opera;
+		// Common checks for Facebook, Instagram, Messenger, Twitter, TikTok, etc.
+		if (
+			/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
+			(window.navigator.standalone === false) ||
+			(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+		) {
+			setIsEmbedded(true);
+		}
+	}, []);
 
 	return (
 		<div className="flex min-h-screen bg-linear-to-br from-gray-900 via-black to-gray-800">
+			{isEmbedded && (
+				<div className="fixed top-0 left-0 w-full z-50 bg-red-600 text-white text-center py-3 px-4 font-semibold shadow-lg">
+					<span>
+						Sign-in with Google and other providers is not supported in this browser or app. <br />
+						Please open this page in Chrome, Safari, or another browser for secure authentication.
+					</span>
+				</div>
+			)}
 			{/* Left Side - Branding */}
 			<div className="hidden lg:flex lg:w-1/2 p-12 flex-col justify-between relative overflow-hidden">
 				<div className="absolute inset-0 opacity-10">
