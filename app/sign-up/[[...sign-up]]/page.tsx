@@ -7,8 +7,7 @@ import { useTheme } from "next-themes";
 import { dark } from "@clerk/themes";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
+export default function SignUpPage() {
 	const { theme } = useTheme();
 	const { isSignedIn } = useUser();
 	const router = useRouter();
