@@ -46,20 +46,24 @@ export async function syncClerkUserToPrisma(
 ) {
   const primaryEmail = userData.email_addresses?.[0]?.email_address || "";
 
-  // Preserve existing role if present; otherwise derive from metadata/env allowlist
+  // Always prefer database role if present; only use Clerk metadata if database role is missing
   const existing = await db.user.findUnique({
     where: { clerkId: clerkUserId },
     select: { role: true },
   });
 
-  const metadataRole = (userData.public_metadata?.role as UserRole) || undefined;
-  const derivedRole = metadataRole ?? existing?.role ?? deriveRoleFromClerkUser({
-    id: clerkUserId,
-    emailAddresses: [{ emailAddress: primaryEmail }],
-    privateMetadata: userData.public_metadata ?? {},
-    publicMetadata: userData.public_metadata ?? {},
-  } as Partial<ClerkUser>);
-  const role = derivedRole || "USER";
+  let role: UserRole = "USER";
+  if (existing?.role) {
+    role = existing.role;
+  } else {
+    const metadataRole = (userData.public_metadata?.role as UserRole) || undefined;
+    role = metadataRole ?? deriveRoleFromClerkUser({
+      id: clerkUserId,
+      emailAddresses: [{ emailAddress: primaryEmail }],
+      privateMetadata: userData.public_metadata ?? {},
+      publicMetadata: userData.public_metadata ?? {},
+    } as Partial<ClerkUser>) ?? "USER";
+  }
 
   const user = await db.user.upsert({
     where: { clerkId: clerkUserId },
@@ -74,7 +78,8 @@ export async function syncClerkUserToPrisma(
       email: primaryEmail,
       firstName: userData.first_name || null,
       lastName: userData.last_name || null,
-      role,
+      // Only update role if not already ADMIN (prevents accidental demotion)
+      role: existing?.role === "ADMIN" ? "ADMIN" : role,
     },
   });
 
