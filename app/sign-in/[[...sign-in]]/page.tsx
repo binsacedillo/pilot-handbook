@@ -17,7 +17,6 @@ export default function SignInPage() {
 		// Common checks for Facebook, Instagram, Messenger, Twitter, TikTok, etc.
 		if (
 			/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
-			(window.navigator.standalone === false) ||
 			(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
 		) {
 			setIsEmbedded(true);
