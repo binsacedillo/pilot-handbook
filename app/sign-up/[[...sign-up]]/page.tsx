@@ -1,3 +1,9 @@
+// Extend Navigator type to include 'standalone' for iOS PWA detection
+declare global {
+	interface Navigator {
+		standalone?: boolean;
+	}
+}
 "use client";
 
 import { SignUp } from "@clerk/nextjs";
@@ -18,17 +24,19 @@ export default function SignUpPage() {
 	useEffect(() => {
 		// Detect embedded browsers/webviews
 		const ua = navigator.userAgent || navigator.vendor;
-		if (
+		const shouldEmbed =
 			/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
 			(window.navigator.standalone === false) ||
-			(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
-		) {
-			setIsEmbedded(true);
+			(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+
+		if (isEmbedded !== shouldEmbed) {
+			setTimeout(() => setIsEmbedded(shouldEmbed), 0);
 		}
+
 		if (isSignedIn) {
 			router.push("/");
 		}
-	}, [isSignedIn, router]);
+	}, [isSignedIn, router, isEmbedded]);
 
 	if (isSignedIn) return null;
 
@@ -122,48 +130,42 @@ export default function SignUpPage() {
 						<p className="text-muted-foreground">Start tracking your flight hours</p>
 					</div>
 
-					<SignUp
-						routing="path"
-						path="/sign-up"
-						signInUrl="/sign-in"
-						fallbackRedirectUrl="/dashboard"
-						appearance={{
-							baseTheme: theme === "dark" ? dark : undefined,
-							variables: {
-								colorPrimary: "#2563eb",
-								borderRadius: "0.75rem",
-								fontSize: "15px",
-							},
-							elements: {
-								rootBox: "w-full",
-								card: "shadow-xl border border-border bg-card",
-								headerTitle: "text-foreground",
-								headerSubtitle: "text-muted-foreground",
-								socialButtonsBlockButton: "border-border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground",
-								socialButtonsIconButton: "border-border bg-card text-card-foreground hover:bg-accent",
-								formButtonPrimary: "bg-blue-600 hover:bg-blue-700 text-white normal-case shadow-sm",
-								formFieldInput: "bg-card border-border text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-								formFieldLabel: "text-foreground",
-								identityPreviewText: "text-foreground",
-								identityPreviewEditButton: "text-muted-foreground hover:text-foreground",
-								formFieldInputShowPasswordButton: "text-muted-foreground hover:text-foreground",
-								otpCodeFieldInput: "bg-card border-border text-foreground",
-								formResendCodeLink: "text-blue-600 hover:text-blue-700",
-								footerActionLink: "text-blue-600 hover:text-blue-700",
-								formHeaderTitle: "text-foreground",
-								formHeaderSubtitle: "text-muted-foreground",
-								dividerLine: "bg-border",
-								dividerText: "text-muted-foreground",
-								logoImage: "brightness-100 dark:brightness-100",
-							},
-						}}
-						// Custom error handling for OAuth failures
-						afterSignUp={(result) => {
-							if (result?.error && result.error.message?.includes("blocked")) {
-								setError("Sign-up failed: This browser or app does not support Google or OAuth sign-up. Please use Chrome, Safari, or another browser.");
-							}
-						}}
-					/>
+						<SignUp
+							routing="path"
+							path="/sign-up"
+							signInUrl="/sign-in"
+							fallbackRedirectUrl="/dashboard"
+							appearance={{
+								baseTheme: theme === "dark" ? dark : undefined,
+								variables: {
+									colorPrimary: "#2563eb",
+									borderRadius: "0.75rem",
+									fontSize: "15px",
+								},
+								elements: {
+									rootBox: "w-full",
+									card: "shadow-xl border border-border bg-card",
+									headerTitle: "text-foreground",
+									headerSubtitle: "text-muted-foreground",
+									socialButtonsBlockButton: "border-border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground",
+									socialButtonsIconButton: "border-border bg-card text-card-foreground hover:bg-accent",
+									formButtonPrimary: "bg-blue-600 hover:bg-blue-700 text-white normal-case shadow-sm",
+									formFieldInput: "bg-card border-border text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+									formFieldLabel: "text-foreground",
+									identityPreviewText: "text-foreground",
+									identityPreviewEditButton: "text-muted-foreground hover:text-foreground",
+									formFieldInputShowPasswordButton: "text-muted-foreground hover:text-foreground",
+									otpCodeFieldInput: "bg-card border-border text-foreground",
+									formResendCodeLink: "text-blue-600 hover:text-blue-700",
+									footerActionLink: "text-blue-600 hover:text-blue-700",
+									formHeaderTitle: "text-foreground",
+									formHeaderSubtitle: "text-muted-foreground",
+									dividerLine: "bg-border",
+									dividerText: "text-muted-foreground",
+									logoImage: "brightness-100 dark:brightness-100",
+								},
+							}}
+						/>
 				</div>
 			</div>
 		</div>
