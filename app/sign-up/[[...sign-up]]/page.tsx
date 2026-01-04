@@ -22,7 +22,7 @@ export default function SignUpPage() {
 	const { isSignedIn } = useUser();
 	const router = useRouter();
 	const [isEmbedded, setIsEmbedded] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const [error] = useState<string | null>(null);
 
 	useEffect(() => {
 		// Detect embedded browsers/webviews
