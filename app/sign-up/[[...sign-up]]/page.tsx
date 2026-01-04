@@ -17,7 +17,7 @@ export default function SignUpPage() {
 
 	useEffect(() => {
 		// Detect embedded browsers/webviews
-		const ua = navigator.userAgent || navigator.vendor || window.opera;
+		const ua = navigator.userAgent || navigator.vendor;
 		if (
 			/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
 			(window.navigator.standalone === false) ||
