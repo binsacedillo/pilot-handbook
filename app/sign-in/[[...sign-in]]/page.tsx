@@ -13,7 +13,7 @@ export default function SignInPage() {
 
 	useEffect(() => {
 		// Detect embedded browsers/webviews
-		const ua = navigator.userAgent || navigator.vendor || window.opera;
+		const ua = navigator.userAgent || navigator.vendor;
 		// Common checks for Facebook, Instagram, Messenger, Twitter, TikTok, etc.
 		if (
 			/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
