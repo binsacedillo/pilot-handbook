@@ -7,14 +7,24 @@ import { useTheme } from "next-themes";
 import { dark } from "@clerk/themes";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export default function SignUpPage() {
 	const { theme } = useTheme();
 	const { isSignedIn } = useUser();
 	const router = useRouter();
+	const [isEmbedded, setIsEmbedded] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
+		// Detect embedded browsers/webviews
+		const ua = navigator.userAgent || navigator.vendor || window.opera;
+		if (
+			/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
+			(window.navigator.standalone === false) ||
+			(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+		) {
+			setIsEmbedded(true);
+		}
 		if (isSignedIn) {
 			router.push("/");
 		}
@@ -24,6 +34,19 @@ export default function SignUpPage() {
 
 	return (
 		<div className="flex min-h-screen bg-linear-to-br from-gray-900 via-blue-900 to-blue-800">
+			{isEmbedded && (
+				<div className="fixed top-0 left-0 w-full z-50 bg-red-600 text-white text-center py-3 px-4 font-semibold shadow-lg">
+					<span>
+						Sign-up with Google and other providers is not supported in this browser or app. <br />
+						Please open this page in Chrome, Safari, or another browser for secure authentication.
+					</span>
+				</div>
+			)}
+			{error && (
+				<div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm font-semibold">
+					{error}
+				</div>
+			)}
 			{/* Left Side - Branding */}
 			<div className="hidden lg:flex lg:w-1/2 p-12 flex-col justify-between relative overflow-hidden">
 				<div className="absolute inset-0 opacity-10">
@@ -133,6 +156,12 @@ export default function SignUpPage() {
 								dividerText: "text-muted-foreground",
 								logoImage: "brightness-100 dark:brightness-100",
 							},
+						}}
+						// Custom error handling for OAuth failures
+						afterSignUp={(result) => {
+							if (result?.error && result.error.message?.includes("blocked")) {
+								setError("Sign-up failed: This browser or app does not support Google or OAuth sign-up. Please use Chrome, Safari, or another browser.");
+							}
 						}}
 					/>
 				</div>
