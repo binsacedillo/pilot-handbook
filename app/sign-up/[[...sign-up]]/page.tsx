@@ -1,10 +1,13 @@
+
+
+"use client";
+
 // Extend Navigator type to include 'standalone' for iOS PWA detection
 declare global {
 	interface Navigator {
 		standalone?: boolean;
 	}
 }
-"use client";
 
 import { SignUp } from "@clerk/nextjs";
 import Link from "next/link";
