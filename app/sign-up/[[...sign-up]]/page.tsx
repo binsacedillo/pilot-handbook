@@ -21,6 +21,7 @@ export default function SignUpPage() {
 	const { isSignedIn } = useUser();
 	const router = useRouter();
 	const [isEmbedded, setIsEmbedded] = useState(false);
+	const [copied, setCopied] = useState(false);
 	// ...existing code...
 
 	useEffect(() => {
@@ -52,12 +53,16 @@ export default function SignUpPage() {
 				<button
 					onClick={() => {
 						navigator.clipboard.writeText(window.location.href);
-						alert("Link copied! Open Chrome/Safari and paste it.");
+						setCopied(true);
+						setTimeout(() => setCopied(false), 2000);
 					}}
 					className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold"
 				>
-					Copy Link & Open Browser
+					{copied ? "Link Copied!" : "Copy Link & Open Browser"}
 				</button>
+				{copied && (
+					<span className="mt-2 text-green-600 font-semibold">Link copied! Open Chrome/Safari and paste it.</span>
+				)}
 				<p className="mt-4 text-sm text-gray-500">
 					Tap the <span className="font-bold">•••</span> menu above and select <br />
 					   <span className="font-bold">&quot;Open in Browser&quot;</span>
