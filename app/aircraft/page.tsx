@@ -1,23 +1,7 @@
 "use client";
 
-import AppHeader from "@/components/AppHeader";
-import AppFooter from "@/components/AppFooter";
-import Footer from "@/components/landing/Footer";
-import { trpc } from "@/trpc/client";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { DeleteDialog } from "@/components/DeleteDialog";
-import { Trash2, Edit2 } from "lucide-react";
-import { useState } from "react";
 
-interface Aircraft {
-  id: string;
-  registration: string;
-  make: string;
-  model: string;
-  status: string;
-  imageUrl: string | null;
-}
+import { Aircraft } from "@prisma/client";
 
 
 import { useRouter } from "next/navigation";
@@ -42,8 +26,8 @@ export default function AircraftPage() {
     aircraftRegistration: string | null;
   }>({ open: false, aircraftId: null, aircraftRegistration: null });
 
-  const displayedAircraft = (aircraft ?? []).filter(
-    (a: { id: string }) => !optimisticAircraft.includes(a.id)
+  const displayedAircraft: Aircraft[] = (aircraft ?? []).filter(
+    (a): a is Aircraft => !optimisticAircraft.includes(a.id)
   );
 
   const handleDeleteClick = (aircraftId: string, registration: string) => {
