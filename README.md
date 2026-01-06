@@ -2,56 +2,90 @@
 
 A comprehensive flight logging and pilot management application built with the T3 Stack. Pilot Handbook helps pilots track their flight hours, manage aircraft, and maintain accurate logbook records while providing administrative tools for flight schools and organizations.
 
-## Features
 
-### 🛩️ Flight Logging
-- **Flight Records Management**: Log and track all your flights with detailed information
-- **Flight Statistics**: View total flight hours, PIC time, dual time, and landing counts
-- **Airport Codes**: Track departure and arrival locations using standard airport codes
-- **Flight Duration Tracking**: Record flight duration with automatic time calculations
-- **Flight Remarks**: Add detailed notes and observations for each flight
+## 🚀 Key Features
 
-### ✈️ Aircraft Management
-- **Aircraft Registry**: Maintain a database of aircraft with make, model, and registration
-- **Flight Hours Tracking**: Monitor total flight hours per aircraft
-- **Aircraft Status**: Track operational status of each aircraft
-- **Multi-Aircraft Support**: Manage multiple aircraft simultaneously
+### ✈️ Pilot Tools
+* **Smart Flight Logging:** Automated duration calculation and aircraft tracking.
+* **Live Weather Widget:** Real-time METAR data with airport name resolution.
+* **Dynamic Filtering:** Filter logs by aircraft type using URL-based state (shareable links).
+* **Recency Tracking:** 90-Day currency monitoring (Day/Night/IFR).
 
-### 👨‍✈️ User Management
-- **Role-Based Access Control**: Support for Admin, Pilot, and User roles
-- **License Tracking**: Store pilot license information and expiry dates
-- **User Profiles**: Manage personal information and preferences
-- **Secure Authentication**: Powered by Clerk for robust user authentication
+### 🛡️ Admin & Security
+* **Role-Based Access:** Admin dashboard for user verification and management.
+* **Secure Auth:** Clerk integration with "In-App Browser" detection for TikTok/Instagram users.
+* **Data Integrity:** Server-side validation with Zod schemas.
 
-### 🔐 Admin Dashboard
-- **System Statistics**: View total users, flights, and aircraft counts
-- **Pilot Verifications**: Dedicated page to verify/revoke pilot accounts
-- **User Management**: View all users with role management and deletion
-- **User Deletion**: Safely delete users with confirmation requirements
-- **Role Management**: Promote users to Pilot or Admin roles
-- **Recent Activity**: Monitor recent user registrations and activity
 
-### 🎨 User Experience
-- **Dark/Light Theme**: System-aware theme with manual override
-- **Theme Persistence**: Saved preferences synced across devices
-- **Responsive Design**: Mobile-first design that works on all devices
-- **Accessibility**: ARIA labels and semantic HTML throughout
-- **Loading States**: Skeleton loaders and loading indicators
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Database**: [PostgreSQL](https://www.postgresql.org/) (via Supabase)
-- **ORM**: [Prisma](https://www.prisma.io/)
-- **Authentication**: [Clerk](https://clerk.com/)
-- **API Layer**: [tRPC](https://trpc.io/) for type-safe APIs
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **UI Components**: Custom components with [Lucide React](https://lucide.dev/) icons
-- **Theming**: [next-themes](https://github.com/pacocoursey/next-themes) for dark/light mode
-- **State Management**: [TanStack Query](https://tanstack.com/query/latest) (React Query)
-- **Testing**: [Vitest](https://vitest.dev/) with 70+ comprehensive unit tests
-- **Charts**: [Recharts](https://recharts.org/) for data visualization
+**Core**
+* **Framework:** Next.js 16 (App Router)
+* **Language:** TypeScript
+* **Library:** React 19 (Server Components & Actions)
+* **Styling:** Tailwind CSS v4
+
+**Backend & Data**
+* **Database:** PostgreSQL (via Supabase)
+* **ORM:** Prisma
+* **API:** tRPC (Type-safe APIs)
+* **Validation:** Zod
+
+**Tools & UI**
+* **Auth:** Clerk (Secure Authentication)
+* **Components:** Radix UI Primitives, Lucide Icons
+* **Testing:** Vitest v4
+
+## 📂 Project Structure
+
+```bash
+prisma/
+	schema.prisma
+	migrations/
+public/
+	favicon.ico
+	logo.png
+scripts/
+	check-admin.ts
+server/
+	trpc.ts
+	routers/
+		admin.ts
+		aircraft.ts
+		flight.ts
+		preferences.ts
+		stats.ts
+		user.ts
+		weather.ts
+		_app.ts
+src/
+	actions/
+		theme.ts
+	components/
+		ThemeProvider.tsx
+		UserManagementTable.tsx
+		flights/
+			FlightFilterBar.tsx
+	lib/
+		shared-schemas.ts
+	trpc/
+		client.ts
+		react.tsx
+		server.ts
+		shared.ts
+	utils/
+trpc/
+	client.ts
+	Provider.tsx
+__tests__/
+	routers/
+		aircraft.test.ts
+		flight.test.ts
+		stats.test.ts
+	security/
+		authorization.test.ts
+```
 
 ## Prerequisites
 
@@ -152,34 +186,6 @@ You can find your Clerk user ID in the Clerk Dashboard or in your browser's deve
 - `npm run typecheck` - Run TypeScript type checking
 - `npm run make:admin <clerkUserId>` - Promote a user to admin role
 
-## Project Structure
-
-```
-pilothandbook/
-├── app/                    # Next.js App Router pages
-│   ├── api/               # API routes (tRPC, webhooks)
-│   ├── admin/             # Admin dashboard pages
-│   │   ├── users/        # User management
-│   │   └── verifications/ # Pilot verifications
-│   ├── dashboard/         # User dashboard
-│   ├── flights/          # Flight logging pages
-│   ├── aircraft/         # Aircraft management
-│   ├── settings/         # User settings & preferences
-│   ├── sign-in/          # Authentication pages
-│   └── sign-up/
-├── components/            # React components
-│   ├── admin/            # Admin-specific components
-│   ├── landing/          # Landing page components
-│   └── ui/               # Reusable UI components
-├── lib/                   # Utility functions and configurations
-│   └── hooks/            # Custom React hooks
-├── prisma/               # Prisma schema and migrations
-├── server/               # tRPC server configuration
-│   └── routers/          # tRPC routers
-├── trpc/                 # tRPC client setup
-├── scripts/              # Utility scripts
-└── __tests__/            # Test files (70+ tests)
-```
 
 ## Database Schema
 
