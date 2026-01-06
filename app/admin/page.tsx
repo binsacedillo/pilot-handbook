@@ -42,24 +42,23 @@ export default function AdminDashboard() {
       <AppHeader />
       <div className="flex-1 p-8">
         <div className="max-w-6xl mx-auto">
+          {/* Back to Dashboard button */}
+          <a href="/dashboard" className="inline-block mb-4">
+            <button className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 dark:text-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 cursor-pointer">
+              ← Back to Dashboard
+            </button>
+          </a>
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-foreground mb-2">
               Welcome back, Admin {user?.emailAddresses?.[0]?.emailAddress ?? 'Admin'}!
             </h2>
             {/* Tabs */}
             <div className="flex gap-2 mb-6">
-              <button className={`px-4 py-2 rounded-lg text-sm font-medium border ${activeTab === 'overview' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100'}`} onClick={() => setActiveTab('overview')}>Overview</button>
-              <button className={`px-4 py-2 rounded-lg text-sm font-medium border ${activeTab === 'users' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100'}`} onClick={() => setActiveTab('users')}>User Management</button>
-              <button className={`px-4 py-2 rounded-lg text-sm font-medium border ${activeTab === 'verifications' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100'}`} onClick={() => setActiveTab('verifications')}>Verifications</button>
+              <button className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer ${activeTab === 'overview' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100'}`} onClick={() => setActiveTab('overview')}>Overview</button>
+              <button className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer ${activeTab === 'users' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100'}`} onClick={() => setActiveTab('users')}>User Management</button>
+              <button className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer ${activeTab === 'verifications' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100'}`} onClick={() => setActiveTab('verifications')}>Verifications</button>
             </div>
           </div>
-
-          {/* Back to Dashboard button */}
-          <a href="/dashboard" className="inline-block mb-4">
-            <button className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 dark:text-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700">
-              ← Back to Dashboard
-            </button>
-          </a>
 
           {/* Tab Content */}
           {activeTab === 'overview' && (
