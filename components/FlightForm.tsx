@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Aircraft } from "@prisma/client";
 import type { RouterOutputs } from "@/src/trpc/shared";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,11 +29,13 @@ type FlightFormData = {
 
 
 
+
 // Inferred type from tRPC router output
-type FlightFromRouter = RouterOutputs["flight"]["getAll"][number];
+type FlightData = RouterOutputs["flight"]["getAll"][number];
+
 
 interface FlightFormProps {
-  initialData?: FlightFromRouter | null;
+  initialData?: FlightData | null;
 }
 
 export default function FlightForm({ initialData }: FlightFormProps) {
@@ -45,36 +46,50 @@ export default function FlightForm({ initialData }: FlightFormProps) {
   const isEditMode = !!initialData;
 
 
-// Inferred type from tRPC router output
-type FlightWithAircraft = FlightFromRouter & { aircraft: Aircraft };
+
 
   const createFlight = trpc.flight.create.useMutation({
     // Optimistic update
     onMutate: async (newFlight) => {
       await utils.flight.getAll.cancel();
-      const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightWithAircraft[] | undefined;
+      const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightData[] | undefined;
       if (previousFlights) {
-        const selectedAircraft = aircraft?.find((a: Aircraft) => a.id === newFlight.aircraftId);
-        if (selectedAircraft) {
-          utils.flight.getAll.setData(
-            {} as Record<string, unknown>,
-            [
-              {
-                ...newFlight,
-                id: "optimistic",
-                aircraft: selectedAircraft,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                userId: selectedAircraft.userId,
-                landings: newFlight.landings ?? 1,
-                remarks: newFlight.remarks ?? null,
-              },
-              ...previousFlights.filter(f =>
-                'createdAt' in f && 'updatedAt' in f && 'userId' in f
-              ),
-            ]
-          );
-        }
+        // Find the full aircraft object from the aircraft list
+        const selectedAircraft = aircraft?.find((a) => a.id === newFlight.aircraftId);
+        // Fallback dummy values for all required fields
+        const fallbackAircraft = {
+          id: newFlight.aircraftId,
+          registration: "",
+          make: "",
+          model: "",
+          status: "",
+          imageUrl: "",
+          isArchived: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          flightHours: 0,
+          userId: "",
+        };
+        // Merge selectedAircraft with fallback to ensure all fields are present
+        const optimisticAircraft = { ...fallbackAircraft, ...(selectedAircraft ?? {}) };
+        utils.flight.getAll.setData(
+          {} as Record<string, unknown>,
+          [
+            {
+              ...newFlight,
+              id: "optimistic",
+              aircraft: optimisticAircraft,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              userId: "",
+              landings: newFlight.landings ?? 1,
+              remarks: newFlight.remarks ?? null,
+            },
+            ...previousFlights.filter(f =>
+              'createdAt' in f && 'updatedAt' in f && 'userId' in f
+            ),
+          ]
+        );
       }
       return { previousFlights };
     },
@@ -96,13 +111,13 @@ type FlightWithAircraft = FlightFromRouter & { aircraft: Aircraft };
     // Optimistic update
     onMutate: async (updatedFlight) => {
       await utils.flight.getAll.cancel();
-      const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightWithAircraft[] | undefined;
+      const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightData[] | undefined;
       if (previousFlights) {
         utils.flight.getAll.setData(
           {} as Record<string, unknown>,
           previousFlights.map(f =>
             f.id === updatedFlight.id
-              ? { ...f, ...updatedFlight } as FlightWithAircraft
+              ? { ...f, ...updatedFlight } as FlightData
               : f
           )
         );
@@ -206,7 +221,7 @@ type FlightWithAircraft = FlightFromRouter & { aircraft: Aircraft };
               <SelectValue placeholder="Select aircraft…" />
             </SelectTrigger>
             <SelectContent>
-              {(aircraft ?? []).map((a: Aircraft) => (
+              {(aircraft ?? []).map((a) => (
                 <SelectItem key={a.id} value={a.id}>
                   {a.registration} • {a.make} {a.model}
                 </SelectItem>
