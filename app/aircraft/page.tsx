@@ -7,6 +7,12 @@ import { useState } from "react";
 import { Aircraft } from "@prisma/client";
 import { trpc } from "@/trpc/client";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import DeleteDialog from "@/components/DeleteDialog";
+import AppHeader from "@/components/AppHeader";
+import AppFooter from "@/components/AppFooter";
+import Image from "next/image";
 
 export default function AircraftPage() {
   // Only show non-archived aircraft by default
@@ -104,9 +110,11 @@ export default function AircraftPage() {
                   {a.make} {a.model}
                 </p>
                 {a.imageUrl ? (
-                  <img
+                  <Image
                     src={a.imageUrl}
                     alt={a.registration}
+                    width={400}
+                    height={160}
                     className="mt-4 rounded-md max-h-40 object-cover w-full mb-4"
                   />
                 ) : null}
