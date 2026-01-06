@@ -3,10 +3,9 @@
 
 
 
+import { useState } from "react";
 import { Aircraft } from "@prisma/client";
 import { trpc } from "@/trpc/client";
-
-
 import { useRouter } from "next/navigation";
 
 export default function AircraftPage() {
