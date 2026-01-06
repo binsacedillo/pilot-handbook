@@ -128,10 +128,10 @@ export default function AdminDashboard() {
                     <table className="w-full min-w-150 text-sm md:text-base md:table-fixed">
                       <thead>
                         <tr className="text-left border-b bg-slate-50 dark:bg-slate-800">
-                          <th className="py-2 pr-4 w-1/4 min-w-[180px]">Email</th>
-                          <th className="py-2 pr-4 w-1/4 min-w-[120px]">Name</th>
-                          <th className="py-2 pr-4 w-1/6 min-w-[80px]">Role</th>
-                          <th className="py-2 pr-4 w-1/4 min-w-[150px]">Created</th>
+                          <th className="py-2 pr-4 w-1/4 min-w-45">Email</th>
+                          <th className="py-2 pr-4 w-1/4 min-w-30">Name</th>
+                          <th className="py-2 pr-4 w-1/6 min-w-20">Role</th>
+                          <th className="py-2 pr-4 w-1/4 min-w-38">Created</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
                         ) : Array.isArray(recentUsers) && recentUsers.length ? (
                           recentUsers.map((u) => (
                             <tr key={u.id} className="border-b hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
-                              <td className="py-2 pr-4 break-all md:truncate max-w-xs md:max-w-[220px]">{u.email}</td>
+                              <td className="py-2 pr-4 break-all md:truncate max-w-xs md:max-w-55">{u.email}</td>
                               <td className="py-2 pr-4 whitespace-nowrap">{[u.firstName, u.lastName].filter(Boolean).join(" ")}</td>
                               <td className="py-2 pr-4 capitalize">{u.role?.toLowerCase()}</td>
                               <td className="py-2 pr-4 whitespace-nowrap">{new Date(u.createdAt).toLocaleString()}</td>
