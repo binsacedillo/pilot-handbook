@@ -3,6 +3,9 @@
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import FlightForm from "@/components/FlightForm";
+import type { RouterOutputs } from "@/src/trpc/shared";
+// Inferred type for a single flight
+type FlightFromRouter = RouterOutputs["flight"]["getAll"][number];
 import { trpc } from "@/trpc/client";
 import { useParams, useRouter } from "next/navigation";
 
@@ -13,6 +16,7 @@ export default function EditFlightPage() {
 
   const { data: flight, isLoading, error } = trpc.flight.getById.useQuery({ id: flightId });
 
+  // Optionally, you could cast or validate the type here if needed
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground flex flex-col">

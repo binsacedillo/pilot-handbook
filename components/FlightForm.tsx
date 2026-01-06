@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Aircraft } from "@prisma/client";
+import type { RouterOutputs } from "@/src/trpc/shared";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -26,21 +28,13 @@ type FlightFormData = {
   aircraftId: string;
 };
 
-type FlightData = {
-  id: string;
-  date: Date;
-  departureCode: string;
-  arrivalCode: string;
-  duration: number;
-  picTime: number;
-  dualTime: number;
-  landings: number;
-  remarks: string | null;
-  aircraftId: string;
-};
+
+
+// Inferred type from tRPC router output
+type FlightFromRouter = RouterOutputs["flight"]["getAll"][number];
 
 interface FlightFormProps {
-  initialData?: FlightData | null;
+  initialData?: FlightFromRouter | null;
 }
 
 export default function FlightForm({ initialData }: FlightFormProps) {
@@ -50,25 +44,43 @@ export default function FlightForm({ initialData }: FlightFormProps) {
   
   const isEditMode = !!initialData;
 
+
+// Inferred type from tRPC router output
+type FlightWithAircraft = FlightFromRouter & { aircraft: Aircraft };
+
   const createFlight = trpc.flight.create.useMutation({
     // Optimistic update
     onMutate: async (newFlight) => {
       await utils.flight.getAll.cancel();
-      const previousFlights = utils.flight.getAll.getData({} as any);
+      const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightWithAircraft[] | undefined;
       if (previousFlights) {
-        const selectedAircraft = aircraft?.find(a => a.id === newFlight.aircraftId);
+        const selectedAircraft = aircraft?.find((a: Aircraft) => a.id === newFlight.aircraftId);
         if (selectedAircraft) {
-          utils.flight.getAll.setData({} as any, [
-            { ...newFlight, id: "optimistic", aircraft: selectedAircraft } as any,
-            ...previousFlights,
-          ]);
+          utils.flight.getAll.setData(
+            {} as Record<string, unknown>,
+            [
+              {
+                ...newFlight,
+                id: "optimistic",
+                aircraft: selectedAircraft,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                userId: selectedAircraft.userId,
+                landings: newFlight.landings ?? 1,
+                remarks: newFlight.remarks ?? null,
+              },
+              ...previousFlights.filter(f =>
+                'createdAt' in f && 'updatedAt' in f && 'userId' in f
+              ),
+            ]
+          );
         }
       }
       return { previousFlights };
     },
     onError: (_err, _newFlight, context) => {
       if (context?.previousFlights) {
-        utils.flight.getAll.setData({} as any, context.previousFlights);
+        utils.flight.getAll.setData({} as Record<string, unknown>, context.previousFlights);
       }
     },
     onSettled: async () => {
@@ -84,15 +96,22 @@ export default function FlightForm({ initialData }: FlightFormProps) {
     // Optimistic update
     onMutate: async (updatedFlight) => {
       await utils.flight.getAll.cancel();
-      const previousFlights = utils.flight.getAll.getData({} as any);
+      const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightWithAircraft[] | undefined;
       if (previousFlights) {
-        utils.flight.getAll.setData({} as any, previousFlights.map(f => f.id === updatedFlight.id ? { ...f, ...updatedFlight } : f));
+        utils.flight.getAll.setData(
+          {} as Record<string, unknown>,
+          previousFlights.map(f =>
+            f.id === updatedFlight.id
+              ? { ...f, ...updatedFlight } as FlightWithAircraft
+              : f
+          )
+        );
       }
       return { previousFlights };
     },
     onError: (_err, _updatedFlight, context) => {
       if (context?.previousFlights) {
-        utils.flight.getAll.setData({} as any, context.previousFlights);
+        utils.flight.getAll.setData({} as Record<string, unknown>, context.previousFlights);
       }
     },
     onSettled: async () => {
@@ -111,10 +130,10 @@ export default function FlightForm({ initialData }: FlightFormProps) {
         date: new Date(initialData.date).toISOString().split("T")[0] || "",
         departureCode: initialData.departureCode,
         arrivalCode: initialData.arrivalCode,
-        duration: initialData.duration.toString(),
-        picTime: initialData.picTime.toString(),
-        dualTime: initialData.dualTime.toString(),
-        landings: initialData.landings.toString(),
+        duration: initialData.duration?.toString() ?? "",
+        picTime: initialData.picTime?.toString() ?? "0",
+        dualTime: initialData.dualTime?.toString() ?? "0",
+        landings: initialData.landings?.toString() ?? "1",
         remarks: initialData.remarks || "",
         aircraftId: initialData.aircraftId,
       };
@@ -187,7 +206,7 @@ export default function FlightForm({ initialData }: FlightFormProps) {
               <SelectValue placeholder="Select aircraft…" />
             </SelectTrigger>
             <SelectContent>
-              {(aircraft ?? []).map((a) => (
+              {(aircraft ?? []).map((a: Aircraft) => (
                 <SelectItem key={a.id} value={a.id}>
                   {a.registration} • {a.make} {a.model}
                 </SelectItem>

@@ -68,7 +68,22 @@ export const flightRouter = createTRPCRouter({
       return ctx.db.flight.findMany({
         where: filters,
         orderBy: { date: 'desc' },
-        include: { aircraft: true },
+        select: {
+          id: true,
+          date: true,
+          departureCode: true,
+          arrivalCode: true,
+          duration: true,
+          picTime: true,
+          dualTime: true,
+          landings: true,
+          remarks: true,
+          aircraftId: true,
+          createdAt: true,
+          updatedAt: true,
+          userId: true,
+          aircraft: true,
+        },
       });
     }),
 
