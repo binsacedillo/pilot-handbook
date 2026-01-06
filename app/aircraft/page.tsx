@@ -24,17 +24,15 @@ export default function AircraftPage() {
   const router = useRouter();
   const deleteMutation = trpc.aircraft.delete.useMutation({
     onSuccess: async () => {
-      // Invalidate all getAll queries (all filters)
-      await utils.aircraft.getAll.invalidate();
-      await utils.aircraft.getAll.invalidate(undefined);
+      // Invalidate all aircraft queries (nuclear option)
+      await utils.aircraft.invalidate();
       router.refresh();
     },
   });
   const restoreMutation = trpc.aircraft.restore.useMutation({
     onSuccess: async () => {
-      // Invalidate all getAll queries (all filters)
-      await utils.aircraft.getAll.invalidate();
-      await utils.aircraft.getAll.invalidate(undefined);
+      // Invalidate all aircraft queries (nuclear option)
+      await utils.aircraft.invalidate();
       router.refresh();
     },
   });
