@@ -9,7 +9,9 @@ import { trpc } from "@/trpc/client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import DeleteDialog from "@/components/DeleteDialog";
+import { DeleteDialog } from "@/components/DeleteDialog";
+import Link from "next/link";
+import { Edit2 } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import Image from "next/image";
@@ -79,7 +81,7 @@ export default function AircraftPage() {
 
         <DeleteDialog
           open={deleteDialogState.open}
-          onOpenChange={(open) =>
+          onOpenChange={(open: boolean) =>
             setDeleteDialogState((prev) => ({ ...prev, open }))
           }
           title="Delete Aircraft"
