@@ -47,6 +47,19 @@ export default function SignUpPage() {
 		   return (
 			   <div className='p-5 text-center'>
 				   <p>Tap the <span className="font-bold">•••</span> or <span className="font-bold">Share</span> icon and select <br/> &apos;Open in Browser&apos;</p>
+				   <button
+					   onClick={() => {
+						   navigator.clipboard.writeText(window.location.href);
+						   setCopied(true);
+						   setTimeout(() => setCopied(false), 2000);
+					   }}
+					   className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold"
+				   >
+					   Copy Link
+				   </button>
+				   {copied && (
+					   <div className="mt-2 text-green-600 font-semibold">Link Copied!</div>
+				   )}
 			   </div>
 		   );
 	}
