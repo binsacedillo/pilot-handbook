@@ -43,7 +43,7 @@ export default function AircraftPage() {
   }>({ open: false, aircraftId: null, aircraftRegistration: null });
 
   const displayedAircraft = (aircraft ?? []).filter(
-    (a) => !optimisticAircraft.includes(a.id)
+    (a: { id: string }) => !optimisticAircraft.includes(a.id)
   );
 
   const handleDeleteClick = (aircraftId: string, registration: string) => {
