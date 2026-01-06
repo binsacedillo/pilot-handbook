@@ -125,29 +125,29 @@ export default function AdminDashboard() {
                 </div>
                 <div className="p-4">
                   <div className="overflow-x-auto w-full">
-                    <table className="min-w-150 text-sm">
+                    <table className="w-full min-w-150 text-sm md:text-base md:table-fixed">
                       <thead>
-                        <tr className="text-left border-b">
-                          <th className="py-2 pr-4">Email</th>
-                          <th className="py-2 pr-4">Name</th>
-                          <th className="py-2 pr-4">Role</th>
-                          <th className="py-2 pr-4">Created</th>
+                        <tr className="text-left border-b bg-slate-50 dark:bg-slate-800">
+                          <th className="py-2 pr-4 w-1/4 min-w-[180px]">Email</th>
+                          <th className="py-2 pr-4 w-1/4 min-w-[120px]">Name</th>
+                          <th className="py-2 pr-4 w-1/6 min-w-[80px]">Role</th>
+                          <th className="py-2 pr-4 w-1/4 min-w-[150px]">Created</th>
                         </tr>
                       </thead>
                       <tbody>
                         {recentLoading ? (
-                          <tr><td colSpan={4}>Loading...</td></tr>
+                          <tr><td colSpan={4} className="py-4 text-center">Loading...</td></tr>
                         ) : Array.isArray(recentUsers) && recentUsers.length ? (
                           recentUsers.map((u) => (
-                            <tr key={u.id} className="border-b">
-                              <td className="py-2 pr-4">{u.email}</td>
-                              <td className="py-2 pr-4">{[u.firstName, u.lastName].filter(Boolean).join(" ")}</td>
+                            <tr key={u.id} className="border-b hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
+                              <td className="py-2 pr-4 break-all md:truncate max-w-xs md:max-w-[220px]">{u.email}</td>
+                              <td className="py-2 pr-4 whitespace-nowrap">{[u.firstName, u.lastName].filter(Boolean).join(" ")}</td>
                               <td className="py-2 pr-4 capitalize">{u.role?.toLowerCase()}</td>
-                              <td className="py-2 pr-4">{new Date(u.createdAt).toLocaleString()}</td>
+                              <td className="py-2 pr-4 whitespace-nowrap">{new Date(u.createdAt).toLocaleString()}</td>
                             </tr>
                           ))
                         ) : (
-                          <tr><td colSpan={4}>No recent users found.</td></tr>
+                          <tr><td colSpan={4} className="py-4 text-center">No recent users found.</td></tr>
                         )}
                       </tbody>
                     </table>
