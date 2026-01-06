@@ -107,6 +107,9 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
   const dewpoint = metar.dewpoint !== null && metar.dewpoint !== undefined ? `${metar.dewpoint}°C` : "—";
   const updatedTime = metar.time ? new Date(metar.time).toLocaleTimeString() : "—";
 
+  // Conditional header logic
+  const showHeader = metar.icao === metar.station ? metar.station : `${metar.station} - ${metar.icao}`;
+
   if (isLoading) {
     // Suggestion: The class `bg-gradient-to-br` can be written as `bg-linear-to-br` (suggestCanonicalClasses)
     // .bg-gradient-to-br {
@@ -153,7 +156,7 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <CardTitle className="text-base font-semibold leading-tight">
-              {metar.icao} - {metar.station}
+              {showHeader}
             </CardTitle>
             <span
               className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${getCategoryBgColor(category)} ${getCategoryColor(category)}`}
