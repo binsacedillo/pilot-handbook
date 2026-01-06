@@ -54,9 +54,42 @@ export default function AdminDashboard() {
             </h2>
             {/* Tabs */}
             <div className="flex gap-2 mb-6">
-              <button className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer ${activeTab === 'overview' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100'}`} onClick={() => setActiveTab('overview')}>Overview</button>
-              <button className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer ${activeTab === 'users' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100'}`} onClick={() => setActiveTab('users')}>User Management</button>
-              <button className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer ${activeTab === 'verifications' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100'}`} onClick={() => setActiveTab('verifications')}>Verifications</button>
+              <button
+                className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500
+                  ${activeTab === 'overview'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100 border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-400'}
+                `}
+                onClick={() => setActiveTab('overview')}
+                tabIndex={0}
+                aria-current={activeTab === 'overview' ? 'page' : undefined}
+              >
+                Overview
+              </button>
+              <button
+                className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500
+                  ${activeTab === 'users'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100 border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-400'}
+                `}
+                onClick={() => setActiveTab('users')}
+                tabIndex={0}
+                aria-current={activeTab === 'users' ? 'page' : undefined}
+              >
+                User Management
+              </button>
+              <button
+                className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500
+                  ${activeTab === 'verifications'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100 border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-400'}
+                `}
+                onClick={() => setActiveTab('verifications')}
+                tabIndex={0}
+                aria-current={activeTab === 'verifications' ? 'page' : undefined}
+              >
+                Verifications
+              </button>
             </div>
           </div>
 
