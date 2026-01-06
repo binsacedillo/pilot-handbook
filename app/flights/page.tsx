@@ -25,6 +25,7 @@ export default function FlightsPage() {
     startDate: searchParams.get("startDate") || undefined,
     endDate: searchParams.get("endDate") || undefined,
     flightType: isValidFlightType(flightTypeValue) ? flightTypeValue : undefined,
+    aircraftId: searchParams.get("aircraftId") || undefined,
   };
 
   const { data: flights } = trpc.flight.getAll.useQuery(filters);
