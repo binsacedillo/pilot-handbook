@@ -4,26 +4,34 @@ import { idSchema, createAircraftSchema, updateAircraftSchema } from '@/src/lib/
 
 export const aircraftRouter = createTRPCRouter({
   // Get all aircraft for the current user
-  getAll: protectedProcedure.query(async ({ ctx }) => {
-    // Return empty array if user not in database yet
-    if (!ctx.user) {
-      return [];
-    }
-    // Only select minimal fields needed for dashboard
-    const aircraft = await ctx.db.aircraft.findMany({
-      where: { userId: ctx.user.id },
-      select: {
-        id: true,
-        registration: true,
-        make: true,
-        model: true,
-        status: true,
-        imageUrl: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-    return aircraft;
-  }),
+  getAll: protectedProcedure
+    .input(
+      // Optional input: includeArchived (default false)
+      z.object({ includeArchived: z.boolean().optional() }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      if (!ctx.user) {
+        return [];
+      }
+      const includeArchived = input?.includeArchived ?? false;
+      const aircraft = await ctx.db.aircraft.findMany({
+        where: {
+          userId: ctx.user.id,
+          ...(includeArchived ? {} : { isArchived: false }),
+        },
+        select: {
+          id: true,
+          registration: true,
+          make: true,
+          model: true,
+          status: true,
+          imageUrl: true,
+          isArchived: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+      return aircraft;
+    }),
 
   // Get a single aircraft by ID
   getById: protectedProcedure
@@ -81,22 +89,23 @@ export const aircraftRouter = createTRPCRouter({
       return aircraft;
     }),
 
-  // Delete an aircraft
+  // Archive (soft delete) an aircraft
   delete: protectedProcedure
     .input(idSchema)
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
       }
-      
-      // Use delete instead of deleteMany for better error handling
-      const aircraft = await ctx.db.aircraft.delete({
+      // Soft delete: set isArchived to true
+      const aircraft = await ctx.db.aircraft.update({
         where: {
           id: input.id,
           userId: ctx.user.id, // Security Check!
         },
+        data: {
+          isArchived: true,
+        },
       });
-
       return aircraft;
     }),
 });

@@ -30,6 +30,7 @@ model Aircraft {
   imageUrl     String?
   status       String   @default("operational")
   flightHours  Int      @default(0)
+  isArchived   Boolean  @default(false)
   userId       String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

@@ -23,7 +23,8 @@ interface Aircraft {
 import { useRouter } from "next/navigation";
 
 export default function AircraftPage() {
-  const { data: aircraft, isLoading } = trpc.aircraft.getAll.useQuery();
+  // Only show non-archived aircraft by default
+  const { data: aircraft, isLoading } = trpc.aircraft.getAll.useQuery({ includeArchived: false });
   const utils = trpc.useUtils();
   const router = useRouter();
   const deleteMutation = trpc.aircraft.delete.useMutation({
