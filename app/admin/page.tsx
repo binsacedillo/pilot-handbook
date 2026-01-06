@@ -92,32 +92,34 @@ export default function AdminDashboard() {
                   <h2 className="text-lg font-semibold">Recent Users</h2>
                 </div>
                 <div className="p-4">
-                  <table className="min-w-full text-sm">
-                    <thead>
-                      <tr className="text-left border-b">
-                        <th className="py-2 pr-4">Email</th>
-                        <th className="py-2 pr-4">Name</th>
-                        <th className="py-2 pr-4">Role</th>
-                        <th className="py-2 pr-4">Created</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentLoading ? (
-                        <tr><td colSpan={4}>Loading...</td></tr>
-                      ) : Array.isArray(recentUsers) && recentUsers.length ? (
-                        recentUsers.map((u) => (
-                          <tr key={u.id} className="border-b">
-                            <td className="py-2 pr-4">{u.email}</td>
-                            <td className="py-2 pr-4">{[u.firstName, u.lastName].filter(Boolean).join(" ")}</td>
-                            <td className="py-2 pr-4 capitalize">{u.role?.toLowerCase()}</td>
-                            <td className="py-2 pr-4">{new Date(u.createdAt).toLocaleString()}</td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr><td colSpan={4}>No recent users found.</td></tr>
-                      )}
-                    </tbody>
-                  </table>
+                  <div className="overflow-x-auto w-full">
+                    <table className="min-w-150 text-sm">
+                      <thead>
+                        <tr className="text-left border-b">
+                          <th className="py-2 pr-4">Email</th>
+                          <th className="py-2 pr-4">Name</th>
+                          <th className="py-2 pr-4">Role</th>
+                          <th className="py-2 pr-4">Created</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {recentLoading ? (
+                          <tr><td colSpan={4}>Loading...</td></tr>
+                        ) : Array.isArray(recentUsers) && recentUsers.length ? (
+                          recentUsers.map((u) => (
+                            <tr key={u.id} className="border-b">
+                              <td className="py-2 pr-4">{u.email}</td>
+                              <td className="py-2 pr-4">{[u.firstName, u.lastName].filter(Boolean).join(" ")}</td>
+                              <td className="py-2 pr-4 capitalize">{u.role?.toLowerCase()}</td>
+                              <td className="py-2 pr-4">{new Date(u.createdAt).toLocaleString()}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr><td colSpan={4}>No recent users found.</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </section>
