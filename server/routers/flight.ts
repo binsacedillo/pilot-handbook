@@ -19,7 +19,18 @@ export const flightRouter = createTRPCRouter({
         return [];
       }
 
-      const filters: Record<string, unknown> = {
+      type DateFilter = { gte?: Date; lte?: Date };
+      type FlightFilters = {
+        userId: string;
+        OR?: Array<Record<string, unknown>>;
+        date?: DateFilter;
+        flightType?: string;
+        picTime?: { gt?: number; equals?: number };
+        dualTime?: { gt?: number; equals?: number };
+        [key: string]: unknown;
+      };
+
+      const filters: FlightFilters = {
         userId: ctx.user.id,
       };
 
@@ -33,9 +44,10 @@ export const flightRouter = createTRPCRouter({
       }
 
       if (input.startDate || input.endDate) {
-        filters.date = {} as any;
-        if (input.startDate) (filters.date as any).gte = input.startDate;
-        if (input.endDate) (filters.date as any).lte = input.endDate;
+        const dateFilter: DateFilter = {};
+        if (input.startDate) dateFilter.gte = input.startDate;
+        if (input.endDate) dateFilter.lte = input.endDate;
+        filters.date = dateFilter;
       }
 
       if (input.flightType) {
@@ -59,6 +71,19 @@ export const flightRouter = createTRPCRouter({
         include: { aircraft: true },
       });
     }),
+
+  // Get unique aircraft for the current user (for scalable filter dropdown)
+  getUserAircraft: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.user) return [];
+    return ctx.db.flight.findMany({
+      where: { userId: ctx.user.id },
+      distinct: ['aircraftId'],
+      select: {
+        aircraftId: true,
+        aircraft: { select: { id: true, model: true, registration: true } },
+      },
+    });
+  }),
 
   // Get a single flight by ID
   getById: protectedProcedure
