@@ -44,34 +44,13 @@ export default function SignUpPage() {
 	if (isSignedIn) return null;
 
 	if (isEmbedded) {
-		return (
-			<div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-				<h1 className="text-xl font-bold mb-4">⚠️ Browser Not Supported</h1>
-				<p className="mb-6">
-					Security features (like Google Login) are disabled inside apps like TikTok or Instagram.
-				</p>
-				<button
-					onClick={() => {
-						navigator.clipboard.writeText(window.location.href);
-						setCopied(true);
-						setTimeout(() => setCopied(false), 2000);
-					}}
-					className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold"
-				>
-					{copied ? "Link Copied!" : "Copy Link & Open Browser"}
-				</button>
-				{copied && (
-					<span className="mt-2 text-green-600 font-semibold">Link copied! Open Chrome/Safari and paste it.</span>
-				)}
-				<p className="mt-4 text-sm text-gray-500">
-					Tap the <span className="font-bold">•••</span> menu above and select <br />
-					   <span className="font-bold">&quot;Open in Browser&quot;</span>
-				</p>
-			</div>
-		);
+		   return (
+			   <div className='p-5 text-center'>
+				   <p>Tap the <span className="font-bold">•••</span> or <span className="font-bold">Share</span> icon and select <br/> &apos;Open in Browser&apos;</p>
+			   </div>
+		   );
 	}
 
-	// Only render SignUp if not embedded
 	return (
 		<div className="flex justify-center py-24">
 			<SignUp
