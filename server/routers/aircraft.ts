@@ -4,6 +4,24 @@ import { createTRPCRouter, protectedProcedure } from '../trpc';
 import { idSchema, createAircraftSchema, updateAircraftSchema } from '@/src/lib/shared-schemas';
 
 export const aircraftRouter = createTRPCRouter({
+    // Restore (unarchive) an aircraft
+    restore: protectedProcedure
+      .input(idSchema)
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
+        }
+        const aircraft = await ctx.db.aircraft.update({
+          where: {
+            id: input.id,
+            userId: ctx.user.id, // Security Check!
+          },
+          data: {
+            isArchived: false,
+          },
+        });
+        return aircraft;
+      }),
   // Get all aircraft for the current user
   getAll: protectedProcedure
     .input(
