@@ -1,3 +1,5 @@
+# 📊 **Current Status:** For a detailed breakdown of completed features, WIPs, and the audit log, please see [PROJECT_STATUS_REPORT.md](./PROJECT_STATUS_REPORT.md).
+
 # Pilot Handbook
 
 A comprehensive flight logging and pilot management application built with the T3 Stack. Pilot Handbook helps pilots track their flight hours, manage aircraft, and maintain accurate logbook records while providing administrative tools for flight schools and organizations.
