@@ -28,8 +28,8 @@ export default function AircraftPage() {
     aircraftRegistration: string | null;
   }>({ open: false, aircraftId: null, aircraftRegistration: null });
 
-  const displayedAircraft: Aircraft[] = (aircraft ?? []).filter(
-    (a): a is Aircraft => !optimisticAircraft.includes(a.id)
+  const displayedAircraft: Aircraft[] = ((aircraft ?? []) as Aircraft[]).filter(
+    (a) => !optimisticAircraft.includes(a.id)
   );
 
   const handleDeleteClick = (aircraftId: string, registration: string) => {
