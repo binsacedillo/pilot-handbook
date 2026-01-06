@@ -19,9 +19,19 @@ interface Aircraft {
   imageUrl: string | null;
 }
 
+
+import { useRouter } from "next/navigation";
+
 export default function AircraftPage() {
   const { data: aircraft, isLoading } = trpc.aircraft.getAll.useQuery();
-  const deleteMutation = trpc.aircraft.delete.useMutation();
+  const utils = trpc.useUtils();
+  const router = useRouter();
+  const deleteMutation = trpc.aircraft.delete.useMutation({
+    onSuccess: async () => {
+      await utils.aircraft.getAll.invalidate();
+      router.refresh();
+    },
+  });
 
   // State for optimistic updates
   const [optimisticAircraft, setOptimisticAircraft] = useState<string[]>([]);
@@ -54,7 +64,7 @@ export default function AircraftPage() {
     try {
       // Send delete request to server
       await deleteMutation.mutateAsync({ id: aircraftId });
-      // Success - optimistic update is complete, dialog closes
+      // Success - handled in onSuccess
     } catch (error) {
       // Rollback on error
       setOptimisticAircraft((prev) => prev.filter((id) => id !== aircraftId));
