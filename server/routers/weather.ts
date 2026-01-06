@@ -1,17 +1,18 @@
+// Import required modules and types
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
-// Server-side cache for weather data
-// Reduces API calls by caching responses for 10 minutes
+// Cache METAR weather data for 10 minutes to reduce API calls
 interface CachedMetar {
 	data: MetarData;
 	timestamp: number;
 }
 
 const weatherCache = new Map<string, CachedMetar>();
-const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
+// Get cached METAR if available and not expired
 function getCachedMetar(icao: string): MetarData | null {
 	const cached = weatherCache.get(icao.toUpperCase());
 	if (!cached) return null;
@@ -28,6 +29,7 @@ function getCachedMetar(icao: string): MetarData | null {
 	return cached.data;
 }
 
+// Store METAR in cache
 function setCachedMetar(icao: string, data: MetarData): void {
 	weatherCache.set(icao.toUpperCase(), {
 		data,
@@ -35,7 +37,7 @@ function setCachedMetar(icao: string, data: MetarData): void {
 	});
 }
 
-// Clean up old cache entries periodically (every 30 minutes)
+// Remove expired cache entries every 30 minutes
 setInterval(() => {
 	const now = Date.now();
 	for (const [key, value] of weatherCache.entries()) {
@@ -45,7 +47,7 @@ setInterval(() => {
 	}
 }, 30 * 60 * 1000);
 
-// Types for AVWX response
+// Types for AVWX API and METAR data
 interface AVWXMetarResponse {
 	raw: string;
 	station: string;
@@ -120,11 +122,11 @@ interface MetarData {
 	time: string;
 }
 
-// AVWX API - Free tier requires registration at https://avwx.rest
-// Sign up for free API key at https://avwx.rest/ or use environment variable
+// AVWX API base URL and key (get free key from avwx.rest)
 const AVWX_BASE_URL = "https://avwx.rest/api";
-const AVWX_KEY = process.env.AVWX_API_KEY || ""; // Get free key from https://avwx.rest
+const AVWX_KEY = process.env.AVWX_API_KEY || "";
 
+// Fetch METAR data from AVWX API
 async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
 	try {
 		const url = new URL(`${AVWX_BASE_URL}/metar/${icao.toUpperCase()}`);
@@ -154,12 +156,13 @@ async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
 			| AVWXMetarResponse
 			| AVWXErrorResponse;
 
+		// If API returns error, log and return null
 		if ("error" in data && data.error) {
 			console.error(`AVWX error for ${icao}:`, data.message);
 			return null;
 		}
 
-		// Log the actual response structure for debugging
+		// Log response for debugging
 		console.log(
 			`AVWX API response structure for ${icao}:`,
 			JSON.stringify(data, null, 2)
@@ -167,7 +170,7 @@ async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
 
 		const metar = data as AVWXMetarResponse;
 
-		// Calculate ceiling from clouds (lowest BKN or OVC layer)
+		// Find lowest BKN/OVC cloud layer for ceiling
 		let ceiling: number | null = null;
 		for (const cloud of metar.clouds || []) {
 			if (
@@ -175,20 +178,20 @@ async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
 				cloud.altitude !== null
 			) {
 				if (ceiling === null || cloud.altitude < ceiling) {
-					ceiling = cloud.altitude * 100; // Convert to feet (altitude is in hundreds of feet)
+					ceiling = cloud.altitude * 100; // hundreds of feet to feet
 				}
 			}
 		}
 
-		// Convert visibility from meters to statute miles if needed
+		// Convert visibility to statute miles if needed
 		let visibilityValue = metar.visibility?.value ?? null;
 		let visibilityUnit = metar.units?.visibility || "m";
 		if (visibilityUnit === "m" && visibilityValue !== null) {
-			visibilityValue = Math.round((visibilityValue / 1609.34) * 10) / 10; // Convert to SM
+			visibilityValue = Math.round((visibilityValue / 1609.34) * 10) / 10;
 			visibilityUnit = "SM";
 		}
 
-		// Safely parse the response with null checks
+		// Return parsed METAR data
 		return {
 			icao: metar.station || icao,
 			raw: metar.raw,
@@ -218,7 +221,7 @@ async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
 	}
 }
 
-// Simple fallback mock data for testing (replace with real API when key is available)
+// Return mock METAR data for testing if API fails
 function getMockMetar(icao: string): MetarData {
 	const now = new Date().toISOString();
 	return {
@@ -246,10 +249,9 @@ function getMockMetar(icao: string): MetarData {
 	};
 }
 
+// Define TRPC router for weather endpoints
 export const weatherRouter = createTRPCRouter({
-	/**
-	 * Get METAR for any airport (public, cached)
-	 */
+	// Public: Get METAR for any airport (uses cache)
 	getMetar: publicProcedure
 		.input(z.object({ icao: z.string().min(4).max(4).toUpperCase() }))
 		.query(async ({ input }) => {
@@ -263,7 +265,7 @@ export const weatherRouter = createTRPCRouter({
 				return cached;
 			}
 
-			// Try AVWX first, fall back to mock data
+			// Fetch from AVWX, fallback to mock if needed
 			let metar = await fetchMetarFromAVWX(input.icao);
 
 			if (!metar) {
@@ -273,15 +275,13 @@ export const weatherRouter = createTRPCRouter({
 				console.log(`Successfully fetched real METAR for ${input.icao}`);
 			}
 
-			// Cache the result
+			// Cache result
 			setCachedMetar(input.icao, metar);
 
 			return metar;
 		}),
 
-	/**
-	 * Get favorite airport METAR (user's preferred airport)
-	 */
+	// Protected: Get METAR for user's favorite airport
 	getFavoriteAirportMetar: protectedProcedure.query(async ({ ctx }) => {
 		try {
 			const prefs = await ctx.db.userPreferences.findUnique({
@@ -299,7 +299,7 @@ export const weatherRouter = createTRPCRouter({
 				return cached;
 			}
 
-			// Try AVWX first, fall back to mock data
+			// Fetch from AVWX, fallback to mock if needed
 			let metar = await fetchMetarFromAVWX(icao);
 
 			if (!metar) {
@@ -309,22 +309,20 @@ export const weatherRouter = createTRPCRouter({
 				console.log(`Successfully fetched real METAR for ${icao}`);
 			}
 
-			// Cache the result
+			// Cache result
 			setCachedMetar(icao, metar);
 
 			return metar;
 		} catch (error) {
 			if (error instanceof TRPCError) throw error;
 			console.error("Weather fetch error:", error);
-			// Return mock data on error instead of failing
+			// Return mock data if error
 			const icao = "KJFK";
 			return getMockMetar(icao);
 		}
 	}),
 
-	/**
-	 * Set user's favorite airport
-	 */
+	// Protected: Set user's favorite airport
 	setFavoriteAirport: protectedProcedure
 		.input(z.object({ icao: z.string().min(4).max(4).toUpperCase() }))
 		.mutation(async ({ ctx, input }) => {
@@ -336,6 +334,7 @@ export const weatherRouter = createTRPCRouter({
 				);
 			}
 
+			// Update or create user preference
 			const updated = await ctx.db.userPreferences.upsert({
 				where: { userId: ctx.user.id },
 				update: { favoriteAirport: input.icao },
