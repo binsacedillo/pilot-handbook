@@ -24,30 +24,30 @@ export default function AircraftPage() {
   const router = useRouter();
   const deleteMutation = trpc.aircraft.delete.useMutation({
     onSuccess: async () => {
-      // Invalidate all aircraft queries (nuclear option)
+      // 1. Force tRPC to mark ALL aircraft lists (active & archived) as stale
       await utils.aircraft.invalidate();
+      // 2. Force Next.js to refresh server components (Safety Backup)
       router.refresh();
     },
   });
   const restoreMutation = trpc.aircraft.restore.useMutation({
     onSuccess: async () => {
-      // Invalidate all aircraft queries (nuclear option)
+      // 1. Force tRPC to mark ALL aircraft lists (active & archived) as stale
       await utils.aircraft.invalidate();
+      // 2. Force Next.js to refresh server components (Safety Backup)
       router.refresh();
     },
   });
 
-  // State for optimistic updates
-  const [optimisticAircraft, setOptimisticAircraft] = useState<string[]>([]);
+  // Removed optimistic update state
   const [deleteDialogState, setDeleteDialogState] = useState<{
     open: boolean;
     aircraftId: string | null;
     aircraftRegistration: string | null;
   }>({ open: false, aircraftId: null, aircraftRegistration: null });
 
-  const displayedAircraft: Aircraft[] = ((aircraft ?? []) as Aircraft[]).filter(
-    (a) => !optimisticAircraft.includes(a.id)
-  );
+  // Show all aircraft from server, no optimistic filtering
+  const displayedAircraft: Aircraft[] = (aircraft ?? []) as Aircraft[];
 
   const handleDeleteClick = (aircraftId: string, registration: string) => {
     setDeleteDialogState({
@@ -59,19 +59,12 @@ export default function AircraftPage() {
 
   const handleConfirmDelete = async () => {
     if (!deleteDialogState.aircraftId) return;
-
     const aircraftId = deleteDialogState.aircraftId;
-
-    // Optimistic update: immediately remove from UI
-    setOptimisticAircraft((prev) => [...prev, aircraftId]);
-
     try {
       // Send delete request to server
       await deleteMutation.mutateAsync({ id: aircraftId });
       // Success - handled in onSuccess
     } catch (error) {
-      // Rollback on error
-      setOptimisticAircraft((prev) => prev.filter((id) => id !== aircraftId));
       console.error("Failed to delete aircraft:", error);
       throw error;
     }
