@@ -18,7 +18,7 @@ import Image from "next/image";
 
 export default function AircraftPage() {
   // Only show non-archived aircraft by default
-  const { data: aircraft, isLoading } = trpc.aircraft.getAll.useQuery({ includeArchived: false });
+  const { data: aircraft } = trpc.aircraft.getAll.useQuery({ includeArchived: false });
   const utils = trpc.useUtils();
   const router = useRouter();
   const deleteMutation = trpc.aircraft.delete.useMutation({
