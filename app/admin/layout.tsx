@@ -1,7 +1,7 @@
 // app/admin/layout.tsx
 
 import { redirect } from "next/navigation";
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
 export default async function AdminLayout({
@@ -25,7 +25,8 @@ export default async function AdminLayout({
 
   // 3. Strict Redirect
   if (!dbUser || dbUser.role !== "ADMIN") {
-    console.warn(`Unauthorized admin access attempt by: ${user.emailAddresses[0].emailAddress}`);
+    const email = user.emailAddresses?.[0]?.emailAddress || "unknown";
+    console.warn(`Unauthorized admin access attempt by: ${email}`);
     redirect("/dashboard");
   }
 
