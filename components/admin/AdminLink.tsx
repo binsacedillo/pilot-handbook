@@ -17,7 +17,7 @@ export async function AdminLink() {
     <li>
       <Link
         href="/admin"
-        className="text-lg font-medium text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 transition-colors flex items-center gap-2 font-semibold"
+        className="text-lg text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 transition-colors flex items-center gap-2 font-semibold"
         title="Admin Panel - System Management"
       >
         <ShieldAlert className="h-4 w-4" aria-hidden="true" />
