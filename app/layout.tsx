@@ -2,9 +2,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
-// ...existing code...
-
 import { TRPCProvider } from "@/trpc/Provider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
