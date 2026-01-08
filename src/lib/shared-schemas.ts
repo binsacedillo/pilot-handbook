@@ -26,6 +26,7 @@ export const createAircraftSchema = z.object({
 
 export const updateAircraftSchema = createAircraftSchema.partial().extend({
   id: z.string().min(1, 'Aircraft ID is required'),
+  flightHours: z.number().optional(),
 });
 
 // ============================================================================
