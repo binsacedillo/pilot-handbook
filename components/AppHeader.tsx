@@ -120,11 +120,13 @@ export default function AppHeader() {
 											href="/settings"
 										/>
 										<UserButton.Action label="manageAccount" />
-										<UserButton.Link
-											label="Admin Panel"
-											labelIcon={<span>👑</span>}
-											href="/admin"
-										/>
+										{isAdmin && (
+											<UserButton.Link
+												label="Admin Panel"
+												labelIcon={<span>👑</span>}
+												href="/admin"
+											/>
+										)}
 									</UserButton.MenuItems>
 								</UserButton>
 							</div>
