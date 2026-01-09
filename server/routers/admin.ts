@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { clerkClient } from "@clerk/nextjs/server";
+import { TRPCError } from "@trpc/server";
 import {
   createTRPCRouter,
-  protectedProcedure,
   adminProcedure,
 } from "../trpc";
 
@@ -63,7 +64,35 @@ export const adminRouter = createTRPCRouter({
       });
     }),
 
-  // 5. Delete User
+  // 5. Update User Role (Dual-Write: DB + Clerk)
+  updateUserRole: adminProcedure
+    .input(z.object({
+      userId: z.string(),
+      role: z.enum(["ADMIN", "USER", "PILOT"]), // Match your Prisma Schema Enums
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // 1. Update Database (Source of Truth)
+      const updatedUser = await ctx.db.user.update({
+        where: { id: input.userId }, // Ensure 'id' is the correct DB lookup field
+        data: { role: input.role },
+      });
+
+      if (!updatedUser) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found in DB" });
+      }
+      // 2. Update Clerk Metadata (Clerk v6 async client)
+      // Note: If your DB 'id' is NOT the 'clerkId', swap this to use 'updatedUser.clerkId'
+      const client = await clerkClient();
+      await client.users.updateUserMetadata(updatedUser.clerkId, {
+        publicMetadata: {
+          role: input.role,
+        },
+      });
+
+      return updatedUser;
+    }),
+
+  // 6. Delete User
   deleteUser: adminProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
