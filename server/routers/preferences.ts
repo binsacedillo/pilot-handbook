@@ -39,16 +39,21 @@ export const preferencesRouter = createTRPCRouter({
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
       }
 
-      // Update Clerk public metadata for theme/units
+      // Update Clerk public metadata for theme/units (Read-Modify-Write, Clerk v6 compliant)
       try {
         // Only run on server
         const { clerkClient } = await import('@clerk/nextjs/server');
         const client = await clerkClient();
-        await client.users.updateUser(ctx.session.userId || "", {
-          publicMetadata: {
-            theme: input.theme,
-            unitSystem: input.unitSystem,
-          },
+        const userId = ctx.session.userId || "";
+        const user = await client.users.getUser(userId);
+        const currentMeta = user.publicMetadata || {};
+        const mergedMeta = {
+          ...currentMeta,
+          theme: input.theme,
+          unitSystem: input.unitSystem,
+        };
+        await client.users.updateUser(userId, {
+          publicMetadata: mergedMeta,
         });
       } catch (err) {
         // Log but don't block
