@@ -1,24 +1,17 @@
-import type { JSX } from 'react';
 import Link from 'next/link';
 import { isCurrentUserAdmin } from '@/lib/clerk-roles';
 import { ShieldAlert } from 'lucide-react';
 
 /**
- * Server component that conditionally renders admin link.
- * Handles errors, type safety, and is ready for Suspense.
+ * Server component that conditionally renders admin link
+ * Only shows if current user has ADMIN role
  */
-export async function AdminLink(): Promise<JSX.Element | null> {
-  let isAdmin: boolean = false;
-  try {
-    isAdmin = await isCurrentUserAdmin();
-  } catch (error) {
-    // Log error for observability, but fail silent for security
-    console.error('AdminLink: Failed to check admin status', error);
-    // Optionally, report to error tracking service here
+export async function AdminLink() {
+  const isAdmin = await isCurrentUserAdmin();
+
+  if (!isAdmin) {
     return null;
   }
-
-  if (!isAdmin) return null;
 
   return (
     <li>
