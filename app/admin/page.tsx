@@ -13,6 +13,7 @@ import UserManagementTable from '@/src/components/UserManagementTable';
 export default function AdminDashboard() {
   // All hooks must be called before any early return
   const { user } = useUser();
+  // TODO: Add error handling for failed queries (show error UI)
   const { data: stats, isLoading } = trpc.admin.getStats.useQuery();
   const { data: recentUsers, isLoading: recentLoading } = trpc.admin.recentUsers.useQuery();
   const { data: allUsers } = trpc.admin.getAllUsers.useQuery({ skip: 0, take: 100 });
@@ -27,6 +28,7 @@ export default function AdminDashboard() {
   const admins = allUsers?.users.filter(u => u.role === 'ADMIN') ?? [];
 
   if (isLoading) {
+    // TODO: Add skeleton loader for better UX
     return (
       <div className="min-h-screen">
         <AppHeader />
@@ -215,7 +217,7 @@ export default function AdminDashboard() {
                             <span className="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
                               Pending
                             </span>
-                            {/* Verification action would go here, see verifications page for full logic */}
+                            {/* TODO: Implement verification action here (see verifications page for full logic) */}
                           </div>
                         </div>
                       </Card>

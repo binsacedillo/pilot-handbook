@@ -58,6 +58,7 @@ export const adminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // Logic to update user verification
       // If you don't have a 'verified' field, you might be using roles
+      // TODO: Add audit logging for role changes (security compliance)
       return ctx.db.user.update({
         where: { id: input.userId },
         data: { role: input.verified ? "PILOT" : "USER" },
@@ -80,6 +81,7 @@ export const adminRouter = createTRPCRouter({
       if (!updatedUser) {
         throw new TRPCError({ code: "NOT_FOUND", message: "User not found in DB" });
       }
+      // FIXME: No rollback if Clerk update fails after DB update (consider transaction or compensating action)
       // 2. Update Clerk Metadata (Clerk v6 async client)
       // Note: If your DB 'id' is NOT the 'clerkId', swap this to use 'updatedUser.clerkId'
       const client = await clerkClient();
@@ -101,6 +103,7 @@ export const adminRouter = createTRPCRouter({
         throw new Error("Cannot delete your own account");
       }
 
+      // TODO: Add soft-delete and audit trail for user deletions
       // Delete user and cascade delete their related data (flights, aircraft)
       return ctx.db.user.delete({
         where: { id: input.userId },

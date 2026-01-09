@@ -1,3 +1,29 @@
+# 🚧 **WIP** | ![Next.js 15](https://img.shields.io/badge/Next.js-15-blue) ![Clerk v6](https://img.shields.io/badge/Clerk-v6-orange)
+
+---
+
+## 🗺️ Roadmap
+
+### ✅ Completed
+- Admin logic (role-based access, user management)
+- Clerk v6 integration (secure authentication, metadata sync)
+- Aircraft registry and management
+- Basic flight logging and filtering
+- Server-side validation (Zod, tRPC)
+- Weather widget (METAR integration)
+
+### 🚧 Pending / WIP
+- Flight log reporting and analytics
+- Advanced recency tracking (IFR, night, custom rules)
+- UI polish and accessibility improvements
+- Multi-aircraft support for users
+- Bulk import/export for flight logs
+- Mobile-first responsive design
+- Open source documentation and contribution guidelines
+- Automated deployment scripts for multiple cloud providers
+
+---
+
 # 📊 **Current Status:** For a detailed breakdown of completed features, WIPs, and the audit log, please see [PROJECT_STATUS_REPORT.md](./PROJECT_STATUS_REPORT.md).
 
 # Pilot Handbook
@@ -28,153 +54,85 @@ A comprehensive flight logging and pilot management application built with the T
 * **Library:** React 19 (Server Components & Actions)
 * **Styling:** Tailwind CSS v4
 
-**Backend & Data**
-* **Database:** PostgreSQL (via Supabase)
-* **ORM:** Prisma
-* **API:** tRPC (Type-safe APIs)
-* **Validation:** Zod
-
-**Tools & UI**
-* **Auth:** Clerk (Secure Authentication)
-* **Components:** Radix UI Primitives, Lucide Icons
-* **Testing:** Vitest v4
 
 ## 📂 Project Structure
 
 ```bash
-prisma/
-	schema.prisma
-	migrations/
-public/
-	favicon.ico
-	logo.png
-scripts/
-	check-admin.ts
-server/
-	trpc.ts
-	routers/
-		admin.ts
-		aircraft.ts
-		flight.ts
-		preferences.ts
-		stats.ts
-		user.ts
-		weather.ts
-		_app.ts
-src/
-	actions/
-		theme.ts
-	components/
-		ThemeProvider.tsx
-		UserManagementTable.tsx
-		flights/
-			FlightFilterBar.tsx
-	lib/
-		shared-schemas.ts
-	trpc/
-		client.ts
-		react.tsx
-		server.ts
-		shared.ts
-	utils/
-trpc/
-	client.ts
-	Provider.tsx
-__tests__/
-	routers/
-		aircraft.test.ts
-		flight.test.ts
-		stats.test.ts
-	security/
-		authorization.test.ts
+├── app/                # Next.js App Router (UI, pages, layouts)
+│   ├── admin/          # Protected admin dashboard (user/role management)
+│   ├── aircraft/       # Aircraft registry and details
+│   ├── dashboard/      # User dashboard (stats, analytics)
+│   ├── flights/        # Flight logbook and entry forms
+│   ├── settings/       # User settings (profile, preferences)
+│   ├── sign-in/        # Auth routes (Clerk)
+│   └── ...             # Other feature routes
+├── components/         # Shared React components (UI, layout, widgets)
+│   ├── admin/          # Admin-specific UI components
+│   ├── landing/        # Landing page sections
+│   └── ui/             # Design system (Button, Card, etc.)
+├── lib/                # Server utilities (db, auth, helpers)
+│   └── hooks/          # Custom React hooks
+├── prisma/             # Database schema and migrations
+├── public/             # Static assets (images, favicon)
+├── scripts/            # Utility scripts (admin tools, DB checks)
+├── server/             # tRPC API routers and server logic
+│   ├── routers/        # tRPC routers (admin, aircraft, user, etc.)
+│   └── trpc.ts         # tRPC server entrypoint
+├── src/                # (Legacy) Shared logic, actions, utils
+├── trpc/               # tRPC client/provider for React
+├── internal-docs/      # Internal scripts and documentation (not shipped)
+├── .env, .gitignore, ... # Config and environment files
 ```
 
-## Prerequisites
+### Folder Explanations
 
-Before you begin, ensure you have the following installed:
-- **Node.js** 18.x or later
-- **npm** or **yarn** or **pnpm**
-- **PostgreSQL** database (local or hosted, e.g., Supabase)
-- **Clerk** account for authentication
+- **/app**: Main Next.js App Router. Each subfolder is a route (e.g., `/admin` is the admin dashboard, `/flights` is the logbook UI).
+```
 
-## Getting Started
+## 🏁 Getting Started
+
+### Prerequisites
+- **Node.js** 20+
+- **pnpm** (recommended) or npm
+- **PostgreSQL** database (Supabase, Neon, or local)
 
 ### 1. Clone the Repository
-
 ```bash
 git clone <your-repo-url>
 cd pilothandbook
 ```
 
 ### 2. Install Dependencies
-
 ```bash
-npm install
+pnpm install
 ```
 
-### 3. Environment Variables
-
-Create a `.env` file in the project root with the following variables:
-
+### 3. Set Up the Database
 ```bash
-# Database
-DATABASE_URL="postgresql://user:password@host:port/database?schema=public"
-
-# Clerk Authentication
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
-CLERK_SECRET_KEY="sk_test_..."
-NEXT_PUBLIC_CLERK_SIGN_IN_URL="/sign-in"
-NEXT_PUBLIC_CLERK_SIGN_UP_URL="/sign-up"
-
-# Clerk Webhooks (for user sync)
-CLERK_WEBHOOK_SECRET="whsec_..."
-
-# Optional: Deployment
-VERCEL_URL="" # Auto-populated on Vercel
+pnpm prisma db push
 ```
 
-**Required Environment Variables:**
-- `DATABASE_URL`: PostgreSQL connection string
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Your Clerk publishable key
-- `CLERK_SECRET_KEY`: Your Clerk secret key
-- `CLERK_WEBHOOK_SECRET`: Webhook secret for Clerk user sync
+### 4. Configure Environment Variables
+Create a `.env` file in the project root with the following keys:
 
-### 4. Set Up the Database
-
-Run Prisma migrations to create the database schema:
-
-```bash
-npx prisma migrate dev --name init
-npx prisma generate
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+DATABASE_URL=your_postgres_connection_string
+CLERK_WEBHOOK_SECRET=your_clerk_webhook_secret
 ```
 
-### 5. Configure Clerk Webhooks
+### 5. Clerk Setup Tip
+> **Important:** In your Clerk Dashboard, go to **User Settings > Metadata** and enable **Public Metadata**. This is required for the `ADMIN` role and other user roles to work correctly in the app.
 
-To sync Clerk users with your database:
-
-1. Go to your [Clerk Dashboard](https://dashboard.clerk.com)
-2. Navigate to **Webhooks** and create a new endpoint
-3. Set the endpoint URL to: `https://your-domain.com/api/webhooks/clerk`
-4. Subscribe to the `user.created` event
-5. Copy the webhook secret and add it to your `.env` as `CLERK_WEBHOOK_SECRET`
-
-### 6. Run the Development Server
-
+### 6. Start the Development Server
 ```bash
-npm run dev
+pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-### 7. Promote Your First Admin
-
-After signing up through the app, promote your account to admin:
-
-```bash
-npm run make:admin <your-clerk-user-id>
-```
-
-You can find your Clerk user ID in the Clerk Dashboard or in your browser's developer console after logging in.
+---
 
 ## Available Scripts
 

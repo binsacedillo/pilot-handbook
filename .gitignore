@@ -43,3 +43,7 @@ next-env.d.ts
 # generated files
 /generated/
 /lib/generated/prisma
+
+# internal docs and dev scripts
+internal-docs/
+check-db.ts

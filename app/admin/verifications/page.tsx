@@ -14,6 +14,7 @@ export default function VerificationsPage() {
     take: 100, // Get all users for verification view
   });
 
+  // TODO: Add loading state for mutation and disable button while pending
   const verifyPilotMutation = trpc.admin.verifyPilot.useMutation({
     onMutate: async ({ userId, verified }) => {
       // Optimistically update the cache
@@ -38,6 +39,7 @@ export default function VerificationsPage() {
       if (context?.previousData) {
         utils.admin.getAllUsers.setData({ skip: 0, take: 100 }, context.previousData);
       }
+      // FIXME: Use toast notification instead of alert for error feedback
       alert(`Failed to update user: ${err.message}`);
     },
     onSettled: async () => {

@@ -31,6 +31,7 @@ export default clerkMiddleware(async (auth, req) => {
   if (isAdminRoute(req)) {
     const role = sessionClaims?.metadata?.role;
 
+    // TODO: Add support for multi-role (e.g., SUPERADMIN, MODERATOR)
     if (role !== "ADMIN") {
       const url = new URL("/dashboard", req.url);
       return NextResponse.redirect(url);
