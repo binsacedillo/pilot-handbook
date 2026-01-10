@@ -274,10 +274,10 @@ export const flightRouter = createTRPCRouter({
     });
 
     const totalFlights = flights.length;
-    const totalHours = flights.reduce((sum, f) => sum + f.duration, 0);
-    const totalPicHours = flights.reduce((sum, f) => sum + f.picTime, 0);
-    const totalDualHours = flights.reduce((sum, f) => sum + f.dualTime, 0);
-    const totalLandings = flights.reduce((sum, f) => sum + f.landings, 0);
+    const totalHours = flights.reduce((sum, f) => sum + (f.duration ?? 0), 0);
+    const totalPicHours = flights.reduce((sum, f) => sum + (f.picTime ?? 0), 0);
+    const totalDualHours = flights.reduce((sum, f) => sum + (f.dualTime ?? 0), 0);
+    const totalLandings = flights.reduce((sum, f) => sum + (f.landings ?? 0), 0);
 
     return {
       totalFlights,
