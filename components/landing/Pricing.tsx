@@ -4,7 +4,8 @@ import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { pricingPlans } from "@/lib/landing-data";
-import { Check, X } from "lucide-react";
+import Check from "lucide-react/dist/esm/icons/check";
+import X from "lucide-react/dist/esm/icons/x";
 
 export default function Pricing() {
 	return (

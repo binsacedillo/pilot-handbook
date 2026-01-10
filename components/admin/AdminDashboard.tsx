@@ -6,7 +6,9 @@ import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import UserManagementTable from "@/src/components/UserManagementTable";
 import { trpc } from "@/trpc/client";
-import { Users, Plane, TrendingUp } from "lucide-react";
+import Users from "lucide-react/dist/esm/icons/users";
+import Plane from "lucide-react/dist/esm/icons/plane";
+import TrendingUp from "lucide-react/dist/esm/icons/trending-up";
 
 export default function AdminDashboard() {
   // System stats

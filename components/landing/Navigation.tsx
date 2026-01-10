@@ -3,7 +3,7 @@
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Plane } from "lucide-react";
+import Plane from "lucide-react/dist/esm/icons/plane";
 
 export default function Navigation() {
 	const companyLinks = [

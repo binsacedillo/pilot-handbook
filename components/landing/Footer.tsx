@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plane } from "lucide-react";
+import Plane from "lucide-react/dist/esm/icons/plane";
 import { footerSections } from "@/lib/landing-data";
 
 export default function Footer() {

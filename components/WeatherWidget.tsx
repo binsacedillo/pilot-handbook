@@ -1,6 +1,12 @@
 'use client';
 
-import { Cloud, CloudRain, Search, Wind, Eye, CloudSun, ThermometerSun } from "lucide-react";
+import Cloud from "lucide-react/dist/esm/icons/cloud";
+import CloudRain from "lucide-react/dist/esm/icons/cloud-rain";
+import Search from "lucide-react/dist/esm/icons/search";
+import Wind from "lucide-react/dist/esm/icons/wind";
+import Eye from "lucide-react/dist/esm/icons/eye";
+import CloudSun from "lucide-react/dist/esm/icons/cloud-sun";
+import ThermometerSun from "lucide-react/dist/esm/icons/thermometer-sun";
 /**
  * @component
  * @name Wind

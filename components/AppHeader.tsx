@@ -4,7 +4,7 @@ import { UserButton, useUser } from "@clerk/nextjs";
 // import { dark } from "@clerk/themes"; // Unused, removed for Light Mode only
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Plane } from "lucide-react";
+import Plane from "lucide-react/dist/esm/icons/plane";
 import { usePathname } from "next/navigation";
 // ...removed useTheme and useSyncExternalStore imports
 
