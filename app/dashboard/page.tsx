@@ -2,6 +2,7 @@
 import { getCurrentUserFull } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import DashboardClient from "./dashboard-client";
+import type { RouterOutputs } from "@/src/trpc/shared";
 
 export default async function Page() {
   // 1. Ensure user is authenticated and exists in database
@@ -31,13 +32,15 @@ export default async function Page() {
   };
 
   // 4. Pass data to client component with proper aircraft relations (filter out nulls)
-  const flightsWithAircraft = flights.map((f) => {
-    const foundAircraft = aircraft.find((a) => a.id === f.aircraftId);
-    if (!foundAircraft) return null;
-    return {
-      ...f,
-      aircraft: foundAircraft,
-    };
-  }).filter((f) => f !== null) as any[];
+  const flightsWithAircraft: RouterOutputs["flight"]["getAll"] = flights
+    .map((f) => {
+      const foundAircraft = aircraft.find((a) => a.id === f.aircraftId);
+      if (!foundAircraft) return null;
+      return {
+        ...f,
+        aircraft: foundAircraft,
+      };
+    })
+    .filter((f): f is NonNullable<typeof f> => f !== null);
   return <DashboardClient initialStats={stats} initialFlights={flightsWithAircraft} initialAircraft={aircraft} />;
 }
