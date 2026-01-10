@@ -1,7 +1,7 @@
 "use client";
 
 import { SignIn } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Plane, CheckCircle, ArrowLeft } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -9,19 +9,14 @@ import { dark } from "@clerk/themes";
 
 export default function SignInPage() {
 	const { theme } = useTheme();
-	const [isEmbedded, setIsEmbedded] = useState(false);
-
-	useEffect(() => {
-		// Detect embedded browsers/webviews
+	const [isEmbedded] = useState(() => {
+		if (typeof window === "undefined") return false;
 		const ua = navigator.userAgent || navigator.vendor;
-		// Common checks for Facebook, Instagram, Messenger, Twitter, TikTok, etc.
-		if (
+		return (
 			/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
 			(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
-		) {
-			setIsEmbedded(true);
-		}
-	}, []);
+		);
+	});
 
 	return (
 		<div className="flex min-h-screen bg-linear-to-br from-gray-900 via-black to-gray-800">

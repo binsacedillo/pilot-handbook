@@ -114,14 +114,13 @@ export const flightRouter = createTRPCRouter({
     });
   }),
 
-  // Get a single flight by ID
-  getById: protectedProcedure
-    .input(idSchema)
+  // Get a single flight by ID (standardized as 'get')
+  get: protectedProcedure
+    .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       if (!ctx.user) {
         return null;
       }
-      
       const flight = await ctx.db.flight.findFirst({
         where: {
           id: input.id,
