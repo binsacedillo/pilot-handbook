@@ -3,15 +3,29 @@ export const dynamic = 'force-dynamic';
 
 import Navigation from "@/components/landing/Navigation";
 import Hero from "@/components/landing/Hero";
-import Features from "@/components/landing/Features";
-import HowItWorks from "@/components/landing/HowItWorks";
-import Pricing from "@/components/landing/Pricing";
-import CTASection from "@/components/landing/CTASection";
-import Footer from "@/components/landing/Footer";
-import { SignedOut } from "@clerk/nextjs";
-import Link from "next/link";
-import { auth } from "@clerk/nextjs/server"; // 1. Import Auth
-import { redirect } from "next/navigation";   // 2. Import Redirect
+import NextDynamic from "next/dynamic";
+
+const Features = NextDynamic(() => import("@/components/landing/Features"), {
+  ssr: true,
+  loading: () => <div className="h-100" />,
+});
+const HowItWorks = NextDynamic(() => import("@/components/landing/HowItWorks"), {
+  ssr: true,
+  loading: () => <div className="h-100" />,
+});
+const Pricing = NextDynamic(() => import("@/components/landing/Pricing"), {
+  ssr: true,
+  loading: () => <div className="h-150" />,
+});
+const CTASection = NextDynamic(() => import("@/components/landing/CTASection"), {
+  ssr: true,
+  loading: () => <div className="h-75" />,
+});
+const Footer = NextDynamic(() => import("@/components/landing/Footer"), {
+  ssr: true,
+  loading: () => <div className="h-50" />,
+});
+// (Removed unused imports: SignedOut, Link, auth, redirect)
 import { db } from "@/lib/db";
 
 async function getTotalFlightHours() {
