@@ -9,36 +9,44 @@ declare global {
 	}
 }
 
-import { SignUp } from "@clerk/nextjs";
+import { SignUp, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Plane, CheckCircle, ArrowLeft } from "lucide-react";
 import { useTheme } from "next-themes";
 import { dark } from "@clerk/themes";
-import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 export default function SignUpPage() {
-	const { theme } = useTheme();
-	const { isSignedIn } = useUser();
-	const router = useRouter();
-	const [isEmbedded, setIsEmbedded] = useState(false);
-	const [copied, setCopied] = useState(false);
+		const { theme } = useTheme();
+		const { isSignedIn, isLoaded } = useUser();
+		const router = useRouter();
+		const [isEmbedded, setIsEmbedded] = useState(false);
+		const [copied, setCopied] = useState(false);
 
-	useEffect(() => {
-		const ua = navigator.userAgent || navigator.vendor;
-		const shouldEmbed =
-			/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
-			(window.navigator.standalone === false) ||
-			(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+		useEffect(() => {
+			const ua = navigator.userAgent || navigator.vendor;
+			const shouldEmbed =
+				/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
+				(window.navigator.standalone === false) ||
+				(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
 
-		if (isEmbedded !== shouldEmbed) {
-			setTimeout(() => setIsEmbedded(shouldEmbed), 0);
+			if (isEmbedded !== shouldEmbed) {
+				setTimeout(() => setIsEmbedded(shouldEmbed), 0);
+			}
+
+			if (isSignedIn) {
+				router.push("/");
+			}
+		}, [isSignedIn, router, isEmbedded]);
+
+		if (!isLoaded) {
+			return (
+				<div className="flex justify-center items-center min-h-screen">
+					<Loader2 className="h-12 w-12 animate-spin text-primary" />
+				</div>
+			);
 		}
-
-		if (isSignedIn) {
-			router.push("/");
-		}
-	}, [isSignedIn, router, isEmbedded]);
 
 	if (isSignedIn) return null;
 

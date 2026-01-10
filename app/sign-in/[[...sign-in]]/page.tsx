@@ -1,15 +1,25 @@
 "use client";
 
-import { SignIn } from "@clerk/nextjs";
+import { SignIn, useUser } from "@clerk/nextjs";
 import { useState } from "react";
 import Link from "next/link";
 import { Plane, CheckCircle, ArrowLeft } from "lucide-react";
 import { useTheme } from "next-themes";
 import { dark } from "@clerk/themes";
 
+import { Loader2 } from "lucide-react";
+
 export default function SignInPage() {
 	const { theme } = useTheme();
+	const { isLoaded } = useUser();
 	const [isEmbedded] = useState(() => {
+			if (!isLoaded) {
+				return (
+					<div className="flex justify-center items-center min-h-screen">
+						<Loader2 className="h-12 w-12 animate-spin text-primary" />
+					</div>
+				);
+			}
 		if (typeof window === "undefined") return false;
 		const ua = navigator.userAgent || navigator.vendor;
 		return (
