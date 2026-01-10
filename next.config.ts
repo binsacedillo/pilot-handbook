@@ -3,11 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Enable future-friendly defaults progressively via explicit config.
   images: {
-    // Add remote patterns when rendering external images (e.g., avatars).
-    // Example:
-    // remotePatterns: [
-    //   { protocol: "https", hostname: "images.example.com" },
-    // ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
   },
 
   // TypeScript strict error checking enabled
