@@ -63,4 +63,10 @@
     "typescript": "^5",
     "vitest": "^4.0.16"
   }
+  ,
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "not dead"
+  ]
 }

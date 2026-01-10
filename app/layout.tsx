@@ -35,6 +35,11 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
+        <head>
+          {/* Preconnect for external image domains */}
+          <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+          <link rel="preconnect" href="https://api.clerk.com" crossOrigin="anonymous" />
+        </head>
         <body className={`font-sans ${inter.variable} flex flex-col min-h-screen`}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <TRPCProvider>
