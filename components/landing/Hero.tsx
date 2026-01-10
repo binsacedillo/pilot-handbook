@@ -26,18 +26,18 @@ export default function Hero({ totalFlightHours }: HeroProps) {
 	const parallaxOffset = scrollY * 0.5;
 
 	return (
-		<section className="relative overflow-hidden bg-linear-to-b from-slate-900 to-blue-900 min-h-175 md:min-h-212.5 pb-20">
-			{/* Parallax Background Image - Next.js Image for LCP/CLS */}
-			<div className="absolute inset-0 w-full h-full opacity-10 -z-10" style={{ transform: `translateY(${parallaxOffset}px)`, willChange: 'transform' }}>
-				<Image
-					src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop"
-					alt="Airplane flying in the sky"
-					fill
-					priority={true}
-					className="object-cover"
-					sizes="100vw"
-				/>
-			</div>
+		   <section className="relative overflow-hidden bg-linear-to-b from-slate-900 to-blue-900 min-h-175 md:min-h-212.5 pb-20">
+			   {/* Parallax Background Image - Next.js Image for LCP/CLS */}
+			   <div className="absolute inset-0 w-full h-full" style={{ transform: `translateY(${parallaxOffset}px)`, willChange: 'transform' }}>
+				   <Image
+					   src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop"
+					   alt="Airplane flying in the sky"
+					   fill
+					   priority={true}
+					   className="object-cover"
+					   sizes="100vw"
+				   />
+			   </div>
 
 			{/* Gradient Overlay */}
 			<div className="absolute inset-0 bg-linear-to-b from-slate-900/70 via-blue-900/50 to-slate-900/70" />
