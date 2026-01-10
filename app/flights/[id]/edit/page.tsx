@@ -14,7 +14,7 @@ export default function EditFlightPage() {
   const router = useRouter();
   const flightId = params.id as string;
 
-  const { data: flight, isLoading, error } = trpc.flight.getById.useQuery({ id: flightId });
+  const { data: flight, isLoading, error } = trpc.flight.get.useQuery({ id: flightId });
 
   // Optionally, you could cast or validate the type here if needed
   if (isLoading) {
