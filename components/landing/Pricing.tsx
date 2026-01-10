@@ -20,7 +20,7 @@ export default function Pricing() {
 						Plans for Every Pilot
 					</h2>
 					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-						Start free and upgrade anytime. No hidden fees, no credit card required.
+						Start free and upgzrade anytime. No hidden fees, no credit card required.
 					</p>
 				</div>
 
@@ -31,7 +31,7 @@ export default function Pricing() {
 							key={plan.name}
 							className={`relative rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col h-full ${
 								plan.highlighted
-									? "border-blue-500/50 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 shadow-xl scale-105 md:scale-100 ring-2 ring-blue-500/20"
+									? "border-blue-500/50 bg-linear-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 shadow-xl scale-105 md:scale-100 ring-2 ring-blue-500/20"
 									: "border-border/50 bg-card/50 hover:border-border/80 hover:shadow-lg"
 							}`}
 						>
@@ -116,9 +116,9 @@ export default function Pricing() {
 												className="flex items-start gap-3 text-sm"
 											>
 												{feature.included ? (
-													<Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+													<Check className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
 												) : (
-													<X className="w-5 h-5 text-slate-300 dark:text-slate-600 flex-shrink-0 mt-0.5" />
+													<X className="w-5 h-5 text-slate-300 dark:text-slate-600 shrink-0 mt-0.5" />
 												)}
 												<span
 													className={
@@ -137,7 +137,7 @@ export default function Pricing() {
 
 							{/* Bottom Border Accent */}
 							{plan.highlighted && (
-								<div className="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+								<div className="h-1 bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500" />
 							)}
 						</div>
 					))}
