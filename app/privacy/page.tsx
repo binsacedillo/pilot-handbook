@@ -104,13 +104,10 @@ export default function PrivacyPage() {
           </section>
           <section>
             <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">Contact: Data Protection Officer (DPO)</h2>
-            <p>This website is still under development. For any questions or concerns regarding your data privacy rights, you may contact our Data Protection Officer:</p>
+            <p>This project is currently under development. A designated Data Protection Officer (DPO) and official contact details will be provided once the platform is publicly launched.</p>
             <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 mt-2">
-              <p className="font-medium">The Data Protection Officer</p>
-              <p>FEU Institute of Technology</p>
-              <p>P. Paredes Street, Sampaloc, Manila</p>
-              <p>Phone: <span className="text-slate-500">+632 82818888</span></p>
-              <p>Email: <a href="mailto:dataprivacy@feutech.edu.ph" className="text-blue-700 dark:text-blue-300 underline">dataprivacy@feutech.edu.ph</a></p>
+              <p className="font-medium">Data Protection Officer (DPO)</p>
+              <p className="text-slate-500">To be announced upon public release</p>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-8">
               By using Pilot Handbook, you acknowledge that you have read and understood this Privacy Policy. We may update this policy from time to time; any changes will be posted on this page.
