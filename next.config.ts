@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
 
   productionBrowserSourceMaps: false,
   turbopack: {}, // Silence Turbopack + Webpack config conflict
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
   webpack: (config, { dev }) => {
     if (dev) {
       config.devtool = false; // Disable source maps in dev
