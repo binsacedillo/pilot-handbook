@@ -1,3 +1,52 @@
+describe('Validation', () => {
+  it('should fail to create if duration is negative', async () => {
+    const input = {
+      aircraftId: 'aircraft-1',
+      departureCode: 'JFK',
+      arrivalCode: 'LAX',
+      date: new Date('2026-01-01'),
+      duration: -10, // Invalid
+      picTime: 0,
+      dualTime: 0,
+      landings: 1,
+      remarks: 'Negative duration',
+    };
+    await expect(caller.flight.create(input)).rejects.toThrow();
+  });
+
+  it('should fail to create if landings is a decimal', async () => {
+    const input = {
+      aircraftId: 'aircraft-1',
+      departureCode: 'JFK',
+      arrivalCode: 'LAX',
+      date: new Date('2026-01-01'),
+      duration: 100,
+      picTime: 0,
+      dualTime: 0,
+      landings: 1.5, // Invalid
+      remarks: 'Decimal landings',
+    };
+    await expect(caller.flight.create(input)).rejects.toThrow();
+  });
+
+  it('should fail to create if date is in the future', async () => {
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 2);
+    const input = {
+      aircraftId: 'aircraft-1',
+      departureCode: 'JFK',
+      arrivalCode: 'LAX',
+      date: futureDate, // Invalid (future)
+      duration: 100,
+      picTime: 0,
+      dualTime: 0,
+      landings: 1,
+      remarks: 'Future date',
+    };
+    // If your schema does not yet validate future dates, this test will fail until you add it
+    await expect(caller.flight.create(input)).rejects.toThrow();
+  });
+});
 
 type Flight = {
   id: string;
