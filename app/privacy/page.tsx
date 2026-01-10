@@ -103,17 +103,6 @@ export default function PrivacyPage() {
             <p>Your personal data is retained only as long as necessary to fulfill the purposes stated above or as required by law.</p>
           </section>
           <section>
-            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">Contact: Data Protection Officer (DPO)</h2>
-            <p>For any questions, requests, or concerns regarding your data privacy rights, please contact our Data Protection Officer:</p>
-            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 mt-2">
-              <p className="font-medium">Data Protection Officer (DPO)</p>
-              <p>Pilot Handbook</p>
-              <p>Email: <a href="mailto:dpo@pilothandbook.com" className="text-blue-700 dark:text-blue-300 underline">dpo@pilothandbook.com</a></p>
-              <p>Phone: <span className="text-slate-500">[Insert DPO contact number]</span></p>
-              <p>Address: <span className="text-slate-500">[Insert business address]</span></p>
-            </div>
-          </section>
-          <section>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-8">
               By using Pilot Handbook, you acknowledge that you have read and understood this Privacy Policy. We may update this policy from time to time; any changes will be posted on this page.
             </p>
