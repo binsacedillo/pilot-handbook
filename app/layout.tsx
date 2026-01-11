@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui/toast";
 import { ClerkProvider } from "@clerk/nextjs";
 import { TRPCProvider } from "@/trpc/Provider";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -34,6 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
+      <ToastProvider>
       <html lang="en" suppressHydrationWarning>
         <head>
           {/* Preconnect for external image domains */}
@@ -53,6 +55,7 @@ export default function RootLayout({
           </ThemeProvider>
         </body>
       </html>
+      </ToastProvider>
     </ClerkProvider>
   );
 }

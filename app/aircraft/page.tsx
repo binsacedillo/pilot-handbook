@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Aircraft } from "@prisma/client";
 import { trpc } from "@/trpc/client";
 import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { Trash2, RefreshCw } from "lucide-react";
 import { DeleteDialog } from "@/components/DeleteDialog";
@@ -15,6 +16,7 @@ import { Edit2 } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import Image from "next/image";
+import { useToast } from "@/components/ui/toast";
 
 
 export default function AircraftPage() {
@@ -22,19 +24,33 @@ export default function AircraftPage() {
   const { data: aircraft, isLoading } = trpc.aircraft.getAll.useQuery({ includeArchived: showArchived });
   const utils = trpc.useUtils();
   const router = useRouter();
+  const { showToast } = useToast();
   const deleteMutation = trpc.aircraft.delete.useMutation({
     onSuccess: async () => {
-      // 1. Force tRPC to mark ALL aircraft lists (active & archived) as stale
       await utils.aircraft.invalidate();
-      // 2. Force Next.js to refresh server components (Safety Backup)
       router.refresh();
+    },
+  });
+  const deletePermanentMutation = trpc.aircraft.deletePermanent.useMutation({
+    onSuccess: async () => {
+      await utils.aircraft.invalidate();
+      router.refresh();
+      showToast("Aircraft permanently deleted.", "success");
+    },
+    onError: (error) => {
+      if (error.data?.code === "CONFLICT") {
+        showToast(
+          "Cannot permanently delete an aircraft with active flight logs. Please archive it instead.",
+          "error"
+        );
+      } else {
+        showToast("Failed to delete aircraft.", "error");
+      }
     },
   });
   const restoreMutation = trpc.aircraft.restore.useMutation({
     onSuccess: async () => {
-      // 1. Force tRPC to mark ALL aircraft lists (active & archived) as stale
       await utils.aircraft.invalidate();
-      // 2. Force Next.js to refresh server components (Safety Backup)
       router.refresh();
     },
   });
@@ -57,16 +73,15 @@ export default function AircraftPage() {
     });
   };
 
+
+  // Use permanent delete for hard delete, fallback to soft if needed
   const handleConfirmDelete = async () => {
     if (!deleteDialogState.aircraftId) return;
     const aircraftId = deleteDialogState.aircraftId;
     try {
-      // Send delete request to server
-      await deleteMutation.mutateAsync({ id: aircraftId });
-      // Success - handled in onSuccess
+      await deletePermanentMutation.mutateAsync({ id: aircraftId });
     } catch (error) {
-      console.error("Failed to delete aircraft:", error);
-      throw error;
+      // Error handled in onError
     }
   };
 
@@ -105,7 +120,7 @@ export default function AircraftPage() {
           title="Delete Aircraft"
           description="Are you sure you want to delete this aircraft? This action cannot be undone."
           itemName={deleteDialogState.aircraftRegistration || ""}
-          isLoading={deleteMutation.isPending}
+          isLoading={deletePermanentMutation.isPending}
           onConfirm={handleConfirmDelete}
         />
 
