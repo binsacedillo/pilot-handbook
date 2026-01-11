@@ -15,8 +15,8 @@ export const flightRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      if (!ctx.user || !ctx.user.id) {
-        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User ID missing in context' });
+      if (!ctx.user) {
+        return [];
       }
 
       type DateFilter = { gte?: Date; lte?: Date };
@@ -259,19 +259,49 @@ export const flightRouter = createTRPCRouter({
   // Get flight statistics
   getStats: protectedProcedure.query(async ({ ctx }) => {
     // Return zero stats if user not in database yet
-    if (!ctx.user || !ctx.user.id) {
-      throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User ID missing in context' });
+    if (!ctx.user) {
+      return {
+        totalFlights: 0,
+        totalHours: 0,
+        totalPicHours: 0,
+        totalDualHours: 0,
+        totalLandings: 0,
+        recency: {
+          last90DaysFlights: 0,
+          last90DaysLandings: 0,
+          isCurrent: false,
+        },
+      };
     }
-    
+
+    // All-time stats
     const flights = await ctx.db.flight.findMany({
       where: { userId: ctx.user.id },
     });
-
     const totalFlights = flights.length;
     const totalHours = flights.reduce((sum, f) => sum + (f.duration ?? 0), 0);
     const totalPicHours = flights.reduce((sum, f) => sum + (f.picTime ?? 0), 0);
     const totalDualHours = flights.reduce((sum, f) => sum + (f.dualTime ?? 0), 0);
     const totalLandings = flights.reduce((sum, f) => sum + (f.landings ?? 0), 0);
+
+    // 90-day recency stats
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const recencyAgg = await ctx.db.flight.aggregate({
+      where: {
+        userId: ctx.user.id,
+        date: { gte: ninetyDaysAgo },
+      },
+      _sum: {
+        landings: true,
+      },
+      _count: {
+        id: true,
+      },
+    });
+    const last90DaysFlights = recencyAgg._count.id ?? 0;
+    const last90DaysLandings = recencyAgg._sum.landings ?? 0;
+    const isCurrent = last90DaysLandings >= 3;
 
     return {
       totalFlights,
@@ -279,6 +309,11 @@ export const flightRouter = createTRPCRouter({
       totalPicHours,
       totalDualHours,
       totalLandings,
+      recency: {
+        last90DaysFlights,
+        last90DaysLandings,
+        isCurrent,
+      },
     };
   }),
 });
