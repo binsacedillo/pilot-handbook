@@ -15,8 +15,8 @@ export const flightRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        return [];
+      if (!ctx.user || !ctx.user.id) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User ID missing in context' });
       }
 
       type DateFilter = { gte?: Date; lte?: Date };
@@ -259,14 +259,8 @@ export const flightRouter = createTRPCRouter({
   // Get flight statistics
   getStats: protectedProcedure.query(async ({ ctx }) => {
     // Return zero stats if user not in database yet
-    if (!ctx.user) {
-      return {
-        totalFlights: 0,
-        totalHours: 0,
-        totalPicHours: 0,
-        totalDualHours: 0,
-        totalLandings: 0,
-      };
+    if (!ctx.user || !ctx.user.id) {
+      throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User ID missing in context' });
     }
     
     const flights = await ctx.db.flight.findMany({

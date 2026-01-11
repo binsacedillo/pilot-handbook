@@ -27,7 +27,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
     const utils = trpc.useUtils();
     // Live queries for aircraft, stats, and flights
     const {
-        data: aircraft = initialAircraft,
+        data: aircraftLive,
         isRefetching: isAircraftRefetching,
         isLoading: isAircraftLoading
     } = trpc.aircraft.getAll.useQuery(
@@ -40,7 +40,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
         }
     );
     const {
-        data: stats = initialStats,
+        data: statsLive,
         isRefetching: isStatsRefetching,
         isLoading: isStatsLoading
     } = trpc.flight.getStats.useQuery(
@@ -53,7 +53,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
         }
     );
     const {
-        data: flights = initialFlights,
+        data: flightsLive,
         isRefetching: isFlightsRefetching,
         isLoading: isFlightsLoading
     } = trpc.flight.getAll.useQuery(
@@ -65,6 +65,12 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
             staleTime: 0,
         }
     );
+    // Debug log for live tRPC data
+    console.log("Live tRPC Data:", {
+        aircraft: aircraftLive,
+        stats: statsLive,
+        flights: flightsLive
+    });
     // Invalidate dashboard stats on mount for navigation sync
     useEffect(() => {
         if (isLoaded) {
@@ -117,6 +123,103 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
     const isRefreshing = isAircraftRefetching || isStatsRefetching || isFlightsRefetching;
     const isLoading = isAircraftLoading || isStatsLoading || isFlightsLoading;
 
+    // Fallbacks for data: prioritize live data, fallback to initialData, then empty
+    const safeAircraft = aircraftLive ?? initialAircraft ?? [];
+    const safeStats = statsLive ?? initialStats ?? {};
+    const safeFlights = flightsLive ?? initialFlights ?? [];
+
+    // If Clerk is not loaded, show skeletons only
+    if (!isLoaded) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <AppHeader />
+                <main className="flex-1 container mx-auto px-4 py-8">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+                        <h1 className="text-2xl font-bold">Dashboard</h1>
+                        <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+                            <Link href="/dashboard/analytics">View analytics</Link>
+                        </Button>
+                    </div>
+                    <section aria-label="Flight Statistics" className="mb-8">
+                        <Card className="sm:hidden">
+                            <CardContent className="p-4">
+                                <div className="space-y-3 animate-pulse">
+                                    <div className="h-6 bg-muted rounded w-1/2 mb-2" />
+                                    <div className="h-6 bg-muted rounded w-1/3 mb-2" />
+                                    <div className="h-6 bg-muted rounded w-1/4 mb-2" />
+                                    <div className="h-6 bg-muted rounded w-1/4 mb-2" />
+                                    <div className="h-6 bg-muted rounded w-1/4" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <Card key={i} className="h-24 animate-pulse bg-muted" />
+                            ))}
+                        </div>
+                    </section>
+                    <section className="mt-12 grid gap-6">
+                        <div>
+                            <h2 className="text-xl font-semibold mb-4">Recent Flights</h2>
+                            <div className="space-y-2 animate-pulse">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <Card key={i} className="h-16 bg-muted" />
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                </main>
+                <AppFooter />
+            </div>
+        );
+    }
+
+    // If essential data is missing, show skeletons
+    if (!safeStats || !safeAircraft || !safeFlights) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <AppHeader />
+                <main className="flex-1 container mx-auto px-4 py-8">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+                        <h1 className="text-2xl font-bold">Dashboard</h1>
+                        <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+                            <Link href="/dashboard/analytics">View analytics</Link>
+                        </Button>
+                    </div>
+                    <section aria-label="Flight Statistics" className="mb-8">
+                        <Card className="sm:hidden">
+                            <CardContent className="p-4">
+                                <div className="space-y-3 animate-pulse">
+                                    <div className="h-6 bg-muted rounded w-1/2 mb-2" />
+                                    <div className="h-6 bg-muted rounded w-1/3 mb-2" />
+                                    <div className="h-6 bg-muted rounded w-1/4 mb-2" />
+                                    <div className="h-6 bg-muted rounded w-1/4 mb-2" />
+                                    <div className="h-6 bg-muted rounded w-1/4" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <Card key={i} className="h-24 animate-pulse bg-muted" />
+                            ))}
+                        </div>
+                    </section>
+                    <section className="mt-12 grid gap-6">
+                        <div>
+                            <h2 className="text-xl font-semibold mb-4">Recent Flights</h2>
+                            <div className="space-y-2 animate-pulse">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <Card key={i} className="h-16 bg-muted" />
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                </main>
+                <AppFooter />
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen flex flex-col">
             <AppHeader />
@@ -148,33 +251,33 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                                             <Plane className="h-4 w-4 text-blue-500" />
                                             <span className="text-sm">Aircraft</span>
                                         </div>
-                                        <span className="text-lg font-bold">{aircraft?.length ?? 0}</span>
+                                        <span className="text-lg font-bold">{safeAircraft?.length ?? initialAircraft?.length ?? 0}</span>
                                     </div>
                                     <div className="flex items-center justify-between py-2 border-b">
                                         <div className="flex items-center gap-2">
                                             <TrendingUp className="h-4 w-4 text-green-500" />
                                             <span className="text-sm">Total Flights</span>
                                         </div>
-                                        <span className="text-lg font-bold">{stats.totalFlights ?? 0}</span>
+                                        <span className="text-lg font-bold">{safeStats?.totalFlights ?? initialStats?.totalFlights ?? 0}</span>
                                     </div>
                                     <div className="flex items-center justify-between py-2 border-b">
                                         <div className="flex items-center gap-2">
                                             <Clock className="h-4 w-4 text-orange-500" />
                                             <span className="text-sm">Flight Hours</span>
                                         </div>
-                                        <span className="text-lg font-bold">{stats.totalHours?.toFixed(1) ?? "0.0"}</span>
+                                        <span className="text-lg font-bold">{safeStats?.totalHours?.toFixed?.(1) ?? initialStats?.totalHours?.toFixed?.(1) ?? "0.0"}</span>
                                     </div>
                                     <div className="flex items-center justify-between py-2 border-b">
                                         <span className="text-sm">PIC Hours</span>
-                                        <span className="text-lg font-bold">{stats.totalPicHours?.toFixed(1) ?? "0.0"}</span>
+                                        <span className="text-lg font-bold">{safeStats?.totalPicHours?.toFixed?.(1) ?? initialStats?.totalPicHours?.toFixed?.(1) ?? "0.0"}</span>
                                     </div>
                                     <div className="flex items-center justify-between py-2 border-b">
                                         <span className="text-sm">Dual Hours</span>
-                                        <span className="text-lg font-bold">{stats.totalDualHours?.toFixed(1) ?? "0.0"}</span>
+                                        <span className="text-lg font-bold">{safeStats?.totalDualHours?.toFixed?.(1) ?? initialStats?.totalDualHours?.toFixed?.(1) ?? "0.0"}</span>
                                     </div>
                                     <div className="flex items-center justify-between py-2">
                                         <span className="text-sm">Total Landings</span>
-                                        <span className="text-lg font-bold">{stats.totalLandings ?? 0}</span>
+                                        <span className="text-lg font-bold">{safeStats?.totalLandings ?? initialStats?.totalLandings ?? 0}</span>
                                     </div>
                                 </div>
                             )}
@@ -198,7 +301,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                                         </div>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">{aircraft?.length ?? 0}</div>
+                                        <div className="text-2xl font-bold">{safeAircraft?.length ?? initialAircraft?.length ?? 0}</div>
                                         <p className="text-xs text-muted-foreground mt-1">Total</p>
                                     </CardContent>
                                 </Card>
@@ -210,7 +313,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                                         </div>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">{stats.totalFlights ?? 0}</div>
+                                        <div className="text-2xl font-bold">{safeStats?.totalFlights ?? initialStats?.totalFlights ?? 0}</div>
                                         <p className="text-xs text-muted-foreground mt-1">Total</p>
                                     </CardContent>
                                 </Card>
@@ -222,7 +325,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                                         </div>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">{stats.totalHours?.toFixed(1) ?? "0.0"}</div>
+                                        <div className="text-2xl font-bold">{safeStats?.totalHours?.toFixed?.(1) ?? initialStats?.totalHours?.toFixed?.(1) ?? "0.0"}</div>
                                         <p className="text-xs text-muted-foreground mt-1">hrs</p>
                                     </CardContent>
                                 </Card>
@@ -231,7 +334,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                                         <CardTitle className="text-sm">PIC</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">{stats.totalPicHours?.toFixed(1) ?? "0.0"}</div>
+                                        <div className="text-2xl font-bold">{safeStats?.totalPicHours?.toFixed?.(1) ?? initialStats?.totalPicHours?.toFixed?.(1) ?? "0.0"}</div>
                                         <p className="text-xs text-muted-foreground mt-1">hrs</p>
                                     </CardContent>
                                 </Card>
@@ -240,7 +343,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                                         <CardTitle className="text-sm">Dual</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">{stats.totalDualHours?.toFixed(1) ?? "0.0"}</div>
+                                        <div className="text-2xl font-bold">{safeStats?.totalDualHours?.toFixed?.(1) ?? initialStats?.totalDualHours?.toFixed?.(1) ?? "0.0"}</div>
                                         <p className="text-xs text-muted-foreground mt-1">hrs</p>
                                     </CardContent>
                                 </Card>
@@ -249,7 +352,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                                         <CardTitle className="text-sm">Landings</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">{stats.totalLandings ?? 0}</div>
+                                        <div className="text-2xl font-bold">{safeStats?.totalLandings ?? initialStats?.totalLandings ?? 0}</div>
                                         <p className="text-xs text-muted-foreground mt-1">total</p>
                                     </CardContent>
                                 </Card>
@@ -270,13 +373,13 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                                     <Card key={i} className="h-16 bg-muted" />
                                 ))}
                             </div>
-                        ) : flights && flights.length > 0 ? (
+                        ) : safeFlights && safeFlights.length > 0 ? (
                             <div className="space-y-2">
-                                {flights.slice(0, 5).map((flight) => (
+                                {safeFlights.slice(0, 5).map((flight) => (
                                     <Card key={flight.id} className="flex-row flex items-center justify-between gap-4 p-4">
                                         <div className="flex-1 min-w-0">
                                             <div className="font-medium truncate">{flight.aircraft?.model || "Aircraft"}</div>
-                                            <div className="text-sm text-muted-foreground">{new Date(flight.date).toLocaleDateString()}</div>
+                                            <div className="text-sm text-muted-foreground">{flight.date ? new Date(flight.date).toLocaleDateString() : ""}</div>
                                         </div>
                                         <div className="text-right whitespace-nowrap">
                                             <span className="text-sm font-semibold">{flight.duration ?? 0} hrs</span>

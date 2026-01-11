@@ -29,8 +29,8 @@ export const aircraftRouter = createTRPCRouter({
       z.object({ includeArchived: z.boolean().optional() }).optional()
     )
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        return [];
+      if (!ctx.user || !ctx.user.id) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User ID missing in context' });
       }
       const includeArchived = input?.includeArchived ?? false;
       const aircraft = await ctx.db.aircraft.findMany({
