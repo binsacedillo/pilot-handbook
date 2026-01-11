@@ -25,6 +25,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
     const { user, isLoaded } = useUser();
     const utils = trpc.useUtils();
     // Live queries for aircraft, stats, and flights
+    const enabled = !!user && isLoaded;
     const {
         data: aircraftLive,
         isRefetching: isAircraftRefetching,
@@ -33,7 +34,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
         undefined,
         {
             initialData: initialAircraft,
-            enabled: isLoaded && !!user,
+            enabled,
             refetchOnMount: "always",
             staleTime: 0,
         }
@@ -46,7 +47,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
         undefined,
         {
             initialData: initialStats,
-            enabled: isLoaded && !!user,
+            enabled,
             refetchOnMount: "always",
             staleTime: 0,
         }
@@ -59,7 +60,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
         {},
         {
             initialData: initialFlights,
-            enabled: isLoaded && !!user,
+            enabled,
             refetchOnMount: "always",
             staleTime: 0,
         }
@@ -246,7 +247,21 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                         ))}
                     </div>
                 ) : (
-                    <div className="text-muted-foreground">No flights found.</div>
+                    <div className="flex flex-col items-center justify-center py-16">
+                        <span className="text-2xl font-bold mb-4">Welcome to Your Pilot Logbook!</span>
+                        <span className="text-base text-muted-foreground mb-8 text-center max-w-md">
+                            Get started by logging your first flight. This tool is designed to help you track your flying experience and stay current. Click below to add your first entry.
+                        </span>
+                        {/* Replace with AddFlightModal trigger if available, fallback to /flights */}
+                        <Button size="lg" className="text-lg px-8 py-4" onClick={() => {
+                            if (typeof window !== 'undefined') {
+                                const evt = new CustomEvent('openAddFlightModal');
+                                window.dispatchEvent(evt);
+                            }
+                        }}>
+                            Add Your First Flight
+                        </Button>
+                    </div>
                 )}
             </div>
             {/* Sidebar: Weather Widget */}

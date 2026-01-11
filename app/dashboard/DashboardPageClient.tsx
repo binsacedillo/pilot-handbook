@@ -10,11 +10,12 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function DashboardPageClient() {
-  const { isLoaded } = useUser();
-  const { isLoading: isStatsLoading, data: stats } = trpc.flight.getStats.useQuery();
-  const { isLoading: isSummaryLoading } = trpc.stats.getSummary.useQuery();
-  const { isLoading: isAircraftLoading, data: aircraft } = trpc.aircraft.getAll.useQuery();
-  const { isLoading: isFlightsLoading, data: flights } = trpc.flight.getAll.useQuery({});
+  const { user, isLoaded } = useUser();
+  const enabled = !!user && isLoaded;
+  const { isLoading: isStatsLoading, data: stats } = trpc.flight.getStats.useQuery(undefined, { enabled });
+  const { isLoading: isSummaryLoading } = trpc.stats.getSummary.useQuery(undefined, { enabled });
+  const { isLoading: isAircraftLoading, data: aircraft } = trpc.aircraft.getAll.useQuery(undefined, { enabled });
+  const { isLoading: isFlightsLoading, data: flights } = trpc.flight.getAll.useQuery({}, { enabled });
   const isLoading = isStatsLoading || isSummaryLoading || isAircraftLoading || isFlightsLoading || !isLoaded;
 
   return (
