@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { user: clerkUser, isLoaded } = useUser();
+  const { isLoaded } = useUser();
   const profileQuery = trpc.user.getProfile.useQuery();
   const updateProfileMutation = trpc.user.updateProfile.useMutation();
 
@@ -92,7 +92,7 @@ export default function ProfilePage() {
       <Card className="p-6">
         <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Profile Picture</h2>
         <div className="flex items-center gap-6">
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <UserButton
               appearance={{
                 elements: {
