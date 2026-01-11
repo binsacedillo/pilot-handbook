@@ -1,3 +1,4 @@
+import { LaunchBanner } from "@/components/landing/LaunchBanner";
 // Force dynamic rendering to ensure real-time flight stats
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +30,22 @@ const Footer = NextDynamic(() => import("@/components/landing/Footer"), {
 import { db } from "@/lib/db";
 
 async function getTotalFlightHours() {
+
+  export default async function LandingPage() {
+    const totalFlightHours = await getTotalFlightHours();
+    return (
+      <>
+        <LaunchBanner />
+        <Navigation />
+        <Hero totalFlightHours={totalFlightHours} />
+        <Features />
+        <HowItWorks />
+        <Pricing />
+        <CTASection />
+        <Footer />
+      </>
+    );
+  }
   try {
     const result = await db.flight.aggregate({
       _sum: { duration: true },

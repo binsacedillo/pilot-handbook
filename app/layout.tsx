@@ -48,7 +48,6 @@ export default function RootLayout({
             <TRPCProvider>
               <ThemeWrapper>
                 <div className="flex flex-col min-h-screen">
-                  <LaunchBanner />
                   <DevWarningBanner />
                   {children}
                 </div>
