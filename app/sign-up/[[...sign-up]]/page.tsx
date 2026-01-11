@@ -1,3 +1,5 @@
+"use client";
+
 import { SignUp, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Plane, CheckCircle, ArrowLeft } from "lucide-react";
@@ -6,9 +8,6 @@ import { dark } from "@clerk/themes";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
-
-
-"use client";
 
 // Extend Navigator type to include 'standalone' for iOS PWA detection
 declare global {

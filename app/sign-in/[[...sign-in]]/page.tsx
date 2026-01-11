@@ -1,10 +1,10 @@
+"use client";
+
 import { SignIn, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Plane, CheckCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { dark } from "@clerk/themes";
-"use client";
-
 
 export default function SignInPage() {
 	const { theme } = useTheme();
