@@ -30,22 +30,6 @@ const Footer = NextDynamic(() => import("@/components/landing/Footer"), {
 import { db } from "@/lib/db";
 
 async function getTotalFlightHours() {
-
-  export default async function LandingPage() {
-    const totalFlightHours = await getTotalFlightHours();
-    return (
-      <>
-        <LaunchBanner />
-        <Navigation />
-        <Hero totalFlightHours={totalFlightHours} />
-        <Features />
-        <HowItWorks />
-        <Pricing />
-        <CTASection />
-        <Footer />
-      </>
-    );
-  }
   try {
     const result = await db.flight.aggregate({
       _sum: { duration: true },
@@ -68,14 +52,17 @@ export default async function Home() {
   //   redirect("/dashboard");
   // }
   return (
-    <main className="min-h-screen flex flex-col bg-background">
-      <Navigation />
-      <Hero totalFlightHours={totalHours} />
-      <Features />
-      <HowItWorks />
-      <Pricing />
-      <CTASection />
-      <Footer />
-    </main>
+    <>
+      <LaunchBanner />
+      <main className="min-h-screen flex flex-col bg-background">
+        <Navigation />
+        <Hero totalFlightHours={totalHours} />
+        <Features />
+        <HowItWorks />
+        <Pricing />
+        <CTASection />
+        <Footer />
+      </main>
+    </>
   );
 }
