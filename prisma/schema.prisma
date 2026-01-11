@@ -29,7 +29,7 @@ model Aircraft {
   registration String
   imageUrl     String?
   status       String   @default("operational")
-  flightHours  Int      @default(0)
+  flightHours  Float    @default(0)
   isArchived   Boolean  @default(false)
   userId       String
   createdAt    DateTime @default(now())
@@ -45,7 +45,7 @@ model Flight {
   date          DateTime
   departureCode String
   arrivalCode   String
-  duration      Int
+  duration      Float
   picTime       Int
   dualTime      Int
   landings      Int?     @default(1) // deprecated, use dayLandings + nightLandings

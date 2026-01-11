@@ -22,11 +22,12 @@ export const createAircraftSchema = z.object({
   registration: z.string().min(1, 'Registration number is required').max(20, 'Registration number too long'),
   imageUrl: z.string().url().optional().or(z.literal('')),
   status: z.string().default('operational'),
+  flightHours: z.number().min(0).optional(),
 });
 
 export const updateAircraftSchema = createAircraftSchema.partial().extend({
   id: z.string().min(1, 'Aircraft ID is required'),
-  flightHours: z.number().optional(),
+  flightHours: z.number().min(0).optional(),
 });
 
 // ============================================================================
@@ -37,7 +38,7 @@ export const createFlightSchema = z.object({
   date: z.date().max(new Date(), { message: 'Flight date cannot be in the future' }),
   departureCode: z.string().min(3).max(4),
   arrivalCode: z.string().min(3).max(4),
-  duration: z.number().min(0, 'Duration cannot be negative'),
+  duration: z.number().min(0.1, 'Duration must be at least 0.1 hours'),
   picTime: z.number().min(0, 'PIC time cannot be negative'),
   dualTime: z.number().min(0, 'Dual time cannot be negative'),
   // Add other duration fields as needed (e.g., night, instrument)
