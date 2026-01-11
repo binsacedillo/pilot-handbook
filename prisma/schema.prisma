@@ -46,8 +46,8 @@ model Flight {
   departureCode String
   arrivalCode   String
   duration      Float
-  picTime       Int
-  dualTime      Int
+  picTime       Float
+  dualTime      Float
   landings      Int?     @default(1) // deprecated, use dayLandings + nightLandings
   dayLandings   Int      @default(0)
   nightLandings Int      @default(0)
