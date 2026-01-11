@@ -3,7 +3,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plane, Clock, TrendingUp } from "lucide-react";
 import AppHeader from "../../components/AppHeader";
 import AppFooter from "../../components/AppFooter";
 import { WeatherWidget } from "@/components/WeatherWidget";
@@ -128,6 +127,12 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
     const safeStats = statsLive ?? initialStats ?? {};
     const safeFlights = flightsLive ?? initialFlights ?? [];
 
+    // Aviation Stat Card values
+    const isCurrent = safeStats?.recency?.isCurrent;
+    const last90DaysLandings = safeStats?.recency?.last90DaysLandings ?? 0;
+    const totalHours = safeStats?.totalHours ?? 0;
+    const fleetCount = safeAircraft?.length ?? 0;
+
     // If Clerk is not loaded, show skeletons only
     if (!isLoaded) {
         return (
@@ -230,134 +235,57 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                         <Link href="/dashboard/analytics">View analytics</Link>
                     </Button>
                 </div>
-                {/* Stats Cards */}
-                <section aria-label="Flight Statistics" className="mb-8">
-                    {/* Mobile: Simple List View */}
-                    <Card className="sm:hidden">
-                        <CardContent className="p-4">
-                            <h3 className="text-sm font-semibold text-muted-foreground mb-3">Flight Statistics</h3>
-                            {isLoading || isRefreshing ? (
-                                <div className="space-y-3 animate-pulse">
-                                    <div className="h-6 bg-muted rounded w-1/2 mb-2" />
-                                    <div className="h-6 bg-muted rounded w-1/3 mb-2" />
-                                    <div className="h-6 bg-muted rounded w-1/4 mb-2" />
-                                    <div className="h-6 bg-muted rounded w-1/4 mb-2" />
-                                    <div className="h-6 bg-muted rounded w-1/4" />
+                {/* Aviation Stat Cards */}
+                <section aria-label="Aviation Stats" className="mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Pilot Currency Card */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Pilot Currency</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {isLoading || isRefreshing ? (
+                                    <div className="h-6 w-32 bg-muted rounded animate-pulse mb-2" />
+                                ) : (
+                                    <span className={`inline-block px-3 py-1 rounded font-semibold text-white text-sm ${isCurrent ? "bg-green-500" : "bg-red-500"}`}>
+                                        {isCurrent ? "CURRENT" : "NOT CURRENT"}
+                                    </span>
+                                )}
+                                <div className="mt-2 text-sm text-muted-foreground">
+                                    {isLoading || isRefreshing ? (
+                                        <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+                                    ) : (
+                                        `${last90DaysLandings}/3 landings in 90 days`
+                                    )}
                                 </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between py-2 border-b">
-                                        <div className="flex items-center gap-2">
-                                            <Plane className="h-4 w-4 text-blue-500" />
-                                            <span className="text-sm">Aircraft</span>
-                                        </div>
-                                        <span className="text-lg font-bold">{safeAircraft?.length ?? initialAircraft?.length ?? 0}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between py-2 border-b">
-                                        <div className="flex items-center gap-2">
-                                            <TrendingUp className="h-4 w-4 text-green-500" />
-                                            <span className="text-sm">Total Flights</span>
-                                        </div>
-                                        <span className="text-lg font-bold">{safeStats?.totalFlights ?? initialStats?.totalFlights ?? 0}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between py-2 border-b">
-                                        <div className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4 text-orange-500" />
-                                            <span className="text-sm">Flight Hours</span>
-                                        </div>
-                                        <span className="text-lg font-bold">{safeStats?.totalHours?.toFixed?.(1) ?? initialStats?.totalHours?.toFixed?.(1) ?? "0.0"}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between py-2 border-b">
-                                        <span className="text-sm">PIC Hours</span>
-                                        <span className="text-lg font-bold">{safeStats?.totalPicHours?.toFixed?.(1) ?? initialStats?.totalPicHours?.toFixed?.(1) ?? "0.0"}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between py-2 border-b">
-                                        <span className="text-sm">Dual Hours</span>
-                                        <span className="text-lg font-bold">{safeStats?.totalDualHours?.toFixed?.(1) ?? initialStats?.totalDualHours?.toFixed?.(1) ?? "0.0"}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between py-2">
-                                        <span className="text-sm">Total Landings</span>
-                                        <span className="text-lg font-bold">{safeStats?.totalLandings ?? initialStats?.totalLandings ?? 0}</span>
-                                    </div>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                    {/* Tablet & Desktop: Grid Cards */}
-                    <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                        {isLoading || isRefreshing ? (
-                            <>
-                                {Array.from({ length: 6 }).map((_, i) => (
-                                    <Card key={i} className="h-24 animate-pulse bg-muted" />
-                                ))}
-                            </>
-                        ) : (
-                            <>
-                                <Card>
-                                    <CardHeader className="pb-2">
-                                        <div className="flex items-center gap-2">
-                                            <Plane className="h-4 w-4 text-blue-500" />
-                                            <CardTitle className="text-sm">Aircraft</CardTitle>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">{safeAircraft?.length ?? initialAircraft?.length ?? 0}</div>
-                                        <p className="text-xs text-muted-foreground mt-1">Total</p>
-                                    </CardContent>
-                                </Card>
-                                <Card>
-                                    <CardHeader className="pb-2">
-                                        <div className="flex items-center gap-2">
-                                            <TrendingUp className="h-4 w-4 text-green-500" />
-                                            <CardTitle className="text-sm">Flights</CardTitle>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">{safeStats?.totalFlights ?? initialStats?.totalFlights ?? 0}</div>
-                                        <p className="text-xs text-muted-foreground mt-1">Total</p>
-                                    </CardContent>
-                                </Card>
-                                <Card className="sm:col-span-2 lg:col-span-1">
-                                    <CardHeader className="pb-2">
-                                        <div className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4 text-orange-500" />
-                                            <CardTitle className="text-sm">Flight Hours</CardTitle>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">{safeStats?.totalHours?.toFixed?.(1) ?? initialStats?.totalHours?.toFixed?.(1) ?? "0.0"}</div>
-                                        <p className="text-xs text-muted-foreground mt-1">hrs</p>
-                                    </CardContent>
-                                </Card>
-                                <Card>
-                                    <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm">PIC</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">{safeStats?.totalPicHours?.toFixed?.(1) ?? initialStats?.totalPicHours?.toFixed?.(1) ?? "0.0"}</div>
-                                        <p className="text-xs text-muted-foreground mt-1">hrs</p>
-                                    </CardContent>
-                                </Card>
-                                <Card>
-                                    <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm">Dual</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">{safeStats?.totalDualHours?.toFixed?.(1) ?? initialStats?.totalDualHours?.toFixed?.(1) ?? "0.0"}</div>
-                                        <p className="text-xs text-muted-foreground mt-1">hrs</p>
-                                    </CardContent>
-                                </Card>
-                                <Card>
-                                    <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm">Landings</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">{safeStats?.totalLandings ?? initialStats?.totalLandings ?? 0}</div>
-                                        <p className="text-xs text-muted-foreground mt-1">total</p>
-                                    </CardContent>
-                                </Card>
-                            </>
-                        )}
+                            </CardContent>
+                        </Card>
+                        {/* Total Experience Card */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Total Experience</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {isLoading || isRefreshing ? (
+                                    <div className="h-6 w-25 bg-muted rounded animate-pulse" />
+                                ) : (
+                                    <span className="text-2xl font-semibold">{totalHours} Hrs</span>
+                                )}
+                            </CardContent>
+                        </Card>
+                        {/* Fleet Size Card */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Fleet Size</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {isLoading || isRefreshing ? (
+                                    <div className="h-6 w-20 bg-muted rounded animate-pulse" />
+                                ) : (
+                                    <span className="text-2xl font-semibold">{fleetCount} Aircraft</span>
+                                )}
+                            </CardContent>
+                        </Card>
                     </div>
                 </section>
                 {/* Recent Flights + Weather */}
