@@ -186,10 +186,18 @@ export const flightRouter = createTRPCRouter({
 
       const flight = await ctx.db.flight.create({
         data: {
-          ...input,
+          date: input.date,
+          departureCode: input.departureCode,
+          arrivalCode: input.arrivalCode,
+          duration: input.duration,
+          picTime: input.picTime,
+          dualTime: input.dualTime,
+          dayLandings: input.dayLandings,
+          nightLandings: input.nightLandings,
+          remarks: input.remarks,
+          aircraftId: input.aircraftId,
           userId: ctx.user.id,
-          // For backward compatibility, set landings = dayLandings + nightLandings if not provided
-          landings: typeof input.landings === 'number' ? input.landings : (input.dayLandings ?? 0) + (input.nightLandings ?? 0),
+          landings: input.dayLandings + input.nightLandings, // for backward compatibility
         },
         include: {
           aircraft: true,

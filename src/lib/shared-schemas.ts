@@ -42,9 +42,8 @@ export const createFlightSchema = z.object({
   picTime: z.number().min(0, 'PIC time cannot be negative'),
   dualTime: z.number().min(0, 'Dual time cannot be negative'),
   // Add other duration fields as needed (e.g., night, instrument)
-  landings: z.number().int().positive('Landings must be positive').default(1).optional(),
-  dayLandings: z.number().int().min(0).default(0),
-  nightLandings: z.number().int().min(0).default(0),
+  dayLandings: z.number().int().min(0),
+  nightLandings: z.number().int().min(0),
   remarks: z.string().optional(),
   aircraftId: z.string().min(1, 'Aircraft is required'),
 });
