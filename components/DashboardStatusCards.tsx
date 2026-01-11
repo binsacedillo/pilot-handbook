@@ -7,9 +7,18 @@ import { trpc } from "@/src/trpc/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardStatusCards() {
-    const { data: flightStats, isLoading: isFlightLoading } = trpc.flight.getStats.useQuery();
-    const { data: generalStats, isLoading: isSummaryLoading } = trpc.stats.getSummary.useQuery();
-    const { data: aircraft, isLoading: isAircraftLoading } = trpc.aircraft.getAll.useQuery();
+    const { data: flightStats, isLoading: isFlightLoading } = trpc.flight.getStats.useQuery(undefined, {
+        refetchOnMount: "always",
+        staleTime: 0,
+    });
+    const { data: generalStats, isLoading: isSummaryLoading } = trpc.stats.getSummary.useQuery(undefined, {
+        refetchOnMount: "always",
+        staleTime: 0,
+    });
+    const { data: aircraft, isLoading: isAircraftLoading } = trpc.aircraft.getAll.useQuery(undefined, {
+        refetchOnMount: "always",
+        staleTime: 0,
+    });
 
     // Data
     const isCurrent = flightStats?.recency?.isCurrent;

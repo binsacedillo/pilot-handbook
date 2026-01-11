@@ -12,10 +12,26 @@ import Link from "next/link";
 export default function DashboardPageClient() {
   const { user, isLoaded } = useUser();
   const enabled = !!user && isLoaded;
-  const { isLoading: isStatsLoading, data: stats } = trpc.flight.getStats.useQuery(undefined, { enabled });
-  const { isLoading: isSummaryLoading } = trpc.stats.getSummary.useQuery(undefined, { enabled });
-  const { isLoading: isAircraftLoading, data: aircraft } = trpc.aircraft.getAll.useQuery(undefined, { enabled });
-  const { isLoading: isFlightsLoading, data: flights } = trpc.flight.getAll.useQuery({}, { enabled });
+  const { isLoading: isStatsLoading, data: stats } = trpc.flight.getStats.useQuery(undefined, {
+    enabled,
+    refetchOnMount: "always",
+    staleTime: 0,
+  });
+  const { isLoading: isSummaryLoading } = trpc.stats.getSummary.useQuery(undefined, {
+    enabled,
+    refetchOnMount: "always",
+    staleTime: 0,
+  });
+  const { isLoading: isAircraftLoading, data: aircraft } = trpc.aircraft.getAll.useQuery(undefined, {
+    enabled,
+    refetchOnMount: "always",
+    staleTime: 0,
+  });
+  const { isLoading: isFlightsLoading, data: flights } = trpc.flight.getAll.useQuery({}, {
+    enabled,
+    refetchOnMount: "always",
+    staleTime: 0,
+  });
   const isLoading = isStatsLoading || isSummaryLoading || isAircraftLoading || isFlightsLoading || !isLoaded;
 
   return (
