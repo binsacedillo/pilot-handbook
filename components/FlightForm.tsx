@@ -22,7 +22,8 @@ type FlightFormData = {
   duration: string;
   picTime: string;
   dualTime: string;
-  landings: string;
+  dayLandings: string;
+  nightLandings: string;
   remarks: string;
   aircraftId: string;
 };
@@ -148,7 +149,8 @@ export default function FlightForm({ initialData }: FlightFormProps) {
         duration: initialData.duration?.toString() ?? "",
         picTime: initialData.picTime?.toString() ?? "0",
         dualTime: initialData.dualTime?.toString() ?? "0",
-        landings: initialData.landings?.toString() ?? "1",
+        dayLandings: (initialData.dayLandings ?? 0).toString(),
+        nightLandings: (initialData.nightLandings ?? 0).toString(),
         remarks: initialData.remarks || "",
         aircraftId: initialData.aircraftId,
       };
@@ -160,7 +162,8 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       duration: "",
       picTime: "0",
       dualTime: "0",
-      landings: "1",
+      dayLandings: "0",
+      nightLandings: "0",
       remarks: "",
       aircraftId: "",
     };
@@ -179,7 +182,8 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       duration: Number(form.duration),
       picTime: Number(form.picTime || 0),
       dualTime: Number(form.dualTime || 0),
-      landings: Number(form.landings || 1),
+      dayLandings: Number(form.dayLandings || 0),
+      nightLandings: Number(form.nightLandings || 0),
       remarks: form.remarks || undefined,
       aircraftId: form.aircraftId,
     };
@@ -292,14 +296,25 @@ export default function FlightForm({ initialData }: FlightFormProps) {
           />
         </div>
         <div>
-          <Label htmlFor="landings">Landings</Label>
+          <Label htmlFor="dayLandings">Day Landings</Label>
           <Input
-            id="landings"
+            id="dayLandings"
             type="number"
-            min={1}
+            min={0}
             step="1"
-            value={form.landings}
-            onChange={(e) => setForm({ ...form, landings: e.target.value })}
+            value={form.dayLandings}
+            onChange={(e) => setForm({ ...form, dayLandings: e.target.value })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="nightLandings">Night Landings</Label>
+          <Input
+            id="nightLandings"
+            type="number"
+            min={0}
+            step="1"
+            value={form.nightLandings}
+            onChange={(e) => setForm({ ...form, nightLandings: e.target.value })}
           />
         </div>
       </div>

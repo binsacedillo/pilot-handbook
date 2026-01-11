@@ -167,7 +167,7 @@ export const flightRouter = createTRPCRouter({
       if (!ctx.user) {
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
       }
-      
+
       // Verify aircraft belongs to user
       const aircraft = await ctx.db.aircraft.findFirst({
         where: {
@@ -184,6 +184,8 @@ export const flightRouter = createTRPCRouter({
         data: {
           ...input,
           userId: ctx.user.id,
+          // For backward compatibility, set landings = dayLandings + nightLandings if not provided
+          landings: typeof input.landings === 'number' ? input.landings : (input.dayLandings ?? 0) + (input.nightLandings ?? 0),
         },
         include: {
           aircraft: true,
@@ -282,25 +284,20 @@ export const flightRouter = createTRPCRouter({
     const totalHours = flights.reduce((sum, f) => sum + (f.duration ?? 0), 0);
     const totalPicHours = flights.reduce((sum, f) => sum + (f.picTime ?? 0), 0);
     const totalDualHours = flights.reduce((sum, f) => sum + (f.dualTime ?? 0), 0);
-    const totalLandings = flights.reduce((sum, f) => sum + (f.landings ?? 0), 0);
+    // Sum both dayLandings and nightLandings for totalLandings
+    const totalLandings = flights.reduce((sum, f) => sum + ((f.dayLandings ?? 0) + (f.nightLandings ?? 0)), 0);
 
     // 90-day recency stats
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-    const recencyAgg = await ctx.db.flight.aggregate({
+    const recentFlights = await ctx.db.flight.findMany({
       where: {
         userId: ctx.user.id,
         date: { gte: ninetyDaysAgo },
       },
-      _sum: {
-        landings: true,
-      },
-      _count: {
-        id: true,
-      },
     });
-    const last90DaysFlights = recencyAgg._count.id ?? 0;
-    const last90DaysLandings = recencyAgg._sum.landings ?? 0;
+    const last90DaysFlights = recentFlights.length;
+    const last90DaysLandings = recentFlights.reduce((sum, f) => sum + ((f.dayLandings ?? 0) + (f.nightLandings ?? 0)), 0);
     const isCurrent = last90DaysLandings >= 3;
 
     return {

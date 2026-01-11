@@ -48,7 +48,9 @@ model Flight {
   duration      Int
   picTime       Int
   dualTime      Int
-  landings      Int      @default(1)
+  landings      Int?     @default(1) // deprecated, use dayLandings + nightLandings
+  dayLandings   Int      @default(0)
+  nightLandings Int      @default(0)
   remarks       String?
   aircraftId    String
   userId        String
