@@ -6,7 +6,7 @@ import { trpc } from "@/trpc/client";
 import Link from "next/link";
 import { useState } from "react";
 import FlightForm from "@/components/FlightForm";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { DeleteDialog } from "@/components/DeleteDialog";
