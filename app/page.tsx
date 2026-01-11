@@ -1,4 +1,5 @@
 import { LaunchBanner } from "@/components/landing/LaunchBanner";
+import DevWarningBanner from "@/components/DevWarningBanner";
 // Force dynamic rendering to ensure real-time flight stats
 export const dynamic = 'force-dynamic';
 
@@ -54,6 +55,7 @@ export default async function Home() {
   return (
     <>
       <LaunchBanner />
+      <DevWarningBanner />
       <main className="min-h-screen flex flex-col bg-background">
         <Navigation />
         <Hero totalFlightHours={totalHours} />
