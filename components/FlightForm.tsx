@@ -173,12 +173,27 @@ export default function FlightForm({ initialData }: FlightFormProps) {
 
   const [form, setForm] = useState<FlightFormData>(getInitialFormState);
 
+  const [formError, setFormError] = useState<string | null>(null);
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.aircraftId) return;
+    setFormError(null);
+    if (!form.aircraftId) {
+      setFormError("Please select an aircraft.");
+      return;
+    }
+    if (!form.date) {
+      setFormError("Please enter a flight date.");
+      return;
+    }
+    const dateObj = new Date(form.date);
+    if (isNaN(dateObj.getTime())) {
+      setFormError("Invalid date format.");
+      return;
+    }
 
     const flightData = {
-      date: new Date(form.date),
+      date: dateObj,
       departureCode: form.departureCode.toUpperCase(),
       arrivalCode: form.arrivalCode.toUpperCase(),
       duration: Number(form.duration),
@@ -206,6 +221,11 @@ export default function FlightForm({ initialData }: FlightFormProps) {
 
   return (
     <form onSubmit={onSubmit} className="bg-card text-card-foreground rounded-lg border border-border shadow p-6 space-y-6">
+      {formError && (
+        <div className="bg-red-100 text-red-700 rounded px-4 py-2 mb-2 text-sm border border-red-300">
+          {formError}
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="date">Date</Label>
