@@ -20,21 +20,29 @@ export default function DashboardStatusCards() {
 
     return (
         <>
-            {/* Pilot Currency Card */}
+            {/* Legality Indicator Card */}
             <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-1">
                     <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <span className="font-semibold text-zinc-700 dark:text-zinc-200 text-base">Pilot Currency</span>
+                <span className="font-semibold text-zinc-700 dark:text-zinc-200 text-base">Legality Status</span>
                 {loading ? (
-                    <Skeleton className="h-7 w-32 my-1" />
+                    <Skeleton className="h-7 w-40 my-1" />
+                ) : isCurrent === true ? (
+                    <span className="inline-block px-3 py-1 rounded font-semibold text-sm mb-1 bg-green-600 text-white">
+                        ✅ CURRENT / LEGAL TO FLY
+                    </span>
+                ) : isCurrent === false ? (
+                    <span className="inline-block px-3 py-1 rounded font-semibold text-sm mb-1 bg-red-600 text-white">
+                        ❌ NOT CURRENT / LOG LANDINGS
+                    </span>
                 ) : (
-                    <span className={`inline-block px-3 py-1 rounded font-semibold text-sm mb-1 ${isCurrent === true ? "bg-emerald-500 text-white" : isCurrent === false ? "bg-rose-500 text-white" : "bg-zinc-400 text-white"}`}>
-                        {isCurrent === true ? "CURRENCY: ACTIVE" : isCurrent === false ? "CURRENCY: EXPIRED" : "CURRENCY: UNKNOWN"}
+                    <span className="inline-block px-3 py-1 rounded font-semibold text-sm mb-1 bg-zinc-400 text-white">
+                        CURRENCY: UNKNOWN
                     </span>
                 )}
                 {loading ? (
-                    <Skeleton className="h-6 w-20 mt-1" />
+                    <Skeleton className="h-6 w-28 mt-1" />
                 ) : (
                     <span className="text-lg font-mono font-bold text-zinc-800 dark:text-zinc-100">{last90DaysLandings} <span className="text-xs font-normal text-zinc-500">/ 3 Landings</span></span>
                 )}
