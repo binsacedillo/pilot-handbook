@@ -12,6 +12,7 @@
 - Server-side validation (Zod, tRPC)
 - Weather widget (METAR integration)
 
+
 ### 🚧 Pending / WIP
 - Flight log reporting and analytics
 - Advanced recency tracking (IFR, night, custom rules)
@@ -22,9 +23,30 @@
 - Open source documentation and contribution guidelines
 - Automated deployment scripts for multiple cloud providers
 
+#### "Final 5%" Quality of Life Improvements (Recommended)
+- Add a loading skeleton for the stats cards to improve perceived performance during data fetches.
+- Add an empty state illustration or message when the user has 0 flights for a friendlier onboarding experience.
+- Implement a toast notification if a data refresh fails (network or server error) to improve error visibility.
+
 ---
 
-# 📊 **Current Status:** For a detailed breakdown of completed features, WIPs, and the audit log, please see [PROJECT_STATUS_REPORT.md](./PROJECT_STATUS_REPORT.md).
+# 📊 **Current Status:**
+
+**Progress Scores (Jan 2026 Final Audit):**
+- Core Logic: 95% (Soft Delete/Archiving, client-side tRPC hooks, real-time reactivity)
+- UI/UX: 95% (No more stale data flashes, clear distinction between Active Fleet and Total Stats)
+- Infrastructure/Perf: 95% (Optimized DB queries, strict protectedProcedure auth)
+
+For a detailed breakdown of completed features, WIPs, and the audit log, please see [PROJECT_STATUS_REPORT.md](./internal-docs/PROJECT_STATUS_REPORT.md).
+#
+## Technical Log: Why Client-Side Data Fetching?
+
+All dashboard data fetching was moved to the client (via tRPC hooks) to address issues with Next.js App Router's soft-navigation and React Query hydration. This ensures:
+- Real-time reactivity and instant updates after navigation or mutations.
+- Consistent, up-to-date data for all dashboard widgets, regardless of navigation method.
+- Simpler cache invalidation and error handling, especially for authenticated/protected data.
+
+This is now the standard for all dashboard and user-specific data modules.
 
 # Pilot Handbook
 
