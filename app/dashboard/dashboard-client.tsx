@@ -252,14 +252,8 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                         <span className="text-base text-muted-foreground mb-8 text-center max-w-md">
                             Get started by logging your first flight. This tool is designed to help you track your flying experience and stay current. Click below to add your first entry.
                         </span>
-                        {/* Replace with AddFlightModal trigger if available, fallback to /flights */}
-                        <Button size="lg" className="text-lg px-8 py-4" onClick={() => {
-                            if (typeof window !== 'undefined') {
-                                const evt = new CustomEvent('openAddFlightModal');
-                                window.dispatchEvent(evt);
-                            }
-                        }}>
-                            Add Your First Flight
+                        <Button size="lg" className="text-lg px-8 py-4" asChild>
+                            <Link href="/flights/new">Add Your First Flight</Link>
                         </Button>
                     </div>
                 )}
