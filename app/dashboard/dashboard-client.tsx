@@ -219,10 +219,11 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
         );
     }
 
-    // --- Render only the Recent Flights and Weather widgets (no heading, nav, or stat cards) ---
+    // --- Two-column layout: main (flights/stats) and sidebar (weather) ---
     return (
-        <div className={`grid gap-8 ${metar ? "lg:grid-cols-2" : ""}`}>
-            <div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main content: Recent Flights and (optionally) other stats */}
+            <div className="lg:col-span-2">
                 <h2 className="text-xl font-semibold mb-4">Recent Flights</h2>
                 {isLoading || isRefreshing ? (
                     <div className="space-y-2 animate-pulse">
@@ -248,8 +249,9 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                     <div className="text-muted-foreground">No flights found.</div>
                 )}
             </div>
-            {metar && (
-                <div className="min-w-0">
+            {/* Sidebar: Weather Widget */}
+            <div className="min-w-0">
+                {metar && (
                     <WeatherWidget
                         metar={metar}
                         isLoading={metarLoading}
@@ -258,8 +260,8 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                         onResetToFavorite={customIcao ? handleResetToFavorite : undefined}
                         isFavorite={isFavorite}
                     />
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }
