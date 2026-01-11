@@ -36,7 +36,22 @@ export default function DashboardPageClient() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                   <DashboardStatusCards />
                 </div>
-                <DashboardClient initialStats={stats} initialFlights={flights} initialAircraft={aircraft} />
+                <DashboardClient
+                  initialStats={stats ?? {
+                    totalFlights: 0,
+                    totalHours: 0,
+                    totalPicHours: 0,
+                    totalDualHours: 0,
+                    totalLandings: 0,
+                    recency: {
+                      last90DaysFlights: 0,
+                      last90DaysLandings: 0,
+                      isCurrent: false,
+                    },
+                  }}
+                  initialFlights={flights ?? []}
+                  initialAircraft={aircraft ?? []}
+                />
               </>
             )}
           </div>
