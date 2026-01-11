@@ -14,7 +14,7 @@ export default function DashboardPageClient() {
   const { isLoading: isStatsLoading, data: stats } = trpc.flight.getStats.useQuery();
   const { isLoading: isSummaryLoading } = trpc.stats.getSummary.useQuery();
   const { isLoading: isAircraftLoading, data: aircraft } = trpc.aircraft.getAll.useQuery();
-  const { isLoading: isFlightsLoading, data: flights } = trpc.flight.getAll.useQuery();
+  const { isLoading: isFlightsLoading, data: flights } = trpc.flight.getAll.useQuery({});
   const isLoading = isStatsLoading || isSummaryLoading || isAircraftLoading || isFlightsLoading || !isLoaded;
 
   return (
