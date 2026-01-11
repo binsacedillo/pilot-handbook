@@ -58,6 +58,11 @@ export default function Pricing() {
 								{/* Pricing */}
 								<div className="mb-8">
 									<div className="flex items-baseline gap-2">
+										{plan.originalPrice && (
+											<span className="text-2xl font-semibold text-muted-foreground line-through mr-2">
+												{plan.originalPrice}
+											</span>
+										)}
 										<span className="text-4xl font-bold text-foreground">
 											{plan.price}
 										</span>
@@ -68,6 +73,11 @@ export default function Pricing() {
 									{plan.name === "Free" && (
 										<p className="text-sm text-green-600 dark:text-green-400 font-semibold mt-2">
 											✓ All features included
+										</p>
+									)}
+									{plan.badge === "Beta" && (
+										<p className="text-xs text-yellow-700 dark:text-yellow-300 font-semibold mt-2">
+											Early Bird pricing during Beta. Pro will be ₱549/mo after launch.
 										</p>
 									)}
 								</div>
@@ -128,6 +138,9 @@ export default function Pricing() {
 													}
 												>
 													{feature.name}
+													{(feature.name.includes("Pro")) && (
+														<span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full font-semibold align-middle">Pro</span>
+													)}
 												</span>
 											</li>
 										))}

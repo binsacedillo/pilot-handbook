@@ -8,6 +8,7 @@ import { TRPCProvider } from "@/trpc/Provider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
 import DevWarningBanner from "@/components/DevWarningBanner";
+import { LaunchBanner } from "@/components/landing/LaunchBanner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -47,6 +48,7 @@ export default function RootLayout({
             <TRPCProvider>
               <ThemeWrapper>
                 <div className="flex flex-col min-h-screen">
+                  <LaunchBanner />
                   <DevWarningBanner />
                   {children}
                 </div>

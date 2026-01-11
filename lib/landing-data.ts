@@ -133,6 +133,7 @@ export interface PricingPlan {
 	ctaHref: string;
 	highlighted: boolean;
 	badge?: string;
+	originalPrice?: string;
 }
 
 export const pricingPlans: PricingPlan[] = [
@@ -159,21 +160,22 @@ export const pricingPlans: PricingPlan[] = [
 	{
 		name: "Pro",
 		description: "For commercial pilots and flight schools across the Philippines",
-		price: "₱549",
+		price: "₱249",
 		period: "per month",
 		highlighted: true,
-		badge: "Coming Soon",
-		cta: "Learn More",
+		badge: "Beta",
+		cta: "Get Early Bird Access",
 		ctaHref: "/sign-up",
 		features: [
 			{ name: "Unlimited flight logging", included: true },
 			{ name: "Aircraft fleet management", included: true },
 			{ name: "Flight statistics & analytics", included: true },
 			{ name: "Cloud backup (unlimited)", included: true },
-			{ name: "90-day recency tracking", included: true },
-			{ name: "PDF export (CAAP-ready)", included: true },
+			{ name: "90-day recency tracking (Pro)", included: true },
+			{ name: "PDF export (CAAP-ready, Pro)", included: true },
 			{ name: "Priority support (PH time zone)", included: true },
 			{ name: "Advanced reporting", included: true },
 		],
+		originalPrice: "₱549",
 	},
 ];
