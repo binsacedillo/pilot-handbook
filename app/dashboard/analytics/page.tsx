@@ -19,7 +19,7 @@ export default async function AnalyticsPage() {
 
     return (
         <main className="p-8">
-            <AnalyticsClient initialStats={stats} />
+            <AnalyticsClient />
         </main>
     );
 }
