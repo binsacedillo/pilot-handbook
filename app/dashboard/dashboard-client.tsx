@@ -25,7 +25,8 @@ interface DashboardClientProps {
 function DashboardClient({ initialStats, initialFlights, initialAircraft }: DashboardClientProps) {
     const { user, isLoaded } = useUser();
     const utils = trpc.useUtils();
-    const { data: aircraft } = trpc.aircraft.getAll.useQuery(
+    // Live queries for aircraft, stats, and flights
+    const { data: aircraft = initialAircraft } = trpc.aircraft.getAll.useQuery(
         undefined,
         {
             initialData: initialAircraft,
@@ -34,15 +35,33 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
             staleTime: 0,
         }
     );
-    // Removed unused recentFlights query to resolve lint warning
+    const { data: stats = initialStats } = trpc.flight.getStats.useQuery(
+        undefined,
+        {
+            initialData: initialStats,
+            enabled: isLoaded && !!user,
+            refetchOnMount: "always",
+            staleTime: 0,
+        }
+    );
+    const { data: flights = initialFlights } = trpc.flight.getAll.useQuery(
+        {},
+        {
+            initialData: initialFlights,
+            enabled: isLoaded && !!user,
+            refetchOnMount: "always",
+            staleTime: 0,
+        }
+    );
     useEffect(() => {
         if (isLoaded) {
             utils.aircraft.getAll.invalidate();
             if (utils.flight.getRecent) utils.flight.getRecent.invalidate();
+            utils.flight.getAll.invalidate();
+            utils.flight.getStats.invalidate();
         }
-    }, [isLoaded, utils.aircraft.getAll, utils.flight.getRecent]);
+    }, [isLoaded, utils.aircraft.getAll, utils.flight.getRecent, utils.flight.getAll, utils.flight.getStats]);
     const [customIcao, setCustomIcao] = useState<string | null>(null);
-    
     // Get favorite airport weather (default)
     const { data: favoriteMetar, isLoading: favoriteLoading, error: favoriteError } = 
         trpc.weather.getFavoriteAirportMetar.useQuery(undefined, {
@@ -54,7 +73,6 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
             refetchOnReconnect: false,
             refetchInterval: 15 * 60 * 1000,
         });
-    
     // Get custom airport weather (when user searches)
     const { data: customMetar, isLoading: customLoading, error: customError } = 
         trpc.weather.getMetar.useQuery(
@@ -69,9 +87,6 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                 refetchInterval: 15 * 60 * 1000,
             }
         );
-    
-    const flights = initialFlights;
-    const stats = initialStats;
 
     // Determine which METAR to display
     const metar = customIcao ? customMetar : favoriteMetar;
