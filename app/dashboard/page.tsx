@@ -29,6 +29,11 @@ export default async function Page() {
     totalPicHours,
     totalDualHours,
     totalLandings,
+    recency: {
+      last90DaysFlights: 0,
+      last90DaysLandings: 0,
+      isCurrent: false,
+    },
   };
 
   // 4. Pass data to client component with proper aircraft relations (filter out nulls)
