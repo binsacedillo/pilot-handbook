@@ -19,14 +19,16 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             staleTime: 5 * 1000,
-            retry: (failureCount, error: unknown) => {
-              // Retry UNAUTHORIZED errors once (handles auth race condition)
-              if ((error as { data?: { code?: string } })?.data?.code === 'UNAUTHORIZED' && failureCount < 1) {
-                return true;
-              }
-              return failureCount < 3;
-            },
-            retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
+            refetchOnWindowFocus: false,
+            retry: false,
+            // If you want to allow a single retry for UNAUTHORIZED, use the custom logic below instead:
+            // retry: (failureCount, error: unknown) => {
+            //   if ((error as { data?: { code?: string } })?.data?.code === 'UNAUTHORIZED' && failureCount < 1) {
+            //     return true;
+            //   }
+            //   return failureCount < 3;
+            // },
+            // retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
           },
         },
       })
