@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Flight" ADD COLUMN     "dayLandings" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "nightLandings" INTEGER NOT NULL DEFAULT 0,
+ALTER COLUMN "landings" DROP NOT NULL;
