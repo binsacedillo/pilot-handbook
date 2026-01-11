@@ -84,6 +84,8 @@ export default function FlightForm({ initialData }: FlightFormProps) {
               updatedAt: new Date(),
               userId: "",
               landings: newFlight.landings ?? 1,
+              dayLandings: typeof newFlight.dayLandings === 'number' ? newFlight.dayLandings : 0,
+              nightLandings: typeof newFlight.nightLandings === 'number' ? newFlight.nightLandings : 0,
               remarks: newFlight.remarks ?? null,
             },
             ...previousFlights.filter(f =>
