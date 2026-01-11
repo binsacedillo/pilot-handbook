@@ -10,6 +10,7 @@ import { WeatherWidget } from "@/components/WeatherWidget";
 import type { RouterOutputs } from "@/src/trpc/shared";
 import { trpc } from "@/src/trpc/client";
 import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
 
 type StatsData = RouterOutputs["flight"]["getStats"];
 type FlightsData = RouterOutputs["flight"]["getAll"];
@@ -22,7 +23,15 @@ interface DashboardClientProps {
 }
 
 function DashboardClient({ initialStats, initialFlights, initialAircraft }: DashboardClientProps) {
-    const { data: aircraft } = trpc.aircraft.getAll.useQuery(undefined, { initialData: initialAircraft });
+    const { user, isLoaded } = useUser();
+    const { data: aircraft } = trpc.aircraft.getAll.useQuery(
+        undefined,
+        {
+            initialData: initialAircraft,
+            enabled: isLoaded && !!user,
+            refetchOnMount: true,
+        }
+    );
     const [customIcao, setCustomIcao] = useState<string | null>(null);
     
     // Get favorite airport weather (default)
