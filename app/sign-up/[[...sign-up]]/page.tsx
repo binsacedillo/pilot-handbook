@@ -11,66 +11,106 @@ declare global {
 
 import { SignUp, useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { Plane, CheckCircle, ArrowLeft } from "lucide-react";
+import { Plane, CheckCircle, ArrowLeft, ExternalLink, Copy } from "lucide-react";
 import { useTheme } from "next-themes";
 import { dark } from "@clerk/themes";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-export default function SignUpPage() {
-		const { theme } = useTheme();
-		const { isSignedIn, isLoaded } = useUser();
-		const router = useRouter();
-		const [isEmbedded, setIsEmbedded] = useState(false);
-		const [copied, setCopied] = useState(false);
 
-		useEffect(() => {
-			const ua = navigator.userAgent || navigator.vendor;
-			const shouldEmbed =
-				/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
-				(window.navigator.standalone === false) ||
-				(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+function isInAppBrowser() {
+	if (typeof window === "undefined") return false;
+	const ua = navigator.userAgent || navigator.vendor;
+	return (
+		/FBAN|FBAV|Instagram|Messenger|Line|WeChat|Snapchat|Twitter|TikTok|wv/.test(ua) ||
+		(window.navigator.standalone === false) ||
+		(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+	);
+}
 
-			if (isEmbedded !== shouldEmbed) {
-				setTimeout(() => setIsEmbedded(shouldEmbed), 0);
-			}
+function RedirectToExternal() {
+	const [copied, setCopied] = useState(false);
+	const [intentError, setIntentError] = useState(false);
+	const url = typeof window !== "undefined" ? window.location.href : "";
 
-			if (isSignedIn) {
-				router.push("/");
-			}
-		}, [isSignedIn, router, isEmbedded]);
-
-		if (!isLoaded) {
-			return (
-				<div className="flex justify-center items-center min-h-screen">
-					<Loader2 className="h-12 w-12 animate-spin text-primary" />
-				</div>
-			);
+	const handleCopy = () => {
+		if (navigator.clipboard) {
+			navigator.clipboard.writeText(url);
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
 		}
+	};
 
-	if (isSignedIn) return null;
+	const handleOpenBrowser = () => {
+		try {
+			if (/Android/i.test(navigator.userAgent)) {
+				window.location.href = `intent://${window.location.host}${window.location.pathname}#Intent;scheme=https;end`;
+			} else {
+				window.open(url, "_blank");
+			}
+		} catch {
+			setIntentError(true);
+		}
+	};
 
-	if (isEmbedded) {
+	return (
+		<div className="flex flex-col items-center justify-center min-h-screen bg-linear-to-br from-blue-900 via-slate-900 to-blue-800 px-4">
+			<div className="max-w-md w-full bg-white/10 rounded-xl shadow-xl p-6 text-center">
+				<div className="flex items-center justify-center gap-2 mb-4">
+					<Plane className="w-7 h-7 text-blue-500" />
+					<span className="text-2xl font-bold text-white">Pilot Handbook</span>
+				</div>
+				<h2 className="text-xl font-semibold text-white mb-2">Google Sign-Up Restricted</h2>
+				<p className="text-slate-200 mb-4">
+					Google and other providers block sign-up from this app&apos;s browser.<br />
+					Please open this page in your device&apos;s browser for secure authentication.
+				</p>
+				<div className="flex flex-col gap-3 mt-4">
+					<button
+						onClick={handleCopy}
+						className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow"
+					>
+						<Copy className="w-5 h-5" /> Copy Link
+					</button>
+					<button
+						onClick={handleOpenBrowser}
+						className="flex items-center justify-center gap-2 bg-slate-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-lg shadow"
+					>
+						<ExternalLink className="w-5 h-5" /> Open in Browser
+					</button>
+				</div>
+				{copied && <div className="mt-2 text-green-400 font-semibold">Link Copied!</div>}
+				{intentError && <div className="mt-2 text-red-400 font-semibold">Could not open browser. Please copy the link manually.</div>}
+				<div className="mt-6 text-xs text-slate-300">Tip: On iOS, tap <span className="font-bold">•••</span> or <span className="font-bold">Share</span> and choose <span className="font-bold">Open in Browser</span>.</div>
+			</div>
+		</div>
+	);
+}
+
+export default function SignUpPage() {
+	const { theme } = useTheme();
+	const { isSignedIn, isLoaded } = useUser();
+	const router = useRouter();
+	const isEmbedded = isInAppBrowser();
+
+	useEffect(() => {
+		if (isSignedIn) {
+			router.push("/");
+		}
+	}, [isSignedIn, router]);
+
+	if (!isLoaded) {
 		return (
-			<div className='p-5 text-center'>
-				<p>Tap the <span className="font-bold">•••</span> or <span className="font-bold">Share</span> icon and select <br/> &apos;Open in Browser&apos;</p>
-				<button
-					onClick={() => {
-						navigator.clipboard.writeText(window.location.href);
-						setCopied(true);
-						setTimeout(() => setCopied(false), 2000);
-					}}
-					className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold"
-				>
-					Copy Link
-				</button>
-				{copied && (
-					<div className="mt-2 text-green-600 font-semibold">Link Copied!</div>
-				)}
+			<div className="flex justify-center items-center min-h-screen">
+				<Loader2 className="h-12 w-12 animate-spin text-primary" />
 			</div>
 		);
 	}
 
+	if (isEmbedded) {
+		return <RedirectToExternal />;
+	}
+	// Main sign-up UI (non-embedded browser)
 	return (
 		<div className="flex min-h-screen bg-linear-to-br from-gray-900 via-black to-gray-800">
 			{/* Left Side - Branding */}
@@ -121,7 +161,7 @@ export default function SignUpPage() {
 
 				<div className="relative z-10">
 					<p className="text-gray-400 text-sm">
-						&ldquo;This logbook has transformed how I track my hours. It&rsquo;s intuitive,
+						&ldquo;This logbook has transformed how I track my hours. It&apos;s intuitive,
 						reliable, and exactly what I needed.&rdquo;
 					</p>
 					<p className="text-white font-semibold mt-2">
