@@ -4,6 +4,8 @@ import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import { trpc } from "@/trpc/client";
 import Link from "next/link";
+import { useState } from "react";
+import FlightForm from "@/components/FlightForm";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -13,6 +15,7 @@ import { useSearchParams } from "next/navigation";
 import { FlightFilterBar } from "@/src/components/flights/FlightFilterBar";
 
 export default function FlightsPage() {
+  const [showForm, setShowForm] = useState(false);
   const searchParams = useSearchParams();
 
   const flightTypeValue = searchParams.get("flightType");
@@ -74,10 +77,17 @@ export default function FlightsPage() {
       <main className="flex-1 max-w-6xl mx-auto p-6 md:p-8 w-full">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">Flights</h1>
-          <Button asChild>
-            <Link href="/flights/new">Log New Flight</Link>
-          </Button>
+          <Button onClick={() => setShowForm(true)}>Log New Flight</Button>
         </div>
+        {showForm && (
+          <div className="mb-8 bg-card border border-border rounded-lg shadow p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Log New Flight</h2>
+              <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>Close</Button>
+            </div>
+            <FlightForm />
+          </div>
+        )}
 
         {/* Filters */}
         <div className="mb-6">
@@ -99,9 +109,7 @@ export default function FlightsPage() {
         {filteredRows.length === 0 ? (
           <div className="bg-card text-foreground rounded-lg border border-border shadow p-8 text-center">
             <p className="text-muted-foreground mb-4">No flights yet.</p>
-            <Button asChild>
-              <Link href="/flights/new">Log your first flight</Link>
-            </Button>
+            <Button onClick={() => setShowForm(true)}>Log your first flight</Button>
           </div>
         ) : (
           <div className="bg-card text-foreground rounded-lg border border-border shadow overflow-x-auto">
