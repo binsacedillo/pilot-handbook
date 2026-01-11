@@ -157,8 +157,8 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
   }
 
   return (
-    <Card className="rounded-xl border bg-linear-to-br from-slate-900/90 via-slate-900/70 to-slate-900/30 text-white shadow-lg">
-      <CardHeader className="pb-0">
+    <Card className="rounded-xl border bg-linear-to-br from-slate-900/90 via-slate-900/70 to-slate-900/30 text-white shadow-lg w-full max-w-md mx-auto lg:mx-0 lg:max-w-full p-2 lg:p-4">
+      <CardHeader className="pb-0 px-2 lg:px-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <CardTitle className="text-base font-semibold leading-tight">
@@ -204,7 +204,7 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
         </div>
       </CardHeader>
 
-      <CardContent className="pt-4">
+      <CardContent className="pt-4 px-2 lg:px-4">
         <div className="grid gap-4 md:grid-cols-[1.1fr_1fr]">
           <div className="space-y-3">
             <div className="text-4xl font-semibold leading-tight">{temperature}</div>

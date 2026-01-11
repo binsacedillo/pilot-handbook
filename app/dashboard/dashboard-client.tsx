@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import AppHeader from "../../components/AppHeader";
@@ -127,12 +127,6 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
     const safeStats = statsLive ?? initialStats ?? {};
     const safeFlights = flightsLive ?? initialFlights ?? [];
 
-    // Aviation Stat Card values
-    const isCurrent = safeStats?.recency?.isCurrent;
-    const last90DaysLandings = safeStats?.recency?.last90DaysLandings ?? 0;
-    const totalHours = safeStats?.totalHours ?? 0;
-    const fleetCount = safeAircraft?.length ?? 0;
-
     // If Clerk is not loaded, show skeletons only
     if (!isLoaded) {
         return (
@@ -225,115 +219,47 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
         );
     }
 
+    // --- Render only the Recent Flights and Weather widgets (no heading, nav, or stat cards) ---
     return (
-        <div className="min-h-screen flex flex-col">
-            <AppHeader />
-            <main className="flex-1 container mx-auto px-4 py-8">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
-                    <h1 className="text-2xl font-bold">Dashboard</h1>
-                    <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
-                        <Link href="/dashboard/analytics">View analytics</Link>
-                    </Button>
-                </div>
-                {/* Aviation Stat Cards */}
-                <section aria-label="Aviation Stats" className="mb-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {/* Pilot Currency Card */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Pilot Currency</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {isLoading || isRefreshing ? (
-                                    <div className="h-6 w-32 bg-muted rounded animate-pulse mb-2" />
-                                ) : (
-                                    <span className={`inline-block px-3 py-1 rounded font-semibold text-white text-sm ${isCurrent ? "bg-green-500" : "bg-red-500"}`}>
-                                        {isCurrent ? "CURRENT" : "NOT CURRENT"}
-                                    </span>
-                                )}
-                                <div className="mt-2 text-sm text-muted-foreground">
-                                    {isLoading || isRefreshing ? (
-                                        <div className="h-4 w-20 bg-muted rounded animate-pulse" />
-                                    ) : (
-                                        `${last90DaysLandings}/3 landings in 90 days`
-                                    )}
+        <div className={`grid gap-8 ${metar ? "lg:grid-cols-2" : ""}`}>
+            <div>
+                <h2 className="text-xl font-semibold mb-4">Recent Flights</h2>
+                {isLoading || isRefreshing ? (
+                    <div className="space-y-2 animate-pulse">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <Card key={i} className="h-16 bg-muted" />
+                        ))}
+                    </div>
+                ) : safeFlights && safeFlights.length > 0 ? (
+                    <div className="space-y-2">
+                        {safeFlights.slice(0, 5).map((flight) => (
+                            <Card key={flight.id} className="flex-row flex items-center justify-between gap-4 p-4">
+                                <div className="flex-1 min-w-0">
+                                    <div className="font-medium truncate">{flight.aircraft?.model || "Aircraft"}</div>
+                                    <div className="text-sm text-muted-foreground">{flight.date ? new Date(flight.date).toLocaleDateString() : ""}</div>
                                 </div>
-                            </CardContent>
-                        </Card>
-                        {/* Total Experience Card */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Total Experience</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {isLoading || isRefreshing ? (
-                                    <div className="h-6 w-25 bg-muted rounded animate-pulse" />
-                                ) : (
-                                    <span className="text-2xl font-semibold">{totalHours} Hrs</span>
-                                )}
-                            </CardContent>
-                        </Card>
-                        {/* Fleet Size Card */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Fleet Size</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {isLoading || isRefreshing ? (
-                                    <div className="h-6 w-20 bg-muted rounded animate-pulse" />
-                                ) : (
-                                    <span className="text-2xl font-semibold">{fleetCount} Aircraft</span>
-                                )}
-                            </CardContent>
-                        </Card>
+                                <div className="text-right whitespace-nowrap">
+                                    <span className="text-sm font-semibold">{flight.duration ?? 0} hrs</span>
+                                </div>
+                            </Card>
+                        ))}
                     </div>
-                </section>
-                {/* Recent Flights + Weather */}
-                <section
-                    aria-label="Recent flights and weather"
-                    className={`mt-12 grid gap-6 ${metar ? "lg:grid-cols-[minmax(0,1.7fr)_minmax(320px,1fr)]" : ""}`}
-                >
-                    <div>
-                        <h2 className="text-xl font-semibold mb-4">Recent Flights</h2>
-                        {isLoading || isRefreshing ? (
-                            <div className="space-y-2 animate-pulse">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                    <Card key={i} className="h-16 bg-muted" />
-                                ))}
-                            </div>
-                        ) : safeFlights && safeFlights.length > 0 ? (
-                            <div className="space-y-2">
-                                {safeFlights.slice(0, 5).map((flight) => (
-                                    <Card key={flight.id} className="flex-row flex items-center justify-between gap-4 p-4">
-                                        <div className="flex-1 min-w-0">
-                                            <div className="font-medium truncate">{flight.aircraft?.model || "Aircraft"}</div>
-                                            <div className="text-sm text-muted-foreground">{flight.date ? new Date(flight.date).toLocaleDateString() : ""}</div>
-                                        </div>
-                                        <div className="text-right whitespace-nowrap">
-                                            <span className="text-sm font-semibold">{flight.duration ?? 0} hrs</span>
-                                        </div>
-                                    </Card>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-muted-foreground">No flights found.</div>
-                        )}
-                    </div>
-                    {metar && (
-                        <div className="min-w-0">
-                            <WeatherWidget
-                                metar={metar}
-                                isLoading={metarLoading}
-                                error={metarError?.message || null}
-                                onAirportChange={handleAirportChange}
-                                onResetToFavorite={customIcao ? handleResetToFavorite : undefined}
-                                isFavorite={isFavorite}
-                            />
-                        </div>
-                    )}
-                </section>
-            </main>
-            <AppFooter />
+                ) : (
+                    <div className="text-muted-foreground">No flights found.</div>
+                )}
+            </div>
+            {metar && (
+                <div className="min-w-0">
+                    <WeatherWidget
+                        metar={metar}
+                        isLoading={metarLoading}
+                        error={metarError?.message || null}
+                        onAirportChange={handleAirportChange}
+                        onResetToFavorite={customIcao ? handleResetToFavorite : undefined}
+                        isFavorite={isFavorite}
+                    />
+                </div>
+            )}
         </div>
     );
 }
