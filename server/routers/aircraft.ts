@@ -4,24 +4,24 @@ import { createTRPCRouter, protectedProcedure } from '../trpc';
 import { idSchema, createAircraftSchema, updateAircraftSchema } from '@/src/lib/shared-schemas';
 
 export const aircraftRouter = createTRPCRouter({
-    // Restore (unarchive) an aircraft
-    restore: protectedProcedure
-      .input(idSchema)
-      .mutation(async ({ ctx, input }) => {
-        if (!ctx.user) {
-          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
-        }
-        const aircraft = await ctx.db.aircraft.update({
-          where: {
-            id: input.id,
-            userId: ctx.user.id, // Security Check!
-          },
-          data: {
-            isArchived: false,
-          },
-        });
-        return aircraft;
-      }),
+  // Restore (unarchive) an aircraft
+  restore: protectedProcedure
+    .input(idSchema)
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
+      }
+      const aircraft = await ctx.db.aircraft.update({
+        where: {
+          id: input.id,
+          userId: ctx.user.id, // Security Check!
+        },
+        data: {
+          isArchived: false,
+        },
+      });
+      return aircraft;
+    }),
   // Get all aircraft for the current user
   getAll: protectedProcedure
     .input(
@@ -59,7 +59,7 @@ export const aircraftRouter = createTRPCRouter({
       if (!ctx.user) {
         return null;
       }
-      
+
       const aircraft = await ctx.db.aircraft.findFirst({
         where: {
           id: input.id,
@@ -76,7 +76,7 @@ export const aircraftRouter = createTRPCRouter({
       if (!ctx.user) {
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
       }
-      
+
       const aircraft = await ctx.db.aircraft.create({
         data: {
           ...input,
@@ -93,7 +93,7 @@ export const aircraftRouter = createTRPCRouter({
       if (!ctx.user) {
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
       }
-      
+
       const { id, ...data } = input;
 
       // Use update instead of updateMany for better error handling
@@ -126,5 +126,35 @@ export const aircraftRouter = createTRPCRouter({
         },
       });
       return aircraft;
+    }),
+
+  // Permanent delete with safety check
+  deletePermanent: protectedProcedure
+    .input(idSchema)
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
+      }
+      // Count flights associated with this aircraft
+      const flightCount = await ctx.db.flight.count({
+        where: {
+          aircraftId: input.id,
+          userId: ctx.user.id,
+        },
+      });
+      if (flightCount > 0) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'Cannot permanently delete an aircraft with active flight logs. Please archive it instead.',
+        });
+      }
+      // No flights, safe to delete
+      const deleted = await ctx.db.aircraft.delete({
+        where: {
+          id: input.id,
+          userId: ctx.user.id,
+        },
+      });
+      return deleted;
     }),
 });
