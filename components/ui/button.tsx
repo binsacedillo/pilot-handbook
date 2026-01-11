@@ -40,7 +40,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 				ref={ref}
 				{...(asChild ? {} : { type })}
 				className={twMerge(
-					"inline-flex items-center justify-center rounded-md font-medium shadow-sm transition cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-slate-100 disabled:cursor-not-allowed disabled:opacity-60",
+					"inline-flex items-center justify-center rounded-md font-medium shadow-sm transition cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-slate-100 disabled:cursor-not-allowed disabled:opacity-60",
 					variantStyles[variant],
 					sizeStyles[size],
 					className
