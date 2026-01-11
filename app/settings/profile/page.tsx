@@ -113,11 +113,10 @@ export default function ProfilePage() {
       {/* Message Alert */}
       {message && (
         <div
-          className={`flex items-center gap-3 rounded-lg p-4 ${
-            message.type === 'success'
+          className={`flex items-center gap-3 rounded-lg p-4 ${message.type === 'success'
               ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
               : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-          }`}
+            }`}
         >
           {message.type === 'success' ? (
             <CheckCircle className="h-5 w-5" />
