@@ -40,7 +40,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
             utils.aircraft.getAll.invalidate();
             if (utils.flight.getRecent) utils.flight.getRecent.invalidate();
         }
-    }, [isLoaded]);
+    }, [isLoaded, utils.aircraft.getAll, utils.flight.getRecent]);
     const [customIcao, setCustomIcao] = useState<string | null>(null);
     
     // Get favorite airport weather (default)
