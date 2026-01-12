@@ -79,7 +79,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
     }, [isLoaded, utils.flight.getStats]);
     const [customIcao, setCustomIcao] = useState<string | null>(null);
     // Get favorite airport weather (default)
-    const { data: favoriteMetar, isLoading: favoriteLoading, error: favoriteError } = 
+    const { data: favoriteMetar, isLoading: favoriteLoading, error: favoriteError } =
         trpc.weather.getFavoriteAirportMetar.useQuery(undefined, {
             enabled: !customIcao,
             placeholderData: (prev) => prev,
@@ -90,10 +90,10 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
             refetchInterval: 15 * 60 * 1000,
         });
     // Get custom airport weather (when user searches)
-    const { data: customMetar, isLoading: customLoading, error: customError } = 
+    const { data: customMetar, isLoading: customLoading, error: customError } =
         trpc.weather.getMetar.useQuery(
             { icao: customIcao! },
-            { 
+            {
                 enabled: !!customIcao,
                 placeholderData: (prev) => prev,
                 staleTime: 10 * 60 * 1000,
