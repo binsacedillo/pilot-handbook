@@ -8,7 +8,8 @@ describe('Validation', () => {
       duration: -10, // Invalid
       picTime: 0,
       dualTime: 0,
-      landings: 1,
+      dayLandings: 1,
+      nightLandings: 0,
       remarks: 'Negative duration',
     };
     await expect(caller.flight.create(input)).rejects.toThrow();
@@ -23,7 +24,8 @@ describe('Validation', () => {
       duration: 100,
       picTime: 0,
       dualTime: 0,
-      landings: 1.5, // Invalid
+      dayLandings: 1.5, // Invalid
+      nightLandings: 0,
       remarks: 'Decimal landings',
     };
     await expect(caller.flight.create(input)).rejects.toThrow();
@@ -40,7 +42,8 @@ describe('Validation', () => {
       duration: 100,
       picTime: 0,
       dualTime: 0,
-      landings: 1,
+      dayLandings: 1,
+      nightLandings: 0,
       remarks: 'Future date',
     };
     // If your schema does not yet validate future dates, this test will fail until you add it
@@ -92,7 +95,8 @@ beforeEach(() => {
         duration: input.duration,
         picTime: input.picTime,
         dualTime: input.dualTime,
-        landings: input.landings,
+        dayLandings: input.dayLandings,
+        nightLandings: input.nightLandings,
         remarks: input.remarks,
       };
       flightDb.push(newFlight);
@@ -128,7 +132,8 @@ describe('Flight Router', () => {
       duration: 300,
       picTime: 100,
       dualTime: 200,
-      landings: 1,
+      dayLandings: 1,
+      nightLandings: 0,
       remarks: 'Test flight',
     };
     const result = await caller.flight.create(input);
@@ -144,7 +149,8 @@ describe('Flight Router', () => {
       duration: 300,
       picTime: 100,
       dualTime: 200,
-      landings: 1,
+      dayLandings: 1,
+      nightLandings: 0,
       remarks: 'Test flight',
     };
     const created = await caller.flight.create(input);
@@ -161,7 +167,8 @@ describe('Flight Router', () => {
       duration: 300,
       picTime: 100,
       dualTime: 200,
-      landings: 1,
+      dayLandings: 1,
+      nightLandings: 0,
       remarks: 'Test flight',
     };
     const created = await caller.flight.create(input);
