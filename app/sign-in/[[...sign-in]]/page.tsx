@@ -76,11 +76,15 @@ export default function SignInPage() {
 						— Sarah Chen, Commercial Pilot
 					</p>
 				</div>
-			</div>
+			</div>z
 
 			{/* Right Side - Sign In Form */}
 			<div className="flex-1 flex items-center justify-center p-8">
 				<div className="w-full max-w-md">
+					<div className="mb-6 p-3 rounded-md bg-yellow-100 border border-yellow-300 text-yellow-900 text-sm flex items-center gap-2">
+						<span role="img" aria-label="Warning">⚠️</span>
+						<span>Sign in only works in external browsers. If you see a 404 or “disallowed_useragent” error, please open this site in Chrome, Safari, or Firefox.</span>
+					</div>
 					<Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors mb-6">
 						<ArrowLeft className="h-4 w-4" aria-hidden />
 						Back to home
