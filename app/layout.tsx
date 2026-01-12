@@ -10,6 +10,8 @@ import { ThemeWrapper } from "@/components/ThemeWrapper";
 import DevWarningBanner from "@/components/DevWarningBanner";
 import { LaunchBanner } from "@/components/landing/LaunchBanner";
 
+import { FeedbackButton } from "@/components/feedback-index";
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
@@ -50,6 +52,7 @@ export default function RootLayout({
                 <div className="flex flex-col min-h-screen">
                   <DevWarningBanner />
                   {children}
+                  <FeedbackButton />
                 </div>
               </ThemeWrapper>
             </TRPCProvider>
