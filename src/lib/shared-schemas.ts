@@ -46,6 +46,13 @@ export const createFlightSchema = z.object({
   nightLandings: z.number().int().min(0),
   remarks: z.string().optional(),
   aircraftId: z.string().min(1, 'Aircraft is required'),
+}).refine((data) => {
+  if (data.picTime && data.picTime > data.duration) return false;
+  if (data.dualTime && data.dualTime > data.duration) return false;
+  return true;
+}, {
+  message: 'PIC or Dual time cannot exceed total flight duration',
+  path: ['picTime'],
 });
 
 export const updateFlightSchema = createFlightSchema.partial().extend({

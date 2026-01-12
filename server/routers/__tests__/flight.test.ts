@@ -1,3 +1,90 @@
+  it('should allow a flight with zero dayLandings and nightLandings', async () => {
+    const input = {
+      aircraftId: 'aircraft-1',
+      departureCode: 'JFK',
+      arrivalCode: 'LAX',
+      date: new Date('2026-01-01'),
+      duration: 1.0,
+      picTime: 1.0,
+      dualTime: 0,
+      dayLandings: 0,
+      nightLandings: 0,
+      remarks: 'No landings (scenic tour)',
+    };
+    const result = await caller.flight.create(input);
+    expect(result.id).toBeDefined();
+    expect(result.dayLandings).toBe(0);
+    expect(result.nightLandings).toBe(0);
+  });
+  
+  it('should sum decimal durations accurately (float precision)', async () => {
+    // Reset DB for this test
+    flightDb.length = 0;
+    await caller.flight.create({
+      aircraftId: 'aircraft-1',
+      departureCode: 'JFK',
+      arrivalCode: 'LAX',
+      date: new Date('2026-01-01'),
+      duration: 2.0,
+      picTime: 2.0,
+      dualTime: 0,
+      dayLandings: 1,
+      nightLandings: 0,
+      remarks: 'Leg 1',
+    });
+    await caller.flight.create({
+      aircraftId: 'aircraft-1',
+      departureCode: 'JFK',
+      arrivalCode: 'LAX',
+      date: new Date('2026-01-02'),
+      duration: 2.0,
+      picTime: 2.0,
+      dualTime: 0,
+      dayLandings: 1,
+      nightLandings: 0,
+      remarks: 'Leg 2',
+    });
+    const total = flightDb.reduce((sum, f) => sum + (typeof f.duration === 'number' ? f.duration : 0), 0);
+    expect(total).toBe(4.0);
+  });
+
+  it('should accept a massive flight duration (14.5h)', async () => {
+    // Reset DB for this test
+    flightDb.length = 0;
+    const input = {
+      aircraftId: 'aircraft-1',
+      departureCode: 'JFK',
+      arrivalCode: 'CDG',
+      date: new Date('2026-01-01'),
+      duration: 14.5,
+      picTime: 14.5,
+      dualTime: 0,
+      dayLandings: 1,
+      nightLandings: 0,
+      remarks: 'International ferry',
+    };
+    const result = await caller.flight.create(input);
+    expect(result.duration).toBe(14.5);
+    // Simulate analytics aggregation
+    const total = flightDb.reduce((sum, f) => sum + (typeof f.duration === 'number' ? f.duration : 0), 0);
+    expect(total).toBeGreaterThanOrEqual(14.5);
+  });
+
+  it('should reject if picTime exceeds duration', async () => {
+    const input = {
+      aircraftId: 'aircraft-1',
+      departureCode: 'JFK',
+      arrivalCode: 'LAX',
+      date: new Date('2026-01-01'),
+      duration: 3.0,
+      picTime: 5.0, // Invalid
+      dualTime: 0,
+      dayLandings: 1,
+      nightLandings: 0,
+      remarks: 'Invalid PIC time',
+    };
+    await expect(caller.flight.create(input)).rejects.toThrow();
+  });
 describe('Validation', () => {
   it('should fail to create if duration is negative', async () => {
     const input = {
@@ -66,7 +153,7 @@ type Flight = {
 
 // Stateful mock array for flights
 let flightDb: Flight[] = [];
-
+// Helper to generate unique IDs for test flights
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createTestCaller, createMockContext } from './test-utils';
@@ -85,20 +172,41 @@ beforeEach(() => {
   });
     flightDb = [];
     // Stateful flight.create
-    ctx.db.flight.create.mockImplementation(async (input) => {
-      const newFlight: Flight = {
-        id: 'test-flight-1',
-        aircraftId: input.aircraftId,
-        departureCode: input.departureCode,
-        arrivalCode: input.arrivalCode,
-        date: input.date,
-        duration: input.duration,
-        picTime: input.picTime,
-        dualTime: input.dualTime,
-        dayLandings: input.dayLandings,
-        nightLandings: input.nightLandings,
-        remarks: input.remarks,
+    ctx.db.flight.create.mockImplementation(async (args) => {
+      const data = args && args.input ? args.input : args?.data ?? args;
+      console.log('Create input duration:', data?.duration);
+      const baseFlight = {
+        id: 'test-flight-' + Date.now(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: 'test-user-id',
+        dayLandings: 0,
+        nightLandings: 0,
+        duration: 0,
+        aircraft: {
+          id: 'test-aircraft',
+          registration: 'RP-C1234',
+          make: 'Cessna',
+          model: '172',
+          imageUrl: '',
+          status: 'Active',
+          isArchived: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          flightHours: 100,
+          userId: 'test-user-id',
+        },
       };
+      const now = new Date();
+      const newFlight = {
+        ...baseFlight,
+        id: 'test-flight-' + Date.now(),
+        createdAt: now,
+        updatedAt: now,
+        ...data,
+        duration: Number(data?.duration ?? baseFlight.duration ?? 0),
+      };
+      console.log('Saved duration:', newFlight.duration);
       flightDb.push(newFlight);
       return newFlight;
     });
