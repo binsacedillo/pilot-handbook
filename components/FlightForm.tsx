@@ -14,6 +14,7 @@ import {
 import { trpc } from "@/trpc/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useToast } from "@/components/ui/toast";
 
 type FlightFormData = {
   date: string;
@@ -43,6 +44,7 @@ export default function FlightForm({ initialData }: FlightFormProps) {
   const router = useRouter();
   const { data: aircraft } = trpc.aircraft.getAll.useQuery();
   const utils = trpc.useUtils();
+  const { showToast } = useToast();
   
   const isEditMode = !!initialData;
 
@@ -100,12 +102,14 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       if (context?.previousFlights) {
         utils.flight.getAll.setData({} as Record<string, unknown>, context.previousFlights);
       }
+      showToast("Failed to create flight. Please try again.", "error");
     },
     onSettled: async () => {
       await utils.flight.getAll.invalidate();
       await utils.flight.getStats.invalidate();
     },
     onSuccess: () => {
+      showToast("Flight created successfully.", "success");
       router.push("/flights");
     },
   });
@@ -131,12 +135,14 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       if (context?.previousFlights) {
         utils.flight.getAll.setData({} as Record<string, unknown>, context.previousFlights);
       }
+      showToast("Failed to update flight. Please try again.", "error");
     },
     onSettled: async () => {
       await utils.flight.getAll.invalidate();
       await utils.flight.getStats.invalidate();
     },
     onSuccess: () => {
+      showToast("Flight updated successfully.", "success");
       router.push("/flights");
     },
   });

@@ -9,7 +9,7 @@ import { trpc } from "@/trpc/client";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { Trash2, RefreshCw } from "lucide-react";
+import { Trash2, RefreshCw, Plane } from "lucide-react";
 import { DeleteDialog } from "@/components/DeleteDialog";
 import Link from "next/link";
 import { Edit2 } from "lucide-react";
@@ -17,6 +17,7 @@ import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import Image from "next/image";
 import { useToast } from "@/components/ui/toast";
+import EmptyState from "@/components/EmptyState";
 
 
 export default function AircraftPage() {
@@ -29,6 +30,10 @@ export default function AircraftPage() {
     onSuccess: async () => {
       await utils.aircraft.invalidate();
       router.refresh();
+      showToast("Aircraft archived.", "success");
+    },
+    onError: (error) => {
+      showToast(`Failed to archive aircraft: ${error.message}`, "error");
     },
   });
   const deletePermanentMutation = trpc.aircraft.deletePermanent.useMutation({
@@ -52,6 +57,10 @@ export default function AircraftPage() {
     onSuccess: async () => {
       await utils.aircraft.invalidate();
       router.refresh();
+      showToast("Aircraft restored.", "success");
+    },
+    onError: (error) => {
+      showToast(`Failed to restore aircraft: ${error.message}`, "error");
     },
   });
 
@@ -129,12 +138,15 @@ export default function AircraftPage() {
             <p className="text-muted-foreground mb-4">Loading…</p>
           </div>
         ) : displayedAircraft.length === 0 ? (
-          <div className="bg-card text-foreground rounded-lg border border-border shadow p-8 text-center">
-            <p className="text-muted-foreground mb-4">No aircraft yet.</p>
-            <Button asChild>
-              <Link href="/aircraft/new">Add your first aircraft</Link>
-            </Button>
-          </div>
+          <EmptyState
+            icon={<Plane className="w-16 h-16 text-muted-foreground" />}
+            title="No Aircraft Yet"
+            description="Start building your fleet by adding your first aircraft. You'll be able to track flights and manage your aviation logbook."
+            action={{
+              label: "Add Your First Aircraft",
+              href: "/aircraft/new",
+            }}
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {displayedAircraft.map((a) => (

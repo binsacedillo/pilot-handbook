@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import AppHeader from "../../components/AppHeader";
 import AppFooter from "../../components/AppFooter";
 import { WeatherWidget } from "@/components/WeatherWidget";
+import EmptyState from "@/components/EmptyState";
 import type { RouterOutputs } from "@/src/trpc/shared";
 import { trpc } from "@/src/trpc/client";
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
+import { LogBook } from "lucide-react";
 
 type StatsData = RouterOutputs["flight"]["getStats"];
 type FlightsData = RouterOutputs["flight"]["getAll"];
@@ -242,16 +244,16 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                         ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-16">
-                        <span className="text-2xl font-bold mb-4">Welcome to Your Pilot Logbook!</span>
-                        <span className="text-base text-muted-foreground mb-8 text-center max-w-md">
-                            Get started by logging your first flight. This tool is designed to help you track your flying experience and stay current. Click below to add your first entry.
-                        </span>
-                        <Button size="lg" className="text-lg px-8 py-4" onClick={() => window.location.href = '/flights'}>
-                            Add Your First Flight
-                        </Button>
-                    </div>
-                )}
+                    <EmptyState
+                        icon={<LogBook className="w-16 h-16 text-muted-foreground" />}
+                        title="Welcome to Your Pilot Logbook!"
+                        description="Get started by logging your first flight. This tool is designed to help you track your flying experience and stay current."
+                        action={{
+                            label: "Add Your First Flight",
+                            href: "/flights",
+                        }}
+                    />
+                )}}
             </div>
             {/* Sidebar: Weather Widget */}
             <div className="min-w-0">
