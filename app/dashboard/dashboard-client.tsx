@@ -11,7 +11,7 @@ import type { RouterOutputs } from "@/src/trpc/shared";
 import { trpc } from "@/src/trpc/client";
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import { LogBook } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 type StatsData = RouterOutputs["flight"]["getStats"];
 type FlightsData = RouterOutputs["flight"]["getAll"];
@@ -245,7 +245,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                     </div>
                 ) : (
                     <EmptyState
-                        icon={<LogBook className="w-16 h-16 text-muted-foreground" />}
+                        icon={<BookOpen className="w-16 h-16 text-muted-foreground" />}
                         title="Welcome to Your Pilot Logbook!"
                         description="Get started by logging your first flight. This tool is designed to help you track your flying experience and stay current."
                         action={{
