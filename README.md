@@ -48,6 +48,12 @@ All dashboard data fetching was moved to the client (via tRPC hooks) to address 
 
 This is now the standard for all dashboard and user-specific data modules.
 
+# Technical Decision: Resilient Data Architecture
+
+**Compliance**: Implemented a non-destructive soft-delete system for both Users and Aircraft, ensuring historical flight data remains intact even when accounts are deactivated (FAA/CAA friendly).
+
+**UX/Performance**: Shifted to client-side tRPC data fetching with pre-defined loading skeletons, eliminating stale-data flashes during Next.js navigation and improving perceived performance (LCP) on the dashboard.
+
 # Pilot Handbook
 
 A comprehensive flight logging and pilot management application built with the T3 Stack. Pilot Handbook helps pilots track their flight hours, manage aircraft, and maintain accurate logbook records while providing administrative tools for flight schools and organizations.
