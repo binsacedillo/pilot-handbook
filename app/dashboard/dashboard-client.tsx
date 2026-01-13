@@ -253,7 +253,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                             href: "/flights",
                         }}
                     />
-                )}}
+                )}
             </div>
             {/* Sidebar: Weather Widget */}
             <div className="min-w-0">
