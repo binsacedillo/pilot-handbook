@@ -11,10 +11,10 @@
 - Basic flight logging and filtering
 - Server-side validation (Zod, tRPC)
 - Weather widget (METAR integration)
+- Flight log reporting and analytics (charts, statistics, 90-day recency)
 
 
 ### 🚧 Pending / WIP
-- Flight log reporting and analytics
 - Advanced recency tracking (IFR, night, custom rules)
 - UI polish and accessibility improvements
 - Multi-aircraft support for users
