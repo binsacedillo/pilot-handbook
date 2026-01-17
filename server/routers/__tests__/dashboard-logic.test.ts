@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createMockContext, createTestCaller } from './test-utils';
-import { flightRouter } from '../flight';
 
 describe('flightRouter.getStats', () => {
   let ctx: ReturnType<typeof createMockContext>;
@@ -17,7 +16,12 @@ describe('flightRouter.getStats', () => {
 
   beforeEach(() => {
     ctx = createMockContext();
-    ctx.user = { id: userId };
+    ctx.user = {
+      id: userId,
+      clerkId: ctx.user.clerkId,
+      email: ctx.user.email,
+      role: ctx.user.role,
+    };
     flightDb = [];
     ctx.db.flight.findMany.mockImplementation(() => Promise.resolve(flightDb));
     caller = createTestCaller(ctx).flight;
@@ -57,7 +61,6 @@ describe('flightRouter.getStats', () => {
       { date: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000), dayLandings: 3, nightLandings: 0 }, // 10 days ago
     );
     // Simulate 90-day currency logic (not in router, but for test strategy)
-    type Flight = { date: Date; dayLandings?: number; nightLandings?: number };
     const recentLandings = flightDb
       .filter((f) =>
         f.date && f.date >= new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
