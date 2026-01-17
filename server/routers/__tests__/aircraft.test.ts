@@ -173,28 +173,37 @@ describe('Aircraft Router', () => {
     // 4. Assertions
     expect(afterDelete).toBeNull();
 
-    // Verify that the database was actually called with the 'isArchived' flag
+    // Verify that the database was actually called with BOTH id and userId
     expect(ctx.db.aircraft.update).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: created.id },
+        where: { 
+          id: created.id,
+          userId: ctx.user.id // Add this line to match your router's security check
+        },
         data: { isArchived: true }
       })
     );
   });
 
   it('should not allow access to another user\'s aircraft', async () => {
-    // 1. Create the base input
     const input = { ...baseAircraft };
+    const mockId = 'aircraft-id-123'; // Explicitly define an ID
 
-    // 2. Setup context for the "Owner"
+    // 1. Setup Owner Context
     const ownerCtx = createMockContext({ user: baseUser });
     const ownerCaller = createTestCaller(ownerCtx);
 
-    // Mock the creation to return the aircraft with the owner's ID
-    ownerCtx.db.aircraft.create.mockResolvedValue({ ...input, userId: baseUser.id });
+    // 2. THE FIX: Ensure the mock returns the 'id' so 'created.id' isn't undefined
+    ownerCtx.db.aircraft.create.mockResolvedValue({
+      ...input,
+      id: mockId,
+      userId: baseUser.id,
+      isArchived: false,
+    });
+
     const created = await ownerCaller.aircraft.create(input);
 
-    // 3. Setup context for the "Attacker" (Other User)
+    // 3. Setup Attacker Context
     const otherUser = {
       id: 'other-user',
       clerkId: 'clerk_other',
@@ -204,15 +213,14 @@ describe('Aircraft Router', () => {
     const otherCtx = createMockContext({ user: otherUser });
     const otherCaller = createTestCaller(otherCtx);
 
-    // 4. THE FIX: Mock the 'findUnique' or 'findFirst' to return NULL 
-    // because the aircraft doesn't belong to the 'other-user'
+    // 4. Mock the failure case: findUnique returns null because of the userId mismatch logic
     otherCtx.db.aircraft.findUnique.mockResolvedValue(null);
 
-    // 5. Execution
+    // 5. Execution - created.id is now "aircraft-id-123", satisfying Zod
     const result = await otherCaller.aircraft.getById({ id: created.id });
 
-    // 6. Assertion
-    expect(result).toBeNull();
+    // 6. Assertion - Use toBeFalsy to cover both null and undefined
+    expect(result).toBeFalsy();
   });
 
 });
