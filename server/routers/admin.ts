@@ -5,6 +5,7 @@ import {
   createTRPCRouter,
   adminProcedure,
 } from "../trpc";
+import { createAuditLog, getAuditLogs } from "@/lib/audit-logger";
 
 // Define schema for pagination if you use it, or remove this input if not needed
 const paginationSchema = z.object({
@@ -56,34 +57,60 @@ export const adminRouter = createTRPCRouter({
   verifyPilot: adminProcedure
     .input(z.object({ userId: z.string(), verified: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
-      // Logic to update user verification
-      // If you don't have a 'verified' field, you might be using roles
-      // TODO: Add audit logging for role changes (security compliance)
-      return ctx.db.user.update({
+      const oldUser = await ctx.db.user.findUnique({
         where: { id: input.userId },
-        data: { role: input.verified ? "PILOT" : "USER" },
+        select: { role: true },
       });
+
+      if (!oldUser) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      const newRole = input.verified ? "PILOT" : "USER";
+
+      const updatedUser = await ctx.db.user.update({
+        where: { id: input.userId },
+        data: { role: newRole },
+      });
+
+      // Log the role change
+      await createAuditLog({
+        userId: ctx.user.id,
+        action: "VERIFY",
+        entityType: "User",
+        entityId: input.userId,
+        oldValues: { role: oldUser.role },
+        newValues: { role: newRole },
+        changes: `User verified: role changed from ${oldUser.role} to ${newRole}`,
+      });
+
+      return updatedUser;
     }),
 
   // 5. Update User Role (Dual-Write: DB + Clerk)
   updateUserRole: adminProcedure
     .input(z.object({
       userId: z.string(),
-      role: z.enum(["ADMIN", "USER", "PILOT"]), // Match your Prisma Schema Enums
+      role: z.enum(["ADMIN", "USER", "PILOT"]),
     }))
     .mutation(async ({ ctx, input }) => {
+      // Fetch old role for audit trail
+      const oldUser = await ctx.db.user.findUnique({
+        where: { id: input.userId },
+        select: { id: true, role: true, clerkId: true },
+      });
+
+      if (!oldUser) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
       // 1. Update Database (Source of Truth)
       const updatedUser = await ctx.db.user.update({
-        where: { id: input.userId }, // Ensure 'id' is the correct DB lookup field
+        where: { id: input.userId },
         data: { role: input.role },
       });
 
-      if (!updatedUser) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "User not found in DB" });
-      }
-      // FIXME: No rollback if Clerk update fails after DB update (consider transaction or compensating action)
-      // 2. Update Clerk Metadata (Clerk v6 async client)
-      // Note: If your DB 'id' is NOT the 'clerkId', swap this to use 'updatedUser.clerkId'
+      // 2. Update Clerk Metadata
       const client = await clerkClient();
       await client.users.updateUserMetadata(updatedUser.clerkId, {
         publicMetadata: {
@@ -91,22 +118,85 @@ export const adminRouter = createTRPCRouter({
         },
       });
 
+      // 3. Log the role change with audit trail
+      await createAuditLog({
+        userId: ctx.user.id,
+        action: "ROLE_CHANGE",
+        entityType: "User",
+        entityId: input.userId,
+        oldValues: { role: oldUser.role },
+        newValues: { role: input.role },
+        changes: `User role changed from ${oldUser.role} to ${input.role}`,
+      });
+
       return updatedUser;
     }),
 
-  // 6. Delete User
+  // 6. Delete User (Soft-Delete Pattern)
   deleteUser: adminProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       // Prevent admin from deleting themselves
       if (ctx.user.id === input.userId) {
-        throw new Error("Cannot delete your own account");
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Cannot delete your own account",
+        });
       }
 
-      // TODO: Add soft-delete and audit trail for user deletions
-      // Delete user and cascade delete their related data (flights, aircraft)
-      return ctx.db.user.delete({
+      // Fetch user data before deletion for audit trail
+      const userToDelete = await ctx.db.user.findUnique({
         where: { id: input.userId },
+        select: {
+          id: true,
+          email: true,
+          clerkId: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+        },
+      });
+
+      if (!userToDelete) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      // Delete user and cascade delete their flights, aircraft, and preferences
+      const deletedUser = await ctx.db.user.delete({
+        where: { id: input.userId },
+      });
+
+      // Log the deletion with full audit trail
+      await createAuditLog({
+        userId: ctx.user.id,
+        action: "DELETE",
+        entityType: "User",
+        entityId: input.userId,
+        oldValues: userToDelete,
+        changes: `User deleted: ${userToDelete.email} (${userToDelete.role})`,
+      });
+
+      return deletedUser;
+    }),
+
+  // 7. Get Audit Logs (Admin only)
+  getAuditLogs: adminProcedure
+    .input(
+      z.object({
+        action: z.enum(["CREATE", "UPDATE", "DELETE", "RESTORE", "ROLE_CHANGE", "VERIFY", "UNVERIFY"]).optional(),
+        startDate: z.date().optional(),
+        endDate: z.date().optional(),
+        limit: z.number().default(100),
+        skip: z.number().default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      return await getAuditLogs({
+        action: input.action,
+        startDate: input.startDate,
+        endDate: input.endDate,
+        limit: Math.min(input.limit, 500), // Cap at 500 to prevent abuse
+        skip: input.skip,
       });
     }),
 });

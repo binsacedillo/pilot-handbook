@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 import { idSchema, createAircraftSchema, updateAircraftSchema } from '@/src/lib/shared-schemas';
+import { createAuditLog } from '@/lib/audit-logger';
 
 export const aircraftRouter = createTRPCRouter({
   // Restore (unarchive) an aircraft
@@ -11,6 +12,26 @@ export const aircraftRouter = createTRPCRouter({
       if (!ctx.user) {
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
       }
+
+      // Fetch aircraft before restoring for audit trail
+      const aircraftToRestore = await ctx.db.aircraft.findUnique({
+        where: { id: input.id },
+        select: {
+          id: true,
+          make: true,
+          model: true,
+          registration: true,
+          userId: true,
+        },
+      });
+
+      if (!aircraftToRestore || aircraftToRestore.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Aircraft not found or unauthorized',
+        });
+      }
+
       const aircraft = await ctx.db.aircraft.update({
         where: {
           id: input.id,
@@ -20,6 +41,18 @@ export const aircraftRouter = createTRPCRouter({
           isArchived: false,
         },
       });
+
+      // Audit log: Aircraft restoration
+      await createAuditLog({
+        userId: ctx.user.id,
+        action: 'RESTORE',
+        entityType: 'Aircraft',
+        entityId: input.id,
+        oldValues: { isArchived: true },
+        newValues: { isArchived: false },
+        changes: `Restored aircraft: ${aircraftToRestore.make} ${aircraftToRestore.model} (${aircraftToRestore.registration})`,
+      });
+
       return aircraft;
     }),
   // Get all aircraft for the current user
@@ -83,6 +116,22 @@ export const aircraftRouter = createTRPCRouter({
           userId: ctx.user.id,
         },
       });
+
+      // Audit log: Aircraft creation
+      await createAuditLog({
+        userId: ctx.user.id,
+        action: 'CREATE',
+        entityType: 'Aircraft',
+        entityId: aircraft.id,
+        newValues: {
+          make: aircraft.make,
+          model: aircraft.model,
+          registration: aircraft.registration,
+          status: aircraft.status,
+        },
+        changes: `Created aircraft: ${aircraft.make} ${aircraft.model} (${aircraft.registration})`,
+      });
+
       return aircraft;
     }),
 
@@ -115,6 +164,27 @@ export const aircraftRouter = createTRPCRouter({
       if (!ctx.user) {
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
       }
+
+      // Fetch aircraft before archiving for audit trail
+      const aircraftToDelete = await ctx.db.aircraft.findUnique({
+        where: { id: input.id },
+        select: {
+          id: true,
+          make: true,
+          model: true,
+          registration: true,
+          status: true,
+          userId: true,
+        },
+      });
+
+      if (!aircraftToDelete || aircraftToDelete.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Aircraft not found or unauthorized',
+        });
+      }
+
       // Soft delete: set isArchived to true
       const aircraft = await ctx.db.aircraft.update({
         where: {
@@ -125,6 +195,25 @@ export const aircraftRouter = createTRPCRouter({
           isArchived: true,
         },
       });
+
+      // Audit log: Aircraft archive/deletion
+      await createAuditLog({
+        userId: ctx.user.id,
+        action: 'DELETE',
+        entityType: 'Aircraft',
+        entityId: input.id,
+        oldValues: {
+          make: aircraftToDelete.make,
+          model: aircraftToDelete.model,
+          registration: aircraftToDelete.registration,
+          isArchived: false,
+        },
+        newValues: {
+          isArchived: true,
+        },
+        changes: `Archived aircraft: ${aircraftToDelete.make} ${aircraftToDelete.model} (${aircraftToDelete.registration})`,
+      });
+
       return aircraft;
     }),
 

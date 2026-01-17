@@ -23,6 +23,7 @@ export const createMockContext = (overrides: Overrides = {}) => {
       flight: {
         create: vi.fn(),
         findFirst: vi.fn(),
+        findUnique: vi.fn(),
         delete: vi.fn(),
         update: vi.fn(),
         groupBy: vi.fn(),

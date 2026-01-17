@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 import { idSchema, createFlightSchema, updateFlightSchema } from '@/src/lib/shared-schemas';
+import { createAuditLog } from '@/lib/audit-logger';
 
 export const flightRouter = createTRPCRouter({
   // Get all flights for the current user with optional filters
@@ -204,6 +205,22 @@ export const flightRouter = createTRPCRouter({
         },
       });
 
+      // Audit log: Flight creation
+      await createAuditLog({
+        userId: ctx.user.id,
+        action: 'CREATE',
+        entityType: 'Flight',
+        entityId: flight.id,
+        newValues: {
+          date: flight.date,
+          departureCode: flight.departureCode,
+          arrivalCode: flight.arrivalCode,
+          duration: flight.duration,
+          aircraftId: flight.aircraftId,
+        },
+        changes: `Created flight: ${flight.departureCode} → ${flight.arrivalCode} (${flight.duration}h)`,
+      });
+
       return flight;
     }),
 
@@ -217,6 +234,18 @@ export const flightRouter = createTRPCRouter({
       
       const { id, ...data } = input;
 
+      // Fetch old values for audit trail
+      const oldFlight = await ctx.db.flight.findUnique({
+        where: { id },
+      });
+
+      if (!oldFlight || oldFlight.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Flight not found or unauthorized',
+        });
+      }
+
       // Use update instead of updateMany for better error handling
       const flight = await ctx.db.flight.update({
         where: {
@@ -224,6 +253,17 @@ export const flightRouter = createTRPCRouter({
           userId: ctx.user.id, // Security Check!
         },
         data,
+      });
+
+      // Log audit event
+      await createAuditLog({
+        userId: ctx.user.id,
+        action: 'UPDATE',
+        entityType: 'flight',
+        entityId: id,
+        oldValues: oldFlight,
+        newValues: flight,
+        changes: `Updated flight: ${Object.keys(data).join(', ')}`,
       });
 
       return flight;
@@ -236,13 +276,48 @@ export const flightRouter = createTRPCRouter({
       if (!ctx.user) {
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
       }
+
+      // Fetch flight before deletion for audit trail
+      const flightToDelete = await ctx.db.flight.findUnique({
+        where: { id: input.id },
+        select: {
+          id: true,
+          date: true,
+          departureCode: true,
+          arrivalCode: true,
+          duration: true,
+          userId: true,
+        },
+      });
+
+      if (!flightToDelete || flightToDelete.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Flight not found or unauthorized',
+        });
+      }
       
-      // Use delete instead of deleteMany for better error handling
+      // Delete the flight
       const flight = await ctx.db.flight.delete({
         where: {
           id: input.id,
           userId: ctx.user.id, // Security Check!
         },
+      });
+
+      // Audit log: Flight deletion
+      await createAuditLog({
+        userId: ctx.user.id,
+        action: 'DELETE',
+        entityType: 'Flight',
+        entityId: input.id,
+        oldValues: {
+          date: flightToDelete.date,
+          departureCode: flightToDelete.departureCode,
+          arrivalCode: flightToDelete.arrivalCode,
+          duration: flightToDelete.duration,
+        },
+        changes: `Deleted flight: ${flightToDelete.departureCode} → ${flightToDelete.arrivalCode}`,
       });
 
       return flight;

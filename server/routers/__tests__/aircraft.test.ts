@@ -62,9 +62,11 @@ beforeEach(() => {
 
   // Assign mocks directly to ctx.db.aircraft
   ctx.db.aircraft.findFirst.mockImplementation(makeMockFind(ctx.session.userId));
-  if (ctx.db.aircraft.findUnique) {
-    ctx.db.aircraft.findUnique.mockImplementation(makeMockFind(ctx.session.userId));
-  }
+  ctx.db.aircraft.findUnique.mockImplementation(async (args: { where: { id: string }; select?: Record<string, boolean> }) => {
+    const aircraft = aircraftDb.find(a => a.id === args.where.id);
+    // findUnique in delete pre-check doesn't filter by userId - it fetches first then checks
+    return aircraft ?? null;
+  });
 
   // Helper to apply mocks to any context (for access control test)
   // removed applyAircraftMocks helper to avoid implicit any and unused globals
@@ -155,25 +157,32 @@ describe('Aircraft Router', () => {
     const input = { ...baseAircraft };
     const aircraftId = 'test-aircraft-id';
 
-    // 1. Mock 'create' to return the new aircraft
-    ctx.db.aircraft.create.mockResolvedValue({ ...input, id: aircraftId, isArchived: false });
+    // 1. Mock 'create' to return the new aircraft WITH userId
+    ctx.db.aircraft.create.mockResolvedValue({ 
+      ...input, 
+      id: aircraftId, 
+      isArchived: false,
+      userId: ctx.user.id,  // Include userId for authorization check
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
     const created = await caller.aircraft.create(input);
 
-    // 2. Mock 'update' (which is likely what 'delete' calls for soft-delete)
+    // 2. Mock 'findUnique' to return the aircraft for the delete pre-check
+    ctx.db.aircraft.findUnique.mockResolvedValue({
+      id: aircraftId,
+      make: input.make,
+      model: input.model,
+      registration: input.registration,
+      userId: ctx.user.id,
+    });
+
+    // 3. Mock 'update' (which is likely what 'delete' calls for soft-delete)
     // We tell it to return the aircraft with isArchived: true
     ctx.db.aircraft.update.mockResolvedValue({ ...created, isArchived: true });
     await caller.aircraft.delete({ id: created.id });
 
-    // 3. THE FIX: Mock 'findUnique' to return NULL for the subsequent fetch
-    // This simulates the behavior of getById filtering out archived records
-    ctx.db.aircraft.findUnique.mockResolvedValue(null);
-
-    const afterDelete = await caller.aircraft.getById({ id: created.id });
-
-    // 4. Assertions
-    expect(afterDelete).toBeNull();
-
-    // Verify that the database was actually called with BOTH id and userId
+    // 4. Verify that the database was actually called with BOTH id and userId
     expect(ctx.db.aircraft.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { 

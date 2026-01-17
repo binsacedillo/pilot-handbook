@@ -8,4 +8,10 @@ vi.mock('@clerk/nextjs/server', () => ({
 	}),
 }));
 
-
+vi.mock('@/lib/audit-logger', () => ({
+	createAuditLog: vi.fn().mockResolvedValue(undefined),
+	summarizeChanges: vi.fn((oldValues, newValues, action) => 'Test change'),
+	getEntityAuditLog: vi.fn().mockResolvedValue([]),
+	getUserAuditLog: vi.fn().mockResolvedValue([]),
+	getAuditLogs: vi.fn().mockResolvedValue([]),
+}));

@@ -96,3 +96,32 @@ enum Theme {
   DARK
   SYSTEM
 }
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  RESTORE
+  ROLE_CHANGE
+  VERIFY
+  UNVERIFY
+}
+
+model AuditLog {
+  id            String      @id @default(uuid())
+  userId        String      // Who performed the action
+  action        AuditAction
+  entityType    String      // e.g., "User", "Flight", "Aircraft"
+  entityId      String      // ID of the affected entity
+  oldValues     Json?       // Previous values (for UPDATE/DELETE)
+  newValues     Json?       // New values (for CREATE/UPDATE)
+  changes       String?     // Human-readable summary (e.g., "role changed from USER to ADMIN")
+  ipAddress     String?     // Request IP for additional tracking
+  userAgent     String?     // Browser/client info
+  createdAt     DateTime    @default(now())
+  
+  @@index([userId, createdAt])
+  @@index([entityType, entityId])
+  @@index([action])
+}
+

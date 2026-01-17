@@ -218,6 +218,13 @@ beforeEach(() => {
       }
       return null;
     });
+  // Mock flight.findUnique for delete pre-check
+    ctx.db.flight.findUnique.mockImplementation(async (args) => {
+      if (args && args.where && args.where.id) {
+        return flightDb.find(f => f.id === args.where.id) || null;
+      }
+      return null;
+    });
   // Mock flight.delete to return the deleted flight object
     // Stateful flight.delete
     ctx.db.flight.delete.mockImplementation(async (args) => {
