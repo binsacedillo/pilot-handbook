@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createMockContext, createTestCaller } from './test-utils';
-import { statsRouter } from '../stats';
-
-
 
 describe('statsRouter', () => {
   let ctx: ReturnType<typeof createMockContext>;
@@ -11,7 +8,12 @@ describe('statsRouter', () => {
 
   beforeEach(() => {
     ctx = createMockContext();
-    ctx.user = { id: userId };
+    ctx.user = {
+      id: userId,
+      clerkId: ctx.user.clerkId,
+      email: ctx.user.email,
+      role: ctx.user.role,
+    };
     caller = createTestCaller(ctx).stats;
   });
 
