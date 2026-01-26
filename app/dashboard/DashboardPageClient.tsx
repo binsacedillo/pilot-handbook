@@ -78,7 +78,7 @@ export default function DashboardPageClient() {
   const isLoading = isStatsLoading || isSummaryLoading || isAircraftLoading || isFlightsLoading || !isLoaded;
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col">
       <AppHeader />
       <main id="main-content" className="flex-1 w-full">
         <div className="container mx-auto px-2 md:px-4 py-8">
