@@ -1,6 +1,7 @@
 "use client";
 export const dynamic = "force-dynamic";
-import AppHeader from "@/components/AppHeader";
+import dynamicImport from "next/dynamic";
+const AppHeader = dynamicImport(() => import("@/components/AppHeader"), { ssr: false });
 import AppFooter from "@/components/AppFooter";
 
 export default function AboutPage() {
