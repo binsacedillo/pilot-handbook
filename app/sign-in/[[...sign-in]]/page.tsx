@@ -76,7 +76,7 @@ export default function SignInPage() {
 						— Sarah Chen, Commercial Pilot
 					</p>
 				</div>
-			</div>z
+			</div>
 
 			{/* Right Side - Sign In Form */}
 			<div className="flex-1 flex items-center justify-center p-8">
