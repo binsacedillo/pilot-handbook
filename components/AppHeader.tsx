@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 export default function AppHeader() {
 	const { user, isLoaded } = useUser();
 	const publicRole = typeof user?.publicMetadata?.role === "string" ? user.publicMetadata.role : undefined;
-	const isAdmin = publicRole === "ADMIN";
+	const isAdmin = publicRole === "ADMIN"	;
 	const pathname = usePathname();
 	const isAdminPage = pathname?.startsWith("/admin");
 
