@@ -1,6 +1,5 @@
-'use client';
 
-import { UserProfile } from "@clerk/nextjs";
+import UserProfileClient from "@/components/UserProfileClient";
 
 export default function AccountSettingsPage() {
   return (
@@ -12,7 +11,7 @@ export default function AccountSettingsPage() {
         </p>
       </div>
       <div className="w-full overflow-x-auto">
-        <UserProfile
+        <UserProfileClient
           routing="hash"
           appearance={{
             variables: {

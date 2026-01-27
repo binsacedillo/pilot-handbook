@@ -1,6 +1,6 @@
-"use client";
 
-import AppHeader from "@/components/AppHeader";
+import AppHeader from "@/components/AppHeaderClient";
+
 import AppFooter from "@/components/AppFooter";
 
 export default function ContactPage() {
