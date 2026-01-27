@@ -50,14 +50,6 @@ export default function RootLayout({
           {/* Preconnect for external image domains */}
           <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://api.clerk.com" crossOrigin="anonymous" />
-          {/* Preload Inter font to avoid layout shift */}
-          <link
-            rel="preload"
-            href="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTcviYw.woff2"
-            as="font"
-            type="font/woff2"
-            crossOrigin="anonymous"
-          />
         </head>
         <body className={`font-sans ${inter.variable} flex flex-col min-h-screen`}>
           {/* Skip to main content for keyboard navigation (WCAG 2.1) */}
