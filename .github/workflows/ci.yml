@@ -5,11 +5,15 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
-
-
+    
 jobs:
+
   test:
     runs-on: ubuntu-latest
+    
+    env:
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
+      DIRECT_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
 
     strategy:
       matrix:
@@ -47,8 +51,12 @@ jobs:
           fi
           echo "✅ Build successful"
 
+
   security-audit:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
+      DIRECT_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
 
     steps:
       - uses: actions/checkout@v4
@@ -62,8 +70,12 @@ jobs:
           echo "⚠️ Review npm audit results above"
           echo "If moderate/high vulnerabilities exist, consider upgrading dependencies"
 
+
   test-coverage:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
+      DIRECT_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
 
     steps:
       - uses: actions/checkout@v4
@@ -89,8 +101,12 @@ jobs:
           name: codecov-umbrella
         continue-on-error: true
 
+
   type-safety:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
+      DIRECT_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
 
     steps:
       - uses: actions/checkout@v4
