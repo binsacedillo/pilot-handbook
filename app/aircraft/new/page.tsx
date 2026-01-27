@@ -1,6 +1,9 @@
-"use client";
 
-import AppHeader from "@/components/AppHeader";
+"use client";
+export const dynamic = "force-dynamic";
+
+import dynamicImport from "next/dynamic";
+const AppHeader = dynamicImport(() => import("@/components/AppHeader"), { ssr: false });
 import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
