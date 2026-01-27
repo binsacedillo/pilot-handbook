@@ -6,14 +6,6 @@ on:
   pull_request:
     branches: [main, develop]
 
-# Prisma needs these env vars even for generation; use dummy values in CI.
-env:
-  DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
-  DIRECT_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
-  # Use CI secrets for Clerk keys; publishable is safe to expose to client
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-  CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-  CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
 
 jobs:
   test:
