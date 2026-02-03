@@ -15,6 +15,7 @@ function getRateLimiter(): Ratelimit | null {
     try {
       limiter = new Ratelimit({
         redis: Redis.fromEnv(),
+        limiter: Ratelimit.slidingWindow(10, "60 s"), // 10 requests per 60 seconds default
         analytics: true,
         prefix: "ratelimit",
       });
@@ -51,14 +52,11 @@ export async function rateLimit(
   // Use Upstash if available (production)
   if (limiter) {
     try {
-      const result = await limiter.limit(key, {
-        rate: Math.ceil((maxRequests * 1000) / windowMs), // requests per second
-        window: windowMs,
-      });
+      const result = await limiter.limit(key);
       return {
         success: result.success,
         remaining: Math.max(0, result.remaining),
-        resetTime: Date.now() + result.resetMs,
+        resetTime: Date.now() + (result.reset - Date.now()),
       };
     } catch (error) {
       console.error("Rate limit check failed:", error);
