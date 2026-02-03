@@ -5,7 +5,7 @@ export default function AppFooter() {
 	const currentYear = new Date().getFullYear();
 
 	return (
-		<footer className="bg-card border-t border-border mt-auto">
+		<footer className="bg-card border-t-2 border-slate-300 dark:border-slate-700 mt-auto">
 			<div className="max-w-7xl mx-auto px-4 py-6 text-muted-foreground">
 				{/* Main Footer Content */}
 				<div className="flex flex-col md:flex-row justify-between items-center gap-4">
