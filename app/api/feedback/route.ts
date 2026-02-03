@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
     // Rate limit: 5 feedback submissions per IP per hour
     const key = getRateLimitKey(req);
-    const result = rateLimit(key, 5, 60 * 60 * 1000);
+    const result = await rateLimit(key, 5, 60 * 60 * 1000);
 
     if (!result.success) {
       return NextResponse.json(
