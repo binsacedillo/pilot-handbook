@@ -222,6 +222,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main content: Recent Flights and (optionally) other stats */}
             <div className="lg:col-span-2">
+                <div className="bg-card rounded-xl border-2 border-orange-500 dark:border-orange-400 shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Recent Flights</h2>
                 {isLoading || isRefreshing ? (
                     <div className="space-y-2 animate-pulse">
@@ -254,6 +255,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                         }}
                     />
                 )}
+                </div>
             </div>
             {/* Sidebar: Weather Widget */}
             <div className="min-w-0">

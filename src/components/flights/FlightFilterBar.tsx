@@ -93,7 +93,7 @@ export function FlightFilterBar() {
   const hasActiveFilters = search || flightType || startDate || endDate;
 
   return (
-    <div className="flex flex-wrap items-end gap-4 rounded-lg border bg-card p-4 shadow-sm">
+    <div className="flex flex-wrap items-end gap-4 rounded-lg border-2 border-blue-400 dark:border-blue-500 bg-card p-4 shadow">
       {/* Search Input */}
       <div className="flex-1 min-w-50">
         <label className="text-sm font-medium mb-1.5 block">Search</label>

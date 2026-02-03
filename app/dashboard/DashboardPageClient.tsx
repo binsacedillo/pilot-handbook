@@ -99,8 +99,8 @@ export default function DashboardPageClient() {
               <>
                 {/* Pilot Currency Skeleton */}
                 <div className="w-full max-w-md mx-auto mb-4">
-                  <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-1 animate-pulse" />
+                  <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 mb-1 animate-pulse" />
                     <span className="font-semibold text-zinc-700 dark:text-zinc-200 text-base">Pilot Currency</span>
                     <div className="h-7 w-40 my-1 bg-accent animate-pulse rounded" />
                     <div className="h-6 w-28 mt-1 bg-accent animate-pulse rounded" />
@@ -114,7 +114,7 @@ export default function DashboardPageClient() {
                 {/* Pilot Currency Status Card */}
                 <div className="mb-4">
                   <div className="w-full max-w-md mx-auto">
-                    <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow">
                       <div className={`flex items-center justify-center w-10 h-10 rounded-full mb-1 ${stats?.recency?.isCurrent ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`}>
                         {stats?.recency?.isCurrent ? (
                           <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>

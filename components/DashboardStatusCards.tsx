@@ -30,8 +30,8 @@ export default function DashboardStatusCards() {
     return (
         <>
             {/* Legality Indicator Card */}
-            <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-1">
+            <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 mb-1">
                     <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <span className="font-semibold text-zinc-700 dark:text-zinc-200 text-base">Legality Status</span>
@@ -57,8 +57,8 @@ export default function DashboardStatusCards() {
                 )}
             </div>
             {/* Total Experience Card */}
-            <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-1">
+            <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 mb-1">
                     <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <span className="font-semibold text-zinc-700 dark:text-zinc-200 text-base">Total Experience</span>
@@ -69,8 +69,8 @@ export default function DashboardStatusCards() {
                 )}
             </div>
             {/* Fleet Size Card */}
-            <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-1">
+            <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 mb-1">
                     <Plane className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <span className="font-semibold text-zinc-700 dark:text-zinc-200 text-base">Total Fleet</span>

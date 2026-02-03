@@ -87,7 +87,7 @@ export default function FlightsPage() {
           <Button onClick={() => setShowForm(true)}>Log New Flight</Button>
         </div>
         {showForm && (
-          <div className="mb-8 bg-card border border-border rounded-lg shadow p-6">
+          <div className="mb-8 bg-card border-2 border-blue-400 dark:border-blue-500 rounded-lg shadow p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Log New Flight</h2>
               <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>Close</Button>
@@ -124,7 +124,7 @@ export default function FlightsPage() {
             }}
           />
         ) : (
-          <div className="bg-card text-foreground rounded-lg border border-border shadow overflow-x-auto">
+          <div className="bg-card text-foreground rounded-lg border-2 border-orange-500 dark:border-orange-400 shadow overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead className="bg-muted text-muted-foreground text-left">
                 <tr>
