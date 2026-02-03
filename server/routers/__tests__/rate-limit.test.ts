@@ -32,82 +32,82 @@ describe('Rate Limiting', () => {
   });
 
   describe('rateLimit', () => {
-    it('should allow requests under the limit', () => {
-      const result1 = rateLimit('test-ip', 5, 60000);
+    it('should allow requests under the limit', async () => {
+      const result1 = await rateLimit('test-ip', 5, 60000);
       expect(result1.success).toBe(true);
       expect(result1.remaining).toBe(4);
 
-      const result2 = rateLimit('test-ip', 5, 60000);
+      const result2 = await rateLimit('test-ip', 5, 60000);
       expect(result2.success).toBe(true);
       expect(result2.remaining).toBe(3);
     });
 
-    it('should block requests over the limit', () => {
+    it('should block requests over the limit', async () => {
       // Make 5 requests (max limit)
       for (let i = 0; i < 5; i++) {
-        rateLimit('test-ip-2', 5, 60000);
+        await rateLimit('test-ip-2', 5, 60000);
       }
 
       // 6th request should be blocked
-      const result = rateLimit('test-ip-2', 5, 60000);
+      const result = await rateLimit('test-ip-2', 5, 60000);
       expect(result.success).toBe(false);
       expect(result.remaining).toBe(0);
     });
 
-    it('should reset after time window expires', () => {
+    it('should reset after time window expires', async () => {
       const windowMs = 60000;
 
       // Make max requests
       for (let i = 0; i < 5; i++) {
-        rateLimit('test-ip-3', 5, windowMs);
+        await rateLimit('test-ip-3', 5, windowMs);
       }
 
       // Should be blocked
-      const blocked = rateLimit('test-ip-3', 5, windowMs);
+      const blocked = await rateLimit('test-ip-3', 5, windowMs);
       expect(blocked.success).toBe(false);
 
       // Advance time past window
       vi.advanceTimersByTime(windowMs + 1000);
 
       // Should be allowed again
-      const allowed = rateLimit('test-ip-3', 5, windowMs);
+      const allowed = await rateLimit('test-ip-3', 5, windowMs);
       expect(allowed.success).toBe(true);
       expect(allowed.remaining).toBe(4);
     });
 
-    it('should track different IPs independently', () => {
-      rateLimit('ip-1', 5, 60000);
-      rateLimit('ip-1', 5, 60000);
-      rateLimit('ip-1', 5, 60000);
+    it('should track different IPs independently', async () => {
+      await rateLimit('ip-1', 5, 60000);
+      await rateLimit('ip-1', 5, 60000);
+      await rateLimit('ip-1', 5, 60000);
 
-      rateLimit('ip-2', 5, 60000);
+      await rateLimit('ip-2', 5, 60000);
 
-      const result1 = rateLimit('ip-1', 5, 60000);
-      const result2 = rateLimit('ip-2', 5, 60000);
+      const result1 = await rateLimit('ip-1', 5, 60000);
+      const result2 = await rateLimit('ip-2', 5, 60000);
 
       expect(result1.remaining).toBe(1); // ip-1 has 3 requests
       expect(result2.remaining).toBe(3); // ip-2 has 1 request
     });
 
-    it('should return proper reset time', () => {
+    it('should return proper reset time', async () => {
       const now = Date.now();
       const windowMs = 60000;
 
-      const result = rateLimit('test-ip-4', 5, windowMs);
+      const result = await rateLimit('test-ip-4', 5, windowMs);
       
       expect(result.resetTime).toBeGreaterThan(now);
       expect(result.resetTime).toBeLessThanOrEqual(now + windowMs);
     });
 
-    it('should handle edge case of exactly max requests', () => {
+    it('should handle edge case of exactly max requests', async () => {
       // Make exactly 5 requests
       for (let i = 0; i < 5; i++) {
-        const result = rateLimit('test-ip-5', 5, 60000);
+        const result = await rateLimit('test-ip-5', 5, 60000);
         expect(result.success).toBe(true);
       }
 
       // 6th should fail
-      const result = rateLimit('test-ip-5', 5, 60000);
+      const result = await rateLimit('test-ip-5', 5, 60000);
       expect(result.success).toBe(false);
     });
   });

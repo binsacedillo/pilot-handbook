@@ -2,11 +2,6 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
-// Accept self-signed certificates from Supabase Pooler in production
-if (process.env.NODE_ENV === "production") {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
-
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
   pool: Pool | undefined;
@@ -23,12 +18,9 @@ function createPrismaClient() {
     idleTimeoutMillis: 30000,    // Close idle connections after 30s
     connectionTimeoutMillis: 2000, // Fail fast if unable to connect
     allowExitOnIdle: true,       // Allow process to exit when no active connections
-    // FIX: Supabase Transaction Pooler (Port 6543) uses a self-signed cert.
-    // We must set rejectUnauthorized: false to avoid "self-signed certificate" errors
-    // during Vercel deployment. (Fixed Jan 2026)
-    ssl: {
-      rejectUnauthorized: false, // Accept self-signed certificates from Supabase Pooler
-    },
+    // Supabase's pgBouncer (port 6543) certificate is trusted on recent versions.
+    // If you get certificate errors, use DIRECT_URL (port 5432) instead.
+    ssl: process.env.NODE_ENV === "production" ? true : false,
   });
 
   // Handle pool errors gracefully

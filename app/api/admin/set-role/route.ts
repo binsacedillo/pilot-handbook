@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     // Rate limit: 20 role changes per minute per IP
     const key = getRateLimitKey(request);
-    const rateResult = rateLimit(key, 20, 60000);
+    const rateResult = await rateLimit(key, 20, 60000);
 
     if (!rateResult.success) {
       return NextResponse.json(
