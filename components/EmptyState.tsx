@@ -28,13 +28,14 @@ export default function EmptyState({
           {description}
         </p>
       )}
-      {action && (
-        <Button size="lg" className="text-lg px-8 py-4" asChild={!!action.href}>
-          {action.href ? (
-            <Link href={action.href}>{action.label}</Link>
-          ) : (
-            <button onClick={action.onClick}>{action.label}</button>
-          )}
+      {action && action.href && (
+        <Button size="lg" className="text-lg px-8 py-4" asChild>
+          <Link href={action.href}>{action.label}</Link>
+        </Button>
+      )}
+      {action && !action.href && (
+        <Button size="lg" className="text-lg px-8 py-4" onClick={action.onClick}>
+          {action.label}
         </Button>
       )}
     </div>

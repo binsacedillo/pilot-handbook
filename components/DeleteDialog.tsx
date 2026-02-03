@@ -21,6 +21,12 @@ export interface DeleteDialogProps {
   onConfirm: () => Promise<void> | void;
   /** Require user to type this text to confirm deletion (e.g., "DELETE") */
   requireConfirmText?: string;
+  /** Custom label for the confirm button */
+  confirmLabel?: string;
+  /** Button variant for the confirm action */
+  confirmVariant?: React.ComponentProps<typeof Button>["variant"];
+  /** Optional class for the title */
+  titleClassName?: string;
 }
 
 export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
@@ -34,6 +40,9 @@ export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
       isLoading = false,
       onConfirm,
       requireConfirmText,
+      confirmLabel = "Delete",
+      confirmVariant = "destructive",
+      titleClassName = "text-destructive",
     },
     ref
   ) => {
@@ -69,7 +78,7 @@ export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
           className="sm:max-w-[425px] bg-card text-card-foreground"
         >
           <DialogHeader>
-            <DialogTitle className="text-destructive">{title}</DialogTitle>
+            <DialogTitle className={titleClassName}>{title}</DialogTitle>
           </DialogHeader>
           <DialogDescription className="py-4">
             {description}
@@ -104,11 +113,11 @@ export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
               Cancel
             </Button>
             <Button
-              variant="destructive"
+              variant={confirmVariant}
               onClick={handleDelete}
               disabled={isDeleting || isLoading || !isConfirmTextValid}
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? "Working..." : confirmLabel}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -9,10 +9,9 @@ import { trpc } from "@/trpc/client";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { Trash2, RefreshCw, Plane } from "lucide-react";
+import { Trash2, RefreshCw, Plane, Edit2, Archive } from "lucide-react";
 import { DeleteDialog } from "@/components/DeleteDialog";
 import Link from "next/link";
-import { Edit2 } from "lucide-react";
 import dynamicImport from "next/dynamic";
 const AppHeader = dynamicImport(() => import("@/components/AppHeader"), { ssr: false });
 import AppFooter from "@/components/AppFooter";
@@ -65,29 +64,53 @@ export default function AircraftPage() {
     },
   });
 
-  // Removed optimistic update state
-  const [deleteDialogState, setDeleteDialogState] = useState<{
+  // Dialog state
+  const [archiveDialogState, setArchiveDialogState] = useState<{
     open: boolean;
     aircraftId: string | null;
     aircraftRegistration: string | null;
   }>({ open: false, aircraftId: null, aircraftRegistration: null });
 
-  // Show all aircraft from server, no optimistic filtering
-  const displayedAircraft: Aircraft[] = (aircraft ?? []) as Aircraft[];
+  const [permanentDeleteDialogState, setPermanentDeleteDialogState] = useState<{
+    open: boolean;
+    aircraftId: string | null;
+    aircraftRegistration: string | null;
+  }>({ open: false, aircraftId: null, aircraftRegistration: null });
 
-  const handleDeleteClick = (aircraftId: string, registration: string) => {
-    setDeleteDialogState({
+  // Show only archived when checkbox is enabled; otherwise show active only
+  const displayedAircraft = showArchived
+    ? (aircraft ?? []).filter((a) => a.isArchived)
+    : (aircraft ?? []);
+
+  const handleArchiveClick = (aircraftId: string, registration: string) => {
+    setArchiveDialogState({
       open: true,
       aircraftId,
       aircraftRegistration: registration,
     });
   };
 
+  const handlePermanentDeleteClick = (aircraftId: string, registration: string) => {
+    setPermanentDeleteDialogState({
+      open: true,
+      aircraftId,
+      aircraftRegistration: registration,
+    });
+  };
 
-  // Use permanent delete for hard delete, fallback to soft if needed
-  const handleConfirmDelete = async () => {
-    if (!deleteDialogState.aircraftId) return;
-    const aircraftId = deleteDialogState.aircraftId;
+  const handleConfirmArchive = async () => {
+    if (!archiveDialogState.aircraftId) return;
+    const aircraftId = archiveDialogState.aircraftId;
+    try {
+      await deleteMutation.mutateAsync({ id: aircraftId });
+    } catch {
+      // Error handled in onError
+    }
+  };
+
+  const handleConfirmPermanentDelete = async () => {
+    if (!permanentDeleteDialogState.aircraftId) return;
+    const aircraftId = permanentDeleteDialogState.aircraftId;
     try {
       await deletePermanentMutation.mutateAsync({ id: aircraftId });
     } catch {
@@ -114,7 +137,7 @@ export default function AircraftPage() {
                 onChange={() => setShowArchived((prev) => !prev)}
                 className="accent-primary"
               />
-              <span className="text-sm">Show Archived</span>
+              <span className="text-sm">Archived Only</span>
             </label>
             <Button asChild>
               <Link href="/aircraft/new">Add Aircraft</Link>
@@ -123,35 +146,57 @@ export default function AircraftPage() {
         </div>
 
         <DeleteDialog
-          open={deleteDialogState.open}
+          open={archiveDialogState.open}
           onOpenChange={(open: boolean) =>
-            setDeleteDialogState((prev) => ({ ...prev, open }))
+            setArchiveDialogState((prev) => ({ ...prev, open }))
           }
-          title="Delete Aircraft"
-          description="Are you sure you want to delete this aircraft? This action cannot be undone."
-          itemName={deleteDialogState.aircraftRegistration || ""}
+          title="Archive Aircraft"
+          description="Archive this aircraft? You can restore it later from Archived Only."
+          itemName={archiveDialogState.aircraftRegistration || ""}
+          isLoading={deleteMutation.isPending}
+          onConfirm={handleConfirmArchive}
+          confirmLabel="Archive"
+          confirmVariant="secondary"
+          titleClassName="text-foreground"
+        />
+
+        <DeleteDialog
+          open={permanentDeleteDialogState.open}
+          onOpenChange={(open: boolean) =>
+            setPermanentDeleteDialogState((prev) => ({ ...prev, open }))
+          }
+          title="Delete Aircraft Permanently"
+          description="This will permanently delete the aircraft and cannot be undone."
+          itemName={permanentDeleteDialogState.aircraftRegistration || ""}
           isLoading={deletePermanentMutation.isPending}
-          onConfirm={handleConfirmDelete}
+          onConfirm={handleConfirmPermanentDelete}
+          confirmLabel="Delete Permanently"
+          requireConfirmText="DELETE"
         />
 
         {isLoading ? (
-          <div className="bg-card text-foreground rounded-lg border border-border shadow p-8 text-center">
+          <div className="bg-card text-foreground rounded-lg border-2 border-orange-500 dark:border-orange-400 shadow p-8 text-center">
             <p className="text-muted-foreground mb-4">Loading…</p>
           </div>
         ) : displayedAircraft.length === 0 ? (
           <EmptyState
             icon={<Plane className="w-16 h-16 text-muted-foreground" />}
-            title="No Aircraft Yet"
-            description="Start building your fleet by adding your first aircraft. You'll be able to track flights and manage your aviation logbook."
-            action={{
-              label: "Add Your First Aircraft",
-              href: "/aircraft/new",
-            }}
+            title={showArchived ? "No Archived Aircraft" : "No Aircraft Yet"}
+            description={
+              showArchived
+                ? "You don't have any archived aircraft. Archive an aircraft to manage it here."
+                : "Start building your fleet by adding your first aircraft. You'll be able to track flights and manage your aviation logbook."
+            }
+            action={
+              showArchived
+                ? { label: "Show Active Aircraft", onClick: () => setShowArchived(false) }
+                : { label: "Add Your First Aircraft", href: "/aircraft/new" }
+            }
           />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {displayedAircraft.map((a) => (
-              <div key={a.id} className={`bg-card text-foreground rounded-lg border border-border shadow p-6 hover:shadow-lg transition-shadow ${a.isArchived ? 'opacity-60' : ''}`}>
+              <div key={a.id} className={`bg-card text-foreground rounded-lg border-2 border-orange-500 dark:border-orange-400 shadow p-6 hover:shadow-lg transition-shadow ${a.isArchived ? 'opacity-60' : ''}`}>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-semibold">{a.registration}</h3>
                   <span className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
@@ -183,26 +228,38 @@ export default function AircraftPage() {
                     </Button>
                   </Link>
                   {a.isArchived ? (
-                    <Button
-                      variant="ghost"
-                      className="flex-1 text-green-600 hover:bg-green-100"
-                      onClick={() => handleRestore(a.id)}
-                      disabled={restoreMutation.isPending}
-                      title="Restore aircraft"
-                    >
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      Restore
-                    </Button>
+                    <>
+                      <Button
+                        variant="ghost"
+                        className="flex-1 text-green-600 hover:bg-green-100"
+                        onClick={() => handleRestore(a.id)}
+                        disabled={restoreMutation.isPending}
+                        title="Restore aircraft"
+                      >
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Restore
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="flex-1 text-destructive hover:bg-destructive/10"
+                        onClick={() => handlePermanentDeleteClick(a.id, a.registration)}
+                        disabled={deletePermanentMutation.isPending}
+                        title="Delete aircraft permanently"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete Permanently
+                      </Button>
+                    </>
                   ) : (
                     <Button
                       variant="ghost"
-                      className="flex-1 text-destructive hover:bg-destructive/10"
-                      onClick={() => handleDeleteClick(a.id, a.registration)}
+                      className="flex-1 text-slate-700 dark:text-slate-200 hover:bg-muted"
+                      onClick={() => handleArchiveClick(a.id, a.registration)}
                       disabled={deleteMutation.isPending}
-                      title="Delete aircraft"
+                      title="Archive aircraft"
                     >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Delete
+                      <Archive className="w-4 h-4 mr-2" />
+                      Archive
                     </Button>
                   )}
                 </div>
