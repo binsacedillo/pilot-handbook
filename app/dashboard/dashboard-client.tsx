@@ -233,7 +233,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                 ) : safeFlights && safeFlights.length > 0 ? (
                     <div className="space-y-2">
                         {safeFlights.slice(0, 5).map((flight) => (
-                            <Card key={flight.id} className="flex-row flex items-center justify-between gap-4 p-4">
+                            <Card key={flight.id} className="flex-row flex items-center justify-between gap-4 p-4 border-slate-200 dark:border-slate-700">
                                 <div className="flex-1 min-w-0">
                                     <div className="font-medium truncate">{flight.aircraft?.model || "Aircraft"}</div>
                                     <div className="text-sm text-muted-foreground">{flight.date ? new Date(flight.date).toLocaleDateString() : ""}</div>
