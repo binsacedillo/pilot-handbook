@@ -75,7 +75,7 @@ export const DeleteDialog = React.forwardRef<HTMLDivElement, DeleteDialogProps>(
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
           ref={ref}
-          className="sm:max-w-[425px] bg-card text-card-foreground"
+          className="sm:max-w-106.25 bg-card text-card-foreground"
         >
           <DialogHeader>
             <DialogTitle className={titleClassName}>{title}</DialogTitle>
