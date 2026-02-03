@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle, CheckCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 import { isNetworkError, getNetworkErrorMessage, getServerErrorMessage } from '@/lib/error-utils';
 
