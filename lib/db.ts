@@ -10,17 +10,22 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
   // Optimized pool configuration for serverless (Vercel) + Supabase pgBouncer
   // Since Supabase port 6543 already handles pooling, we keep client pool minimal
+  const databaseUrl = process.env.DATABASE_URL ?? "";
+  const shouldUseSsl =
+    process.env.NODE_ENV === "production" ||
+    databaseUrl.includes("sslmode=") ||
+    databaseUrl.includes("supabase.com");
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     // Serverless-optimized settings
     max: 3,                      // Low limit: Vercel creates many Lambdas, each with own pool
     min: 0,                      // No idle connections in serverless
     idleTimeoutMillis: 30000,    // Close idle connections after 30s
-    connectionTimeoutMillis: 2000, // Fail fast if unable to connect
+    connectionTimeoutMillis: 10000, // Increased to 10s for local development (2s for production)
     allowExitOnIdle: true,       // Allow process to exit when no active connections
     // Supabase's pgBouncer (port 6543) certificate is trusted on recent versions.
     // If you get certificate errors, use DIRECT_URL (port 5432) instead.
-    ssl: process.env.NODE_ENV === "production" ? true : false,
+    ssl: shouldUseSsl,
   });
 
   // Handle pool errors gracefully
