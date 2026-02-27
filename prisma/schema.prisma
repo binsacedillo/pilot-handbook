@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String           @id @default(uuid())
+  clerkId         String           @unique
+  email           String           @unique
+  firstName       String?          @db.VarChar(100)
+  lastName        String?          @db.VarChar(100)
+  license         String?          @db.VarChar(50)
+  licenseExpiry   DateTime?
+  role            UserRole         @default(USER)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  aircraft        Aircraft[]
+  flights         Flight[]
+  userPreferences UserPreferences?
+}
+
+model Aircraft {
+  id           String   @id @default(uuid())
+  make         String   @db.VarChar(100)
+  model        String   @db.VarChar(100)
+  registration String   @db.VarChar(20)
+  imageUrl     String?
+  status       String   @default("operational")
+  flightHours  Float    @default(0)
+  isArchived   Boolean  @default(false)
+  userId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flights      Flight[]
+
+  @@unique([userId, registration])
+}
+
+model Flight {
+  id            String   @id @default(uuid())
+  date          DateTime
+  departureCode String   @db.VarChar(4)
+  arrivalCode   String   @db.VarChar(4)
+  duration      Float
+  picTime       Float
+  dualTime      Float
+  landings      Int?     @default(1) // deprecated, use dayLandings + nightLandings
+  dayLandings   Int      @default(0)
+  nightLandings Int      @default(0)
+  remarks       String?  @db.VarChar(500)
+  aircraftId    String
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  aircraft      Aircraft @relation(fields: [aircraftId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+}
+
+model UserPreferences {
+  id                String     @id @default(cuid())
+  userId            String     @unique
+  darkMode          Boolean    @default(false)
+  defaultAircraftId String?
+  unitSystem        UnitSystem @default(METRIC)
+  currency          String     @default("USD")
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  theme             Theme      @default(SYSTEM)
+  favoriteAirport   String?    @default("KJFK")
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+
+
+enum UserRole {
+  ADMIN
+  PILOT
+  USER
+}
+
+enum UnitSystem {
+  METRIC
+  IMPERIAL
+}
+
+enum Theme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  RESTORE
+  ROLE_CHANGE
+  VERIFY
+  UNVERIFY
+}
+
+model AuditLog {
+  id            String      @id @default(uuid())
+  userId        String      // Who performed the action
+  action        AuditAction
+  entityType    String      @db.VarChar(50)  // e.g., "User", "Flight", "Aircraft"
+  entityId      String      // ID of the affected entity
+  oldValues     Json?       // Previous values (for UPDATE/DELETE)
+  newValues     Json?       // New values (for CREATE/UPDATE)
+  changes       String?     @db.VarChar(500) // Human-readable summary (e.g., "role changed from USER to ADMIN")
+  ipAddress     String?     @db.VarChar(45)  // Request IP for additional tracking (IPv6 safe)
+  userAgent     String?     @db.VarChar(500) // Browser/client info
+  createdAt     DateTime    @default(now())
+  
+  @@index([userId, createdAt])
+  @@index([entityType, entityId])
+  @@index([action])
+}
+
