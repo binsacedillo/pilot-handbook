@@ -11,7 +11,10 @@ import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { DeleteDialog } from "@/components/common/DeleteDialog";
-import { Plane, Calendar, Clock, MapPin, Edit, Trash2 } from "lucide-react";
+import { 
+  Plane, Calendar, Clock, MapPin, Edit, Trash2, 
+  Download, FileDown, FileJson, Upload, CheckCircle, ShieldCheck, Plus 
+} from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { FlightFilterBar } from "@/src/components/flights/FlightFilterBar";
 import EmptyState from "@/components/common/EmptyState";
@@ -19,6 +22,10 @@ import { useToast } from "@/components/ui/toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { exportFlightsToCSV, parseFlightsFromCSV } from "@/lib/csv-utils";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { FlightPDF } from "@/components/flights/FlightPDF";
+import { useUser } from "@clerk/nextjs";
 
 type FlightData = RouterOutputs["flight"]["getAll"][number];
 
@@ -26,6 +33,8 @@ export default function FlightsPage() {
   const [showForm, setShowForm] = useState(false);
   const searchParams = useSearchParams();
   const { showToast } = useToast();
+  const { user } = useUser();
+  const userName = user?.fullName || user?.primaryEmailAddress?.emailAddress || "Pilot";
 
   const flightTypeValue = searchParams.get("flightType");
   const isValidFlightType = (value: string | null): value is "PIC" | "DUAL" | "SOLO" => {
@@ -54,7 +63,7 @@ export default function FlightsPage() {
 
   const filteredRows = useMemo(() => {
     if (!flights) return [];
-    const filtered = flights.filter((f: FlightData) => !optimisticFlights.includes(f.id));
+    const filtered = (flights || []).filter((f: any) => !optimisticFlights.includes(f.id));
     return filtered;
   }, [flights, optimisticFlights]);
 
@@ -85,9 +94,49 @@ export default function FlightsPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <AppHeader />
       <main className="flex-1 max-w-6xl mx-auto p-6 md:p-8 w-full">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">Flights</h1>
-          <Button onClick={() => setShowForm(true)}>Log New Flight</Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => {
+              const fileInput = document.createElement('input');
+              fileInput.type = 'file';
+              fileInput.accept = '.csv';
+              fileInput.onchange = async (e) => {
+                const file = (e.target as HTMLInputElement).files?.[0];
+                if (file) {
+                   try {
+                     const data = await parseFlightsFromCSV(file);
+                     showToast(`Parsed ${data.length} flights from CSV (Import logic would go here)`, "success");
+                     // Note: Real import would involve calling a multi-create mutation
+                   } catch (err) {
+                     showToast("Failed to parse CSV", "error");
+                   }
+                }
+              };
+              fileInput.click();
+            }}>
+              <Upload className="w-4 h-4" /> Import CSV
+            </Button>
+            
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => exportFlightsToCSV(filteredRows)}>
+              <FileJson className="w-4 h-4" /> Export CSV
+            </Button>
+
+            <PDFDownloadLink
+              document={<FlightPDF flights={filteredRows} userName={userName} />}
+              fileName={`flights_report_${new Date().toISOString().split('T')[0]}.pdf`}
+            >
+              {({ loading }) => (
+                <Button variant="outline" size="sm" className="gap-2" disabled={loading}>
+                  <FileDown className="w-4 h-4" /> {loading ? "Preparing PDF..." : "Export PDF"}
+                </Button>
+              )}
+            </PDFDownloadLink>
+
+            <Button onClick={() => setShowForm(true)} className="gap-2">
+              <Plus className="w-4 h-4" /> Log New Flight
+            </Button>
+          </div>
         </div>
         {showForm && (
           <div className="mb-8 bg-card border-2 border-blue-400 dark:border-blue-500 rounded-lg shadow p-6">
@@ -138,21 +187,35 @@ export default function FlightsPage() {
                   <th className="px-4 py-3 font-semibold">PIC</th>
                   <th className="px-4 py-3 font-semibold">Dual</th>
                   <th className="px-4 py-3 font-semibold">Landings</th>
+                  <th className="px-4 py-3 font-semibold text-center">Status</th>
                   <th className="px-4 py-3 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredRows.map((f: FlightData) => (
-                  <tr key={f.id} className="border-t border-border hover:bg-muted transition-colors">
-                    <td className="px-4 py-3">{new Date(f.date).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">
-                      {f.departureCode} → {f.arrivalCode}
-                    </td>
-                    <td className="px-4 py-3">{f.aircraft?.registration}</td>
-                    <td className="px-4 py-3">{f.duration}h</td>
-                    <td className="px-4 py-3">{f.picTime}</td>
-                    <td className="px-4 py-3">{f.dualTime}</td>
-                    <td className="px-4 py-3">{f.landings}</td>
+                {filteredRows.map((item: any) => {
+                  const f = item as any;
+                  return (
+                    <tr key={f.id} className="border-t border-border hover:bg-muted transition-colors">
+                      <td className="px-4 py-3">{new Date(f.date).toLocaleDateString()}</td>
+                      <td className="px-4 py-3">
+                        {f.departureCode} → {f.arrivalCode}
+                      </td>
+                      <td className="px-4 py-3">{f.aircraft?.registration}</td>
+                      <td className="px-4 py-3">{f.duration}h</td>
+                      <td className="px-4 py-3">{f.picTime}</td>
+                      <td className="px-4 py-3">{f.dualTime}</td>
+                      <td className="px-4 py-3">{f.landings}</td>
+                      <td className="px-4 py-3 text-center">
+                        {f.isVerified ? (
+                          <div className="flex justify-center" title={`Verified by ${f.instructorName || 'Instructor'}`}>
+                            <ShieldCheck className="w-5 h-5 text-green-500" />
+                          </div>
+                        ) : (
+                          <div className="flex justify-center opacity-20" title="Unverified">
+                            <CheckCircle className="w-5 h-5" />
+                          </div>
+                        )}
+                      </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <Link href={`/flights/${f.id}/edit`}>
@@ -181,9 +244,10 @@ export default function FlightsPage() {
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
