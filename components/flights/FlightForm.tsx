@@ -11,11 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { trpc } from "@/trpc/client";
+import { trpc } from "@/src/trpc/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast";
 import { isNetworkError, getNetworkErrorMessage, getServerErrorMessage } from "@/lib/error-utils";
+import SignaturePad from "@/components/common/SignaturePad";
+import { PenTool, CheckCircle2 } from "lucide-react";
 
 type FlightFormData = {
   date: string;
@@ -28,6 +30,8 @@ type FlightFormData = {
   nightLandings: string;
   remarks: string;
   aircraftId: string;
+  instructorName: string;
+  signatureData: string | null;
 };
 
 
@@ -47,6 +51,7 @@ export default function FlightForm({ initialData }: FlightFormProps) {
   const { data: aircraft } = trpc.aircraft.getAll.useQuery();
   const utils = trpc.useUtils();
   const { showToast } = useToast();
+  const [showSignaturePad, setShowSignaturePad] = useState(false);
   
   const isEditMode = !!initialData;
 
@@ -87,11 +92,12 @@ export default function FlightForm({ initialData }: FlightFormProps) {
               createdAt: new Date(),
               updatedAt: new Date(),
               userId: "",
-              dayLandings: typeof newFlight.dayLandings === 'number' ? newFlight.dayLandings : 0,
-              nightLandings: typeof newFlight.nightLandings === 'number' ? newFlight.nightLandings : 0,
-              landings: (typeof newFlight.dayLandings === 'number' ? newFlight.dayLandings : 0) + (typeof newFlight.nightLandings === 'number' ? newFlight.nightLandings : 0),
+              isVerified: (newFlight as any).isVerified ?? false,
+              instructorName: (newFlight as any).instructorName ?? null,
+              signatureData: (newFlight as any).signatureData ?? null,
+              landings: (newFlight as any).dayLandings + (newFlight as any).nightLandings,
               remarks: newFlight.remarks ?? null,
-            },
+            } as any,
             ...previousFlights.filter(f =>
               'createdAt' in f && 'updatedAt' in f && 'userId' in f
             ),
@@ -134,7 +140,13 @@ export default function FlightForm({ initialData }: FlightFormProps) {
           {} as Record<string, unknown>,
           previousFlights.map(f =>
             f.id === updatedFlight.id
-              ? { ...f, ...updatedFlight } as FlightData
+              ? { 
+                  ...f, 
+                  ...updatedFlight,
+                  isVerified: (updatedFlight as any).isVerified ?? (f as any).isVerified,
+                  instructorName: (updatedFlight as any).instructorName ?? (f as any).instructorName,
+                  signatureData: (updatedFlight as any).signatureData ?? (f as any).signatureData,
+                } as any
               : f
           )
         );
@@ -168,17 +180,20 @@ export default function FlightForm({ initialData }: FlightFormProps) {
   // Compute initial form state based on initialData (Edit Mode) or defaults (Create Mode)
   const getInitialFormState = (): FlightFormData => {
     if (initialData) {
+      const data = initialData as any;
       return {
-        date: new Date(initialData.date).toISOString().split("T")[0] || "",
-        departureCode: initialData.departureCode,
-        arrivalCode: initialData.arrivalCode,
-        duration: initialData.duration?.toString() ?? "",
-        picTime: initialData.picTime?.toString() ?? "0",
-        dualTime: initialData.dualTime?.toString() ?? "0",
-        dayLandings: (initialData.dayLandings ?? 0).toString(),
-        nightLandings: (initialData.nightLandings ?? 0).toString(),
-        remarks: initialData.remarks || "",
-        aircraftId: initialData.aircraftId,
+        date: data.date ? (new Date(data.date).toISOString().split("T")[0] as string) : "",
+        departureCode: (data.departureCode as string) || "",
+        arrivalCode: (data.arrivalCode as string) || "",
+        duration: (data.duration ?? "").toString(),
+        picTime: (data.picTime ?? "0").toString(),
+        dualTime: (data.dualTime ?? "0").toString(),
+        dayLandings: (data.dayLandings ?? 0).toString(),
+        nightLandings: (data.nightLandings ?? 0).toString(),
+        remarks: (data.remarks as string) || "",
+        aircraftId: (data.aircraftId as string) || "",
+        instructorName: (data.instructorName as string) || "",
+        signatureData: (data.signatureData as string) || null,
       };
     }
     return {
@@ -192,6 +207,8 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       nightLandings: "0",
       remarks: "",
       aircraftId: "",
+      instructorName: "",
+      signatureData: null,
     };
   };
 
@@ -227,9 +244,16 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       nightLandings: Number(form.nightLandings || 0),
       remarks: form.remarks || undefined,
       aircraftId: form.aircraftId,
+      instructorName: form.instructorName || undefined,
+      signatureData: form.signatureData || undefined,
     };
 
     if (isEditMode) {
+      if (!initialData?.id) {
+        setFormError("Unable to update flight: missing flight ID.");
+        return;
+      }
+
       // Edit Mode: Call update.mutate
       updateFlight.mutate({
         id: initialData.id,
@@ -375,6 +399,61 @@ export default function FlightForm({ initialData }: FlightFormProps) {
           onChange={(e) => setForm({ ...form, remarks: e.target.value })}
         />
       </div>
+
+      <div className="border-t pt-4 space-y-4">
+        <h3 className="text-sm font-medium flex items-center gap-2">
+          <PenTool className="w-4 h-4" /> Instructor Verification (Optional)
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+          <div>
+            <Label htmlFor="instructorName">Instructor Name</Label>
+            <Input
+              id="instructorName"
+              placeholder="Full Name"
+              value={form.instructorName}
+              onChange={(e) => setForm({ ...form, instructorName: e.target.value })}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+             {form.signatureData ? (
+               <div className="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 p-2 rounded border border-green-200 dark:border-green-800">
+                 <CheckCircle2 className="w-4 h-4 text-green-500" />
+                 <span className="text-xs text-green-700 dark:text-green-400 font-medium">Signed</span>
+                 <Button 
+                   type="button" 
+                   variant="ghost" 
+                   size="sm" 
+                   className="text-xs ml-auto h-7"
+                   onClick={() => setForm({ ...form, signatureData: null })}
+                 >
+                   Clear Signature
+                 </Button>
+               </div>
+             ) : (
+               <Button 
+                 type="button" 
+                 variant="outline" 
+                 onClick={() => setShowSignaturePad(true)}
+                 className="w-full"
+               >
+                 Add Signature
+               </Button>
+             )}
+          </div>
+        </div>
+      </div>
+
+      {showSignaturePad && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <SignaturePad 
+            onSave={(data) => {
+              setForm({ ...form, signatureData: data });
+              setShowSignaturePad(false);
+            }} 
+            onCancel={() => setShowSignaturePad(false)} 
+          />
+        </div>
+      )}
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={isPending}>
