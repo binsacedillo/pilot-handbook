@@ -123,7 +123,7 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
     // Fallbacks for data: prioritize live data, fallback to initialData, then empty
     const safeAircraft = aircraftLive ?? initialAircraft ?? [];
     const safeStats = statsLive ?? initialStats ?? {};
-    const safeFlights = flightsLive ?? initialFlights ?? [];
+    const safeFlights: FlightsData = (flightsLive ?? initialFlights ?? []) as FlightsData;
 
     // If Clerk is not loaded, show skeletons only
     if (!isLoaded) {
