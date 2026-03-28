@@ -113,7 +113,7 @@ export const flightRouter = createTRPCRouter({
               userId: true,
             },
           },
-        } as any,
+        },
       });
     }),
 
@@ -176,7 +176,7 @@ export const flightRouter = createTRPCRouter({
               userId: true,
             },
           },
-        } as any,
+        },
       });
       return flight;
     }),
@@ -203,11 +203,13 @@ export const flightRouter = createTRPCRouter({
 
       const flight = await ctx.db.flight.create({
         data: {
-          isVerified: (input as any).isVerified ?? false,
-          instructorName: (input as any).instructorName,
-          signatureData: (input as any).signatureData,
+          ...input,
+          userId: ctx.user.id,
+          isVerified: input.isVerified ?? false,
+          instructorName: input.instructorName,
+          signatureData: input.signatureData,
           landings: input.dayLandings + input.nightLandings, // for backward compatibility
-        } as any,
+        },
         include: {
           aircraft: true,
         },
