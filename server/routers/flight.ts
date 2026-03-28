@@ -13,6 +13,8 @@ export const flightRouter = createTRPCRouter({
         startDate: z.coerce.date().optional(),
         endDate: z.coerce.date().optional(),
         flightType: z.enum(['PIC', 'DUAL', 'SOLO']).optional(),
+        aircraftId: z.string().optional(),
+        isVerified: z.boolean().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -65,6 +67,14 @@ export const flightRouter = createTRPCRouter({
             break;
         }
       }
+      
+      if (input.aircraftId) {
+        filters.aircraftId = input.aircraftId;
+      }
+      
+      if (input.isVerified !== undefined) {
+        filters.isVerified = input.isVerified;
+      }
 
       return ctx.db.flight.findMany({
         where: filters,
@@ -82,6 +92,9 @@ export const flightRouter = createTRPCRouter({
           nightLandings: true,
           remarks: true,
           aircraftId: true,
+          isVerified: true,
+          instructorName: true,
+          signatureData: true,
           createdAt: true,
           updatedAt: true,
           userId: true,
@@ -100,7 +113,7 @@ export const flightRouter = createTRPCRouter({
               userId: true,
             },
           },
-        },
+        } as any,
       });
     }),
 
@@ -142,6 +155,9 @@ export const flightRouter = createTRPCRouter({
           nightLandings: true,
           remarks: true,
           aircraftId: true,
+          isVerified: true,
+          instructorName: true,
+          signatureData: true,
           createdAt: true,
           updatedAt: true,
           userId: true,
@@ -160,7 +176,7 @@ export const flightRouter = createTRPCRouter({
               userId: true,
             },
           },
-        },
+        } as any,
       });
       return flight;
     }),
@@ -187,19 +203,11 @@ export const flightRouter = createTRPCRouter({
 
       const flight = await ctx.db.flight.create({
         data: {
-          date: input.date,
-          departureCode: input.departureCode,
-          arrivalCode: input.arrivalCode,
-          duration: input.duration,
-          picTime: input.picTime,
-          dualTime: input.dualTime,
-          dayLandings: input.dayLandings,
-          nightLandings: input.nightLandings,
-          remarks: input.remarks,
-          aircraftId: input.aircraftId,
-          userId: ctx.user.id,
+          isVerified: (input as any).isVerified ?? false,
+          instructorName: (input as any).instructorName,
+          signatureData: (input as any).signatureData,
           landings: input.dayLandings + input.nightLandings, // for backward compatibility
-        },
+        } as any,
         include: {
           aircraft: true,
         },
