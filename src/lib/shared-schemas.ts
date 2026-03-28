@@ -46,6 +46,9 @@ const flightBaseSchema = z.object({
   nightLandings: z.number().int().min(0),
   remarks: z.string().max(500, 'Remarks limited to 500 characters').optional(),
   aircraftId: z.string().min(1, 'Aircraft is required'),
+  isVerified: z.boolean().default(false).optional(),
+  instructorName: z.string().max(100).optional().nullable(),
+  signatureData: z.string().optional().nullable(),
 });
 
 const flightDurationGuard = (data: { duration?: number; picTime?: number; dualTime?: number }, ctx: z.RefinementCtx) => {

@@ -56,6 +56,9 @@ model Flight {
   updatedAt     DateTime @updatedAt
   dayLandings   Int      @default(0)
   nightLandings Int      @default(0)
+  isVerified    Boolean  @default(false)
+  instructorName String?  @db.VarChar(100)
+  signatureData String?  @db.Text
   aircraft      Aircraft @relation(fields: [aircraftId], references: [id])
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
