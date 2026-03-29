@@ -203,6 +203,7 @@ export default function AircraftPage() {
                       src={a.imageUrl}
                       alt={a.registration}
                       fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover transition-transform group-hover:scale-105"
                     />
                   ) : (
