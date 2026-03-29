@@ -5,7 +5,7 @@ import AppFooter from "@/components/common/AppFooter";
 import { trpc } from "@/src/trpc/client";
 import type { RouterOutputs } from "@/src/trpc/shared";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FlightForm from "@/components/flights/FlightForm";
 import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -23,7 +23,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { exportFlightsToCSV, parseFlightsFromCSV } from "@/lib/csv-utils";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import dynamic from "next/dynamic";
+// import { PDFDownloadLink } from "@react-pdf/renderer";
+const PDFDownloadLink = dynamic(
+  () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
+  {
+    ssr: false,
+    loading: () => (
+      <Button variant="outline" size="sm" className="gap-2" disabled>
+        <FileDown className="w-4 h-4" /> Loading...
+      </Button>
+    ),
+  }
+);
 import { FlightPDF } from "@/components/flights/FlightPDF";
 import { useUser } from "@clerk/nextjs";
 
@@ -53,6 +65,11 @@ export default function FlightsPage() {
   const deleteMutation = trpc.flight.delete.useMutation();
   const queryClient = useQueryClient();
 
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   // State for optimistic updates (store flight IDs)
   const [optimisticFlights, setOptimisticFlights] = useState<string[]>([]);
   const [deleteDialogState, setDeleteDialogState] = useState<{
@@ -122,16 +139,18 @@ export default function FlightsPage() {
               <FileJson className="w-4 h-4" /> Export CSV
             </Button>
 
-            <PDFDownloadLink
-              document={<FlightPDF flights={filteredRows} userName={userName} />}
-              fileName={`flights_report_${new Date().toISOString().split('T')[0]}.pdf`}
-            >
-              {({ loading }) => (
-                <Button variant="outline" size="sm" className="gap-2" disabled={loading}>
-                  <FileDown className="w-4 h-4" /> {loading ? "Preparing PDF..." : "Export PDF"}
-                </Button>
-              )}
-            </PDFDownloadLink>
+            {isMounted && (
+              <PDFDownloadLink
+                document={<FlightPDF flights={filteredRows} userName={userName} />}
+                fileName={`flights_report_${new Date().toISOString().split('T')[0]}.pdf`}
+              >
+                {({ loading }) => (
+                  <Button variant="outline" size="sm" className="gap-2" disabled={loading}>
+                    <FileDown className="w-4 h-4" /> {loading ? "Preparing PDF..." : "Export PDF"}
+                  </Button>
+                )}
+              </PDFDownloadLink>
+            )}
 
             <Button onClick={() => setShowForm(true)} className="gap-2">
               <Plus className="w-4 h-4" /> Log New Flight
