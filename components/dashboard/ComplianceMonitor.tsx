@@ -41,7 +41,6 @@ export function ComplianceMonitor({ compliance, isLoading }: ComplianceMonitorPr
 
     if (!compliance) return null;
 
-    const deadlineDate = new Date(compliance.nextDeadline);
     const isUrgent = compliance.daysUntilExpiry < 15;
 
     return (
