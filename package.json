@@ -84,6 +84,7 @@
 	"overrides": {
 		"hono": "^4.11.4",
 		"lodash": "^4.17.21",
-		"chevrotain": "^11.0.0"
+		"chevrotain": "^11.0.0",
+		"serialize-javascript": "7.0.5"
 	}
 }
