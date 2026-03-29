@@ -12,6 +12,7 @@ const navLinks = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/flights', label: 'Logbook' },
   { href: '/aircraft', label: 'Aircraft' },
+  { href: '/tools', label: 'Tools' },
   { href: '/dashboard/analytics', label: 'Statistics' },
   { href: '/profile', label: 'Profile' },
   { href: '/settings', label: 'Settings' },

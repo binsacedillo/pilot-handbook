@@ -256,6 +256,28 @@ function DashboardClient({ initialStats, initialFlights, initialAircraft }: Dash
                         />
                     )}
                 </div>
+
+                <div className="mt-8 bg-card rounded-xl border-2 border-blue-500 dark:border-blue-400 shadow p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold">Operational Tools</h2>
+                        <Link href="/tools">
+                            <Button size="sm" variant="outline">View All Tools</Button>
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Link href="/tools/performance" className="group p-4 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-colors bg-slate-50/50 dark:bg-slate-900/50">
+                            <h3 className="font-bold group-hover:text-blue-600 transition-colors">Performance Calculator</h3>
+                            <p className="text-sm text-muted-foreground mt-1 text-balance">Check Density Altitude and Pressure Altitude for your flight.</p>
+                        </Link>
+                        <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-800 opacity-60 bg-slate-50/50 dark:bg-slate-900/50">
+                            <div className="flex justify-between items-start">
+                                <h3 className="font-bold">Weight & Balance</h3>
+                                <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 bg-accent rounded text-accent-foreground">Soon</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground mt-1">Interactive CG calculator for various aircraft models.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             {/* Sidebar: Weather Widget */}
             <div className="min-w-0">

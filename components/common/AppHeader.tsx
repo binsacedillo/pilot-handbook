@@ -18,6 +18,7 @@ export default function AppHeader() {
 		{ label: "Dashboard", href: "/dashboard" },
 		{ label: "Flights", href: "/flights" },
 		{ label: "Aircraft", href: "/aircraft" },
+		{ label: "Tools", href: "/tools" },
 	];
 
 	return (

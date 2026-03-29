@@ -29,6 +29,11 @@ export default function Navigation() {
 							</Link>
 						</SignedOut>
 						<SignedIn>
+							<Link href="/tools" className="hidden xs:inline mr-2">
+								<Button variant="ghost" className="text-foreground text-sm px-3 sm:px-4">
+									Tools
+								</Button>
+							</Link>
 							<Link href="/dashboard">
 								<Button className="bg-blue-600 hover:bg-blue-700 text-primary-foreground text-sm px-3 sm:px-4">
 									<span className="hidden sm:inline">Go to Dashboard</span>
