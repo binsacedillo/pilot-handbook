@@ -87,11 +87,16 @@ interface AVWXMetarResponse {
 		value: number | null;
 		repr: string;
 	};
+	altimeter: {
+		value: number | null;
+		repr: string;
+	};
 	units: {
 		wind_speed: string;
 		visibility: string;
 		altitude: string;
 		temperature: string;
+		altimeter: string;
 	};
 }
 
@@ -121,6 +126,8 @@ interface MetarData {
 	};
 	temperature: number | null;
 	dewpoint: number | null;
+	altimeter: number | null;
+	altimeterUnit: string;
 	time: string;
 }
 
@@ -223,6 +230,8 @@ async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
 			},
 			temperature: metar.temperature?.value ?? null,
 			dewpoint: metar.dewpoint?.value ?? null,
+			altimeter: metar.altimeter?.value ?? null,
+			altimeterUnit: metar.units?.altimeter || "inHg",
 			time: metar.time?.dt || new Date().toISOString(),
 		};
 	} catch (error) {
@@ -257,6 +266,8 @@ function getMockMetar(icao: string): MetarData {
 		},
 		temperature: -4,
 		dewpoint: -17,
+		altimeter: 30.34,
+		altimeterUnit: "inHg",
 		time: now,
 	};
 }
