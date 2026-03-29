@@ -15,7 +15,22 @@ export interface FlightCSVRow {
   Instructor: string;
 }
 
-export const exportFlightsToCSV = (flights: any[]) => {
+interface FlightInput {
+  date: Date | string;
+  departureCode: string;
+  arrivalCode: string;
+  duration: number;
+  picTime: number;
+  dualTime: number;
+  dayLandings: number;
+  nightLandings: number;
+  remarks?: string | null;
+  aircraft?: { registration: string } | null;
+  isVerified: boolean;
+  instructorName?: string | null;
+}
+
+export const exportFlightsToCSV = (flights: FlightInput[]) => {
   const csvData: FlightCSVRow[] = flights.map((f) => ({
     Date: new Date(f.date).toLocaleDateString(),
     Departure: f.departureCode,

@@ -30,26 +30,28 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
     () =>
       new QueryClient({
         queryCache: new QueryCache({
-          onError: (error: any) => {
+          onError: (error: unknown) => {
+            const trpcError = error as { data?: { code?: string }; message?: string };
             // Avoid double-toasting if it's a session issue (handled by SessionExpirationHandler)
-            if (error?.data?.code === 'UNAUTHORIZED') return;
+            if (trpcError?.data?.code === 'UNAUTHORIZED') return;
 
             // Only toast on the final retry failure or if retries are disabled
             // In TanStack Query v5, the meta/retry state can be checked if needed, 
             // but for global visibility, a "Background Refresh Failed" is helpful.
             showToast(
-              error.message || "Background refresh failed. Please check your connection.",
+              trpcError.message || "Background refresh failed. Please check your connection.",
               "error",
               { duration: 4000 }
             );
           },
         }),
         mutationCache: new MutationCache({
-          onError: (error: any) => {
-            if (error?.data?.code === 'UNAUTHORIZED') return;
+          onError: (error: unknown) => {
+            const trpcError = error as { data?: { code?: string }; message?: string };
+            if (trpcError?.data?.code === 'UNAUTHORIZED') return;
 
             showToast(
-              error.message || "Action failed. Please try again.",
+              trpcError.message || "Action failed. Please try again.",
               "error"
             );
           },
