@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,19 +10,13 @@ import {
   calculatePressureAltitude, 
   calculateDensityAltitude 
 } from "@/lib/aviation-math";
-import { CloudRain, Wind, Thermometer, MapPin, AlertTriangle, RefreshCw } from "lucide-react";
+import { Thermometer, MapPin, AlertTriangle, RefreshCw } from "lucide-react";
 
 export default function DensityAltitudeCalculator() {
   const [elevation, setElevation] = useState<string>("0");
   const [altimeter, setAltimeter] = useState<string>("29.92");
   const [temperature, setTemperature] = useState<string>("15");
   const [icao, setIcao] = useState<string>("");
-  
-  const [results, setResults] = useState<{
-    pressureAltitude: number;
-    densityAltitude: number;
-  } | null>(null);
-
   const { data: metar, isLoading, refetch } = trpc.weather.getMetar.useQuery(
     { icao: icao.toUpperCase() },
     { enabled: false }
@@ -36,12 +30,13 @@ export default function DensityAltitudeCalculator() {
 
   useEffect(() => {
     if (metar) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (metar.altimeter) setAltimeter(metar.altimeter.toString());
       if (metar.temperature !== null) setTemperature(metar.temperature.toString());
     }
   }, [metar]);
 
-  const calculate = () => {
+  const results = useMemo(() => {
     const elev = parseFloat(elevation);
     const alt = parseFloat(altimeter);
     const temp = parseFloat(temperature);
@@ -49,13 +44,9 @@ export default function DensityAltitudeCalculator() {
     if (!isNaN(elev) && !isNaN(alt) && !isNaN(temp)) {
       const pa = calculatePressureAltitude(elev, alt);
       const da = calculateDensityAltitude(pa, temp);
-      setResults({ pressureAltitude: pa, densityAltitude: da });
+      return { pressureAltitude: pa, densityAltitude: da };
     }
-  };
-
-  // Re-calculate results whenever inputs change
-  useEffect(() => {
-    calculate();
+    return null;
   }, [elevation, altimeter, temperature]);
 
   return (

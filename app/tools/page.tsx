@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Link from "next/link";
-import { Thermometer, Gauge, Ruler, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import { Thermometer, Gauge, ArrowRight, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const tools = [
