@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-interface HeroProps { }
-
-export default function Hero({ }: HeroProps) {
+export default function Hero() {
 	const [scrollY, setScrollY] = useState(0);
 
 	useEffect(() => {

@@ -9,10 +9,9 @@ import { RotateCcw, Check, X } from "lucide-react";
 interface SignaturePadProps {
   onSave: (signatureData: string) => void;
   onCancel: () => void;
-  initialData?: string | null;
 }
 
-export default function SignaturePad({ onSave, onCancel, initialData }: SignaturePadProps) {
+export default function SignaturePad({ onSave, onCancel }: SignaturePadProps) {
   const sigCanvas = useRef<SignatureCanvas>(null);
 
   const clear = () => {
