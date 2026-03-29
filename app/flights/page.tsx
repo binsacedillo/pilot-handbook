@@ -12,16 +12,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { DeleteDialog } from "@/components/common/DeleteDialog";
 import { 
-  Plane, Calendar, Clock, MapPin, Edit, Trash2, 
-  Download, FileDown, FileJson, Upload, CheckCircle, ShieldCheck, Plus 
+  Edit, Trash2, 
+  FileDown, FileJson, Upload, CheckCircle, ShieldCheck, Plus 
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { FlightFilterBar } from "@/src/components/flights/FlightFilterBar";
 import EmptyState from "@/components/common/EmptyState";
 import { useToast } from "@/components/ui/toast";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { exportFlightsToCSV, parseFlightsFromCSV } from "@/lib/csv-utils";
 import dynamic from "next/dynamic";
 // import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -39,7 +37,7 @@ const PDFDownloadLink = dynamic(
 import { FlightPDF } from "@/components/flights/FlightPDF";
 import { useUser } from "@clerk/nextjs";
 
-type FlightData = RouterOutputs["flight"]["getAll"][number];
+
 
 export default function FlightsPage() {
   const [showForm, setShowForm] = useState(false);
@@ -67,6 +65,7 @@ export default function FlightsPage() {
 
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
   }, []);
   
@@ -80,7 +79,7 @@ export default function FlightsPage() {
 
   const filteredRows = useMemo(() => {
     if (!flights) return [];
-    const filtered = (flights || []).filter((f: any) => !optimisticFlights.includes(f.id));
+    const filtered = (flights || []).filter((f: RouterOutputs["flight"]["getAll"][number]) => !optimisticFlights.includes(f.id));
     return filtered;
   }, [flights, optimisticFlights]);
 
@@ -125,7 +124,7 @@ export default function FlightsPage() {
                      const data = await parseFlightsFromCSV(file);
                      showToast(`Parsed ${data.length} flights from CSV (Import logic would go here)`, "success");
                      // Note: Real import would involve calling a multi-create mutation
-                   } catch (err) {
+                   } catch {
                      showToast("Failed to parse CSV", "error");
                    }
                 }
@@ -211,8 +210,7 @@ export default function FlightsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredRows.map((item: any) => {
-                  const f = item as any;
+                {filteredRows.map((f: RouterOutputs["flight"]["getAll"][number]) => {
                   return (
                     <tr key={f.id} className="border-t border-border hover:bg-muted transition-colors">
                       <td className="px-4 py-3">{new Date(f.date).toLocaleDateString()}</td>

@@ -8,7 +8,6 @@ import {
   Document,
   StyleSheet,
   Image,
-  Font,
 } from "@react-pdf/renderer";
 
 // Create styles
@@ -97,8 +96,10 @@ const styles = StyleSheet.create({
   },
 });
 
+import type { RouterOutputs } from "@/src/trpc/shared";
+
 interface FlightPDFProps {
-  flights: any[];
+  flights: RouterOutputs["flight"]["getAll"];
   userName: string;
 }
 
@@ -140,6 +141,7 @@ export const FlightPDF = ({ flights, userName }: FlightPDFProps) => {
               <View style={styles.tableCol}>
                 {f.signatureData ? (
                   <View style={styles.signatureContainer}>
+                    {/* eslint-disable-next-line jsx-a11y/alt-text */}
                     <Image src={f.signatureData} style={styles.signatureImage} />
                     <Text style={{ fontSize: 6, marginTop: 2 }}>{f.instructorName}</Text>
                   </View>

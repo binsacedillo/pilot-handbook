@@ -89,12 +89,12 @@ export default function FlightForm({ initialData }: FlightFormProps) {
           createdAt: new Date(),
           updatedAt: new Date(),
           userId: "",
-          isVerified: (newFlight as any).isVerified ?? false,
-          instructorName: (newFlight as any).instructorName ?? null,
-          signatureData: (newFlight as any).signatureData ?? null,
-          landings: (newFlight as any).dayLandings + (newFlight as any).nightLandings,
+          isVerified: false,
+          instructorName: newFlight.instructorName ?? null,
+          signatureData: newFlight.signatureData ?? null,
+          landings: (newFlight.dayLandings ?? 0) + (newFlight.nightLandings ?? 0),
           remarks: newFlight.remarks ?? null,
-        } as any;
+        } as FlightData;
 
         utils.flight.getAll.setData(
           {} as Record<string, unknown>,
@@ -141,10 +141,10 @@ export default function FlightForm({ initialData }: FlightFormProps) {
             return { 
               ...f, 
               ...updatedFlight,
-              isVerified: (updatedFlight as any).isVerified ?? (f as any).isVerified,
-              instructorName: (updatedFlight as any).instructorName ?? (f as any).instructorName,
-              signatureData: (updatedFlight as any).signatureData ?? (f as any).signatureData,
-            } as any;
+              isVerified: f.isVerified,
+              instructorName: updatedFlight.instructorName ?? f.instructorName,
+              signatureData: updatedFlight.signatureData ?? f.signatureData,
+            } as FlightData;
           })
         );
       }
@@ -193,7 +193,7 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       };
     }
 
-    const data = initialData as any;
+    const data = initialData;
     const formattedDate = data.date 
       ? new Date(data.date).toISOString().split("T")[0] || ""
       : "";
