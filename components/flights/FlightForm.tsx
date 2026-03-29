@@ -59,14 +59,13 @@ export default function FlightForm({ initialData }: FlightFormProps) {
 
 
   const createFlight = trpc.flight.create.useMutation({
-    // Optimistic update
     onMutate: async (newFlight) => {
       await utils.flight.getAll.cancel();
       const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightData[] | undefined;
+      
       if (previousFlights) {
-        // Find the full aircraft object from the aircraft list
         const selectedAircraft = aircraft?.find((a: AircraftData) => a.id === newFlight.aircraftId);
-        // Fallback dummy values for all required fields
+        
         const fallbackAircraft = {
           id: newFlight.aircraftId,
           registration: "",
@@ -80,28 +79,26 @@ export default function FlightForm({ initialData }: FlightFormProps) {
           flightHours: 0,
           userId: "",
         };
-        // Merge selectedAircraft with fallback to ensure all fields are present
+
         const optimisticAircraft = { ...fallbackAircraft, ...(selectedAircraft ?? {}) };
+        
+        const optimisticItem = {
+          ...newFlight,
+          id: "optimistic",
+          aircraft: optimisticAircraft,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          userId: "",
+          isVerified: (newFlight as any).isVerified ?? false,
+          instructorName: (newFlight as any).instructorName ?? null,
+          signatureData: (newFlight as any).signatureData ?? null,
+          landings: (newFlight as any).dayLandings + (newFlight as any).nightLandings,
+          remarks: newFlight.remarks ?? null,
+        } as any;
+
         utils.flight.getAll.setData(
           {} as Record<string, unknown>,
-          [
-            {
-              ...newFlight,
-              id: "optimistic",
-              aircraft: optimisticAircraft,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              userId: "",
-              isVerified: (newFlight as any).isVerified ?? false,
-              instructorName: (newFlight as any).instructorName ?? null,
-              signatureData: (newFlight as any).signatureData ?? null,
-              landings: (newFlight as any).dayLandings + (newFlight as any).nightLandings,
-              remarks: newFlight.remarks ?? null,
-            } as any,
-            ...previousFlights.filter(f =>
-              'createdAt' in f && 'updatedAt' in f && 'userId' in f
-            ),
-          ]
+          [optimisticItem, ...previousFlights]
         );
       }
       return { previousFlights };
@@ -131,24 +128,24 @@ export default function FlightForm({ initialData }: FlightFormProps) {
   });
 
   const updateFlight = trpc.flight.update.useMutation({
-    // Optimistic update
     onMutate: async (updatedFlight) => {
       await utils.flight.getAll.cancel();
       const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightData[] | undefined;
+      
       if (previousFlights) {
         utils.flight.getAll.setData(
           {} as Record<string, unknown>,
-          previousFlights.map(f =>
-            f.id === updatedFlight.id
-              ? { 
-                  ...f, 
-                  ...updatedFlight,
-                  isVerified: (updatedFlight as any).isVerified ?? (f as any).isVerified,
-                  instructorName: (updatedFlight as any).instructorName ?? (f as any).instructorName,
-                  signatureData: (updatedFlight as any).signatureData ?? (f as any).signatureData,
-                } as any
-              : f
-          )
+          previousFlights.map(f => {
+            if (f.id !== updatedFlight.id) return f;
+            
+            return { 
+              ...f, 
+              ...updatedFlight,
+              isVerified: (updatedFlight as any).isVerified ?? (f as any).isVerified,
+              instructorName: (updatedFlight as any).instructorName ?? (f as any).instructorName,
+              signatureData: (updatedFlight as any).signatureData ?? (f as any).signatureData,
+            } as any;
+          })
         );
       }
       return { previousFlights };
@@ -179,36 +176,41 @@ export default function FlightForm({ initialData }: FlightFormProps) {
 
   // Compute initial form state based on initialData (Edit Mode) or defaults (Create Mode)
   const getInitialFormState = (): FlightFormData => {
-    if (initialData) {
-      const data = initialData as any;
+    if (!initialData) {
       return {
-        date: data.date ? (new Date(data.date).toISOString().split("T")[0] as string) : "",
-        departureCode: (data.departureCode as string) || "",
-        arrivalCode: (data.arrivalCode as string) || "",
-        duration: (data.duration ?? "").toString(),
-        picTime: (data.picTime ?? "0").toString(),
-        dualTime: (data.dualTime ?? "0").toString(),
-        dayLandings: (data.dayLandings ?? 0).toString(),
-        nightLandings: (data.nightLandings ?? 0).toString(),
-        remarks: (data.remarks as string) || "",
-        aircraftId: (data.aircraftId as string) || "",
-        instructorName: (data.instructorName as string) || "",
-        signatureData: (data.signatureData as string) || null,
+        date: "",
+        departureCode: "",
+        arrivalCode: "",
+        duration: "",
+        picTime: "0",
+        dualTime: "0",
+        dayLandings: "0",
+        nightLandings: "0",
+        remarks: "",
+        aircraftId: "",
+        instructorName: "",
+        signatureData: null,
       };
     }
+
+    const data = initialData as any;
+    const formattedDate = data.date 
+      ? new Date(data.date).toISOString().split("T")[0] || ""
+      : "";
+
     return {
-      date: "",
-      departureCode: "",
-      arrivalCode: "",
-      duration: "",
-      picTime: "0",
-      dualTime: "0",
-      dayLandings: "0",
-      nightLandings: "0",
-      remarks: "",
-      aircraftId: "",
-      instructorName: "",
-      signatureData: null,
+      date: formattedDate,
+      departureCode: data.departureCode || "",
+      arrivalCode: data.arrivalCode || "",
+      duration: (data.duration ?? "").toString(),
+      picTime: (data.picTime ?? "0").toString(),
+      dualTime: (data.dualTime ?? "0").toString(),
+      dayLandings: (data.dayLandings ?? 0).toString(),
+      nightLandings: (data.nightLandings ?? 0).toString(),
+      remarks: data.remarks || "",
+      aircraftId: data.aircraftId || "",
+      instructorName: data.instructorName || "",
+      signatureData: data.signatureData || null,
     };
   };
 
