@@ -8,6 +8,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["192.168.254.102", "192.168.254.102:3000", "localhost:3000"],
   // Enable future-friendly defaults progressively via explicit config.
   images: {
     remotePatterns: [
