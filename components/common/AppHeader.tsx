@@ -3,7 +3,7 @@
 import { UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import Plane from "lucide-react/dist/esm/icons/plane";
+import { Plane } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function AppHeader() {

@@ -8,7 +8,7 @@ import AppFooter from '@/components/common/AppFooter';
 import { Card } from '@/components/ui/card';
 import { useUser } from '@clerk/nextjs';
 import { Users, Plane, TrendingUp, CheckCircle, XCircle } from 'lucide-react';
-import UserManagementTable from '@/src/components/UserManagementTable';
+import UserManagementTable from '@/components/admin/UserManagementTable';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 

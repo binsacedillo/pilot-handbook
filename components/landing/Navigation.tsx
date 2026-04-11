@@ -3,7 +3,7 @@
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import Plane from "lucide-react/dist/esm/icons/plane";
+import { Plane } from "lucide-react";
 
 export default function Navigation() {
 	return (

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { trpc } from "@/src/trpc/client";
+import { trpc } from "@/trpc/client";
 import { 
   calculatePressureAltitude, 
   calculateDensityAltitude 

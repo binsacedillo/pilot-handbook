@@ -2,8 +2,8 @@
 
 import AppHeader from "@/components/common/AppHeader";
 import AppFooter from "@/components/common/AppFooter";
-import { trpc } from "@/src/trpc/client";
-import type { RouterOutputs } from "@/src/trpc/shared";
+import { trpc } from "@/trpc/client";
+import type { RouterOutputs } from "@/trpc/shared";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import FlightForm from "@/components/flights/FlightForm";
@@ -16,7 +16,7 @@ import {
   FileDown, FileJson, Upload, CheckCircle, ShieldCheck, Plus 
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { FlightFilterBar } from "@/src/components/flights/FlightFilterBar";
+import { FlightFilterBar } from "@/components/flights/FlightFilterBar";
 import EmptyState from "@/components/common/EmptyState";
 import { useToast } from "@/components/ui/toast";
 

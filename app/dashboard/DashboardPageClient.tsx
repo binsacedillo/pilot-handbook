@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { trpc } from "@/src/trpc/client";
+import { trpc } from "@/trpc/client";
 import AppHeader from "@/components/common/AppHeader";
 import AppFooter from "@/components/common/AppFooter";
 import DashboardStatusCards from "@/components/dashboard/DashboardStatusCards";

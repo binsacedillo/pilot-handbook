@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import { trpc } from "../../trpc/client";
+import { trpc } from "./client";
 import { getUrl, transformer } from "./shared";
 import { httpBatchLink } from "@trpc/client";
 

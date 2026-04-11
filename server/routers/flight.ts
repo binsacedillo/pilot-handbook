@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
-import { idSchema, createFlightSchema, updateFlightSchema } from '@/src/lib/shared-schemas';
+import { idSchema, createFlightSchema, updateFlightSchema } from '@/lib/shared-schemas';
 import { createAuditLog } from '@/lib/audit-logger';
 
 export const flightRouter = createTRPCRouter({

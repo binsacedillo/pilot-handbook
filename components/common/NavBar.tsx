@@ -5,8 +5,7 @@ import { usePathname } from 'next/navigation';
 import React, { Suspense, useState } from 'react';
 import { AdminLink } from '@/components/admin/AdminLink';
 import { Button } from '@/components/ui/button';
-import Menu from 'lucide-react/dist/esm/icons/menu';
-import X from 'lucide-react/dist/esm/icons/x';
+import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard' },

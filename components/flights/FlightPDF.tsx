@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   },
 });
 
-import type { RouterOutputs } from "@/src/trpc/shared";
+import type { RouterOutputs } from "@/trpc/shared";
 
 interface FlightPDFProps {
   flights: RouterOutputs["flight"]["getAll"];

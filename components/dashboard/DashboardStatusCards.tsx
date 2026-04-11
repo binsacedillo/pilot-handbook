@@ -3,7 +3,7 @@
 
 import { Plane, Clock, Shield } from "lucide-react";
 import Link from "next/link";
-import { trpc } from "@/src/trpc/client";
+import { trpc } from "@/trpc/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardStatusCards() {

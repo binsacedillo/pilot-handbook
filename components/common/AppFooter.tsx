@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Plane from "lucide-react/dist/esm/icons/plane";
+import { Plane } from "lucide-react";
 
 export default function AppFooter() {
 	const currentYear = new Date().getFullYear();

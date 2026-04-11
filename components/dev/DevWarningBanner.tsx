@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import AlertTriangle from "lucide-react/dist/esm/icons/alert-triangle";
-import X from "lucide-react/dist/esm/icons/x";
+import { AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DevWarningBannerProps {

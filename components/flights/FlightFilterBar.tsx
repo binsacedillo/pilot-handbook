@@ -1,50 +1,154 @@
-// Import navigation hooks from Next.js
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-// Import TRPC client for API calls
-import { trpc } from '@/trpc/client';
-// Import UI components for the select dropdown
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+'use client';
 
-// FlightFilterBar displays a dropdown to filter flights by aircraft
-export default function FlightFilterBar() {
-  // Get router and current path info
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+type FlightType = 'PIC' | 'DUAL' | 'SOLO';
+
+export function FlightFilterBar() {
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
-  // Fetch user's aircraft list from API
-  const { data: aircraftList } = trpc.flight.getUserAircraft.useQuery();
+
+  const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [flightType, setFlightType] = useState<FlightType | ''>(
+    (searchParams.get('flightType') as FlightType) || '',
+  );
+  const [startDate, setStartDate] = useState(searchParams.get('startDate') || '');
+  const [endDate, setEndDate] = useState(searchParams.get('endDate') || '');
+
+  const searchParamsString = useMemo(() => searchParams.toString(), [searchParams]);
+
+  const updateUrlParams = useCallback(
+    (updates: Record<string, string>) => {
+      const params = new URLSearchParams(searchParamsString);
+      let changed = false;
+
+      Object.entries(updates).forEach(([key, value]) => {
+        const existing = params.get(key);
+        if (value) {
+          if (existing !== value) {
+            params.set(key, value);
+            changed = true;
+          }
+        } else if (existing !== null) {
+          params.delete(key);
+          changed = true;
+        }
+      });
+
+      if (!changed) return;
+
+      const query = params.toString();
+      router.replace(query ? `?${query}` : '?', { scroll: false });
+    },
+    [searchParamsString, router],
+  );
+
+  // Debounced search update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateUrlParams({ search });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, updateUrlParams]);
+
+  const handleFlightTypeChange = (value: string) => {
+    if (value === 'ALL') {
+      setFlightType('');
+      updateUrlParams({ flightType: '' });
+      return;
+    }
+
+    setFlightType(value as FlightType);
+    updateUrlParams({ flightType: value });
+  };
+
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+    updateUrlParams({ startDate: e.target.value });
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value);
+    updateUrlParams({ endDate: e.target.value });
+  };
+
+  const handleReset = () => {
+    setSearch('');
+    setFlightType('');
+    setStartDate('');
+    setEndDate('');
+    router.push(window.location.pathname, { scroll: false });
+  };
+
+  const hasActiveFilters = search || flightType || startDate || endDate;
 
   return (
-    // Dropdown select for aircraft filter
-    <Select
-      // When the selected value changes, update the URL query params
-      onValueChange={(value) => {
-        const params = new URLSearchParams(searchParams.toString());
-        // If a specific aircraft is selected, set its ID in the params
-        if (value && value !== 'ALL') params.set('aircraftId', value);
-        // If 'All Aircraft' is selected, remove the filter
-        else params.delete('aircraftId');
-        // Navigate to the new URL with updated params
-        router.push(`${pathname}?${params.toString()}`);
-      }}
-    >
-      {/* Trigger button for the dropdown - responsive width */}
-      <SelectTrigger className="w-full sm:w-45">
-        {/* Placeholder text for the dropdown */}
-        <SelectValue placeholder="Select Aircraft" />
-      </SelectTrigger>
-      {/* Dropdown content with aircraft options */}
-      <SelectContent>
-        {/* Option to show all aircraft */}
-        <SelectItem value="ALL">All Aircraft</SelectItem>
-        {/* List user's aircraft as options */}
-        {aircraftList?.map((item) => (
-          <SelectItem key={item.aircraft.id} value={item.aircraft.id}>
-            {/* Show registration and model */}
-            {item.aircraft.registration} ({item.aircraft.model})
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex flex-wrap items-end gap-4 rounded-lg border-2 border-blue-400 dark:border-blue-500 bg-card p-4 shadow">
+      {/* Search Input */}
+      <div className="flex-1 min-w-50">
+        <label className="text-sm font-medium mb-1.5 block">Search</label>
+        <Input
+          placeholder="Search flights, routes, remarks..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full"
+        />
+      </div>
+
+      {/* Flight Type Select */}
+      <div className="w-45">
+        <label className="text-sm font-medium mb-1.5 block">Flight Type</label>
+        <Select value={flightType} onValueChange={handleFlightTypeChange}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">All Types</SelectItem>
+            <SelectItem value="PIC">PIC</SelectItem>
+            <SelectItem value="DUAL">DUAL</SelectItem>
+            <SelectItem value="SOLO">SOLO</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Start Date */}
+      <div className="w-40">
+        <label className="text-sm font-medium mb-1.5 block">Start Date</label>
+        <Input
+          type="date"
+          value={startDate}
+          onChange={handleStartDateChange}
+          className="w-full"
+        />
+      </div>
+
+      {/* End Date */}
+      <div className="w-40">
+        <label className="text-sm font-medium mb-1.5 block">End Date</label>
+        <Input
+          type="date"
+          value={endDate}
+          onChange={handleEndDateChange}
+          className="w-full"
+        />
+      </div>
+
+      {/* Reset Button */}
+      {hasActiveFilters && (
+        <Button variant="outline" onClick={handleReset} className="h-10">
+          Reset
+        </Button>
+      )}
+    </div>
   );
 }
