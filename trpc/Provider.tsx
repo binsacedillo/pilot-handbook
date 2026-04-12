@@ -107,8 +107,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
           },
           headers() {
             return {
-              // Ensure cookies are sent with requests for auth
-              credentials: 'include',
+              // Standard Next.js client headers will be automatically included
             };
           },
         }),
