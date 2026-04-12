@@ -19,19 +19,19 @@ const tools = [
     title: "Weight & Balance",
     description: "Calculate Center of Gravity (CG) and weight limits for your aircraft.",
     icon: Gauge,
-    href: "#",
+    href: "/tools/weight-balance",
     color: "text-amber-500",
     bgColor: "bg-amber-50 dark:bg-amber-900/20",
-    status: "Coming Soon",
+    status: "Active",
   },
   {
     title: "Fuel Planner",
     description: "Estimate fuel burn and reserves based on distance and wind conditions.",
     icon: Zap,
-    href: "#",
+    href: "/tools/fuel",
     color: "text-green-500",
     bgColor: "bg-green-50 dark:bg-green-900/20",
-    status: "Coming Soon",
+    status: "Active",
   },
 ];
 

@@ -90,7 +90,7 @@ export default function PrivacyPage() {
             <ul className="list-disc list-inside ml-2">
               <li><span className="font-semibold">Vercel</span> (Hosting and deployment)</li>
               <li><span className="font-semibold">Clerk</span> (Authentication and user management)</li>
-              <li><span className="font-semibold">Supabase/Postgres</span> (Database and data storage)</li>
+              <li><span className="font-semibold">Neon/Postgres</span> (Database and data storage)</li>
             </ul>
             <p>All third-party processors are contractually obligated to comply with data privacy standards and safeguard your information.</p>
           </section>

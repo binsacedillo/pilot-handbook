@@ -4,7 +4,7 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import ClerkProviderClient from "@/components/providers/ClerkProviderClient";
 import { TRPCProvider } from "@/trpc/Provider";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeWrapper } from "@/components/providers/ThemeWrapper";
 import DevWarningBanner from "@/components/dev/DevWarningBanner";
 import { FeedbackButton } from "@/components/feedback/feedback-index";
@@ -38,6 +38,11 @@ export const metadata: Metadata = {
       {
         url: "/icon-192.png",
         sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/icon-512.png",
+        sizes: "512x512",
         type: "image/png",
       },
     ],
@@ -77,13 +82,13 @@ export default function RootLayout({
           <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://api.clerk.com" crossOrigin="anonymous" />
         </head>
-        <body className={`font-sans ${inter.variable} flex flex-col min-h-screen`}>
+        <body className={`font-sans ${inter.variable} flex flex-col min-h-screen transition-colors duration-300`}>
           {/* Skip to main content for keyboard navigation (WCAG 2.1) */}
           <a href="#main-content" className="skip-to-main">
             Skip to main content
           </a>
 
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <TRPCProvider>
               <ClerkProviderClient>
                 <SessionExpirationHandler />

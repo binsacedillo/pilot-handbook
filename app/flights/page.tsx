@@ -15,7 +15,7 @@ import {
   Edit, Trash2, 
   FileDown, FileJson, Upload, CheckCircle, ShieldCheck, Plus 
 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { FlightFilterBar } from "@/components/flights/FlightFilterBar";
 import EmptyState from "@/components/common/EmptyState";
 import { useToast } from "@/components/ui/toast";
@@ -40,10 +40,12 @@ import { useUser } from "@clerk/nextjs";
 
 
 export default function FlightsPage() {
-  const [showForm, setShowForm] = useState(false);
-  const searchParams = useSearchParams();
-  const { showToast } = useToast();
   const { user } = useUser();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [showForm, setShowForm] = useState(false);
+  const { showToast } = useToast();
   const userName = user?.fullName || user?.primaryEmailAddress?.emailAddress || "Pilot";
 
   const flightTypeValue = searchParams.get("flightType");
@@ -65,9 +67,19 @@ export default function FlightsPage() {
 
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
-  }, []);
+    
+    // URL Cleanup (UX Pro Move): Deep-link detection and query consumption
+    if (searchParams.get("new") === "true") {
+      setShowForm(true);
+      
+      // Clean up the URL to prevent re-opening on refresh
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("new");
+      const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+      router.replace(nextUrl);
+    }
+  }, [searchParams, router, pathname]);
   
   // State for optimistic updates (store flight IDs)
   const [optimisticFlights, setOptimisticFlights] = useState<string[]>([]);

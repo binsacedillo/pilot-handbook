@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "../styles/glass-cockpit.css";
 
 /* Prevent flash of wrong theme (next-themes) */
 html {
