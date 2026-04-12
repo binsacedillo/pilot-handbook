@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useClerk, useAuth } from '@clerk/nextjs';
 import { usePathname } from 'next/navigation';
 import { 
@@ -15,7 +15,9 @@ import { Button } from '@/components/ui/button';
 import { useIdleTimer } from '@/lib/hooks/useIdleTimer';
 import { SESSION_CONFIG } from '@/lib/security/session-config';
 import { trpc } from '@/trpc/client';
-import { ShieldAlert, Clock, Lock, ShieldCheck } from 'lucide-react';
+import { TRPCClientError } from '@trpc/client';
+import { useToast } from '@/components/ui/toast';
+import { ShieldAlert, Clock, Lock, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 /**
  * Global component that handles inactivity and session timeouts.
@@ -25,20 +27,36 @@ export function IdleTimeoutManager() {
   const { signOut } = useClerk();
   const { isSignedIn } = useAuth();
   const pathname = usePathname();
-  const logSecurityEvent = trpc.user.logSecurityEvent.useMutation();
+  const { showToast } = useToast();
+  const logSecurityEvent = trpc.user.logSecurityEvent.useMutation({
+    // SILENT MUTATION: Prevents tRPC from logging 401 failures to the terminal/console
+    // during session death events. This is "Normal Procedures" for session cleanup.
+    onError: () => {} 
+  });
   
   const [open, setOpen] = useState(false);
   const [isHardLimit, setIsHardLimit] = useState(false);
+  const toastTriggered = useRef(false);
 
   const handleLogout = async (type: 'INACTIVITY_LOGOUT' | 'HARD_SESSION_LOGOUT') => {
     try {
-      // 1. Audit log the event on the server
-      await logSecurityEvent.mutateAsync({ 
-        type, 
-        details: `Auto-logout from ${pathname}` 
-      });
+      // 1. Audit log the event on the server (Only if we still have a frontend session)
+      if (isSignedIn) {
+        await logSecurityEvent.mutateAsync({ 
+          type, 
+          details: `Auto-logout from ${pathname}` 
+        });
+      }
     } catch (e) {
-      console.error('Failed to log security event:', e);
+      if (e instanceof TRPCClientError && e.data?.code === 'UNAUTHORIZED') {
+        // CATEGORY: NORMAL PROCEDURES
+        // The server expired the session before the log could land.
+        console.warn('🛡️ Security: Audit log attempted post-expiry. Session already terminated by server.');
+      } else {
+        // CATEGORY: SYSTEM FAILURE
+        // Actual error (Network issue, Database failure, etc.)
+        console.error('🚨 Security: Critical failure during logout audit:', e);
+      }
     } finally {
       // 2. Perform the actual sign out with context recovery URL
       signOut({ redirectUrl: pathname });
@@ -50,7 +68,7 @@ export function IdleTimeoutManager() {
     onHardLimit: () => handleLogout('HARD_SESSION_LOGOUT'),
   });
 
-  // Sync dialog visibility with warning status
+  // Sync dialog visibility with warning status and trigger "Master Caution" Toast
   useEffect(() => {
     if (status === 'warning') {
       setOpen(true);
@@ -60,8 +78,19 @@ export function IdleTimeoutManager() {
       setIsHardLimit(true);
     } else if (status === 'active') {
       setOpen(false);
+      toastTriggered.current = false; // Reset toast trigger
     }
-  }, [status]);
+
+    // MASTER CAUTION: 60-second secondary warning toast
+    if (timeLeft > 59000 && timeLeft < 61000 && !toastTriggered.current && (status === 'warning' || status === 'hard-limit-warning')) {
+      showToast(
+        `Master Caution: Session will expire in 60s.`, 
+        "info", 
+        { duration: 8000 }
+      );
+      toastTriggered.current = true;
+    }
+  }, [status, timeLeft, showToast]);
 
   // If user is not signed in, this manager is inactive
   if (!isSignedIn) return null;
