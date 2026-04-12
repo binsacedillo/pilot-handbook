@@ -91,24 +91,24 @@ export const footerSections: FooterSection[] = [
 	{
 		title: "Company",
 		links: [
-			{ label: "About", href: "/sign-up" },
-			{ label: "Blog", href: "/sign-up" },
-			{ label: "Contact", href: "/sign-up" },
+			{ label: "About", href: "/about" },
+			{ label: "Blog", href: "/blog" },
+			{ label: "Contact", href: "/contact" },
 		],
 	},
 	{
 		title: "Product",
 		links: [
-			{ label: "Features", href: "/sign-up" },
-			{ label: "FAQ", href: "/sign-up" },
+			{ label: "Features", href: "/#features" },
+			{ label: "FAQ", href: "/#faq" },
 		],
 	},
 	{
 		title: "Legal",
 		links: [
-			{ label: "Privacy", href: "/sign-up" },
-			{ label: "Terms", href: "/sign-up" },
-			{ label: "Security", href: "/sign-up" },
+			{ label: "Privacy", href: "/privacy" },
+			{ label: "Terms", href: "/terms" },
+			{ label: "Security", href: "/privacy" },
 		],
 	},
 ];

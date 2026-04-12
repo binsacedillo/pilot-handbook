@@ -11,7 +11,16 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useToast } from "@/components/ui/toast";
 
-export default function DashboardPageClient() {
+export default function DashboardPageClient({ 
+  initialData 
+}: { 
+  initialData: {
+    stats: any;
+    summary: any;
+    aircraft: any;
+    flights: any;
+  }
+}) {
   const { user, isLoaded } = useUser();
   const { showToast } = useToast();
   const [isOffline, setIsOffline] = useState(false);
@@ -39,26 +48,36 @@ export default function DashboardPageClient() {
       window.removeEventListener("offline", handleOffline);
     };
   }, [showToast]);
+
   const enabled = !!user && isLoaded;
-  const { isLoading: isStatsLoading, data: stats, error: statsError } = trpc.flight.getStats.useQuery(undefined, {
+
+  // Use initialData to provide instant updates while revalidating
+  const { data: stats, error: statsError, isLoading: isStatsLoading } = trpc.flight.getStats.useQuery(undefined, {
     enabled,
-    refetchOnMount: "always",
-    staleTime: 0,
+    initialData: initialData.stats,
+    refetchOnMount: false, // Use prefetched data
+    staleTime: 1000 * 60, // 1 minute
   });
-  const { isLoading: isSummaryLoading, error: summaryError } = trpc.stats.getSummary.useQuery(undefined, {
+
+  const { error: summaryError, isLoading: isSummaryLoading } = trpc.stats.getSummary.useQuery(undefined, {
     enabled,
-    refetchOnMount: "always",
-    staleTime: 0,
+    initialData: initialData.summary,
+    refetchOnMount: false,
+    staleTime: 1000 * 60,
   });
-  const { isLoading: isAircraftLoading, data: aircraft, error: aircraftError } = trpc.aircraft.getAll.useQuery(undefined, {
+
+  const { data: aircraft, error: aircraftError, isLoading: isAircraftLoading } = trpc.aircraft.getAll.useQuery(undefined, {
     enabled,
-    refetchOnMount: "always",
-    staleTime: 0,
+    initialData: initialData.aircraft,
+    refetchOnMount: false,
+    staleTime: 1000 * 60,
   });
-  const { isLoading: isFlightsLoading, data: flights, error: flightsError } = trpc.flight.getAll.useQuery({}, {
+
+  const { data: flights, error: flightsError, isLoading: isFlightsLoading } = trpc.flight.getRecent.useQuery({ limit: 6 }, {
     enabled,
-    refetchOnMount: "always",
-    staleTime: 0,
+    initialData: initialData.flights,
+    refetchOnMount: false,
+    staleTime: 1000 * 60,
   });
 
   useEffect(() => {
@@ -75,7 +94,10 @@ export default function DashboardPageClient() {
       }
     });
   }, [aircraftError, flightsError, showToast, statsError, summaryError]);
-  const isLoading = isStatsLoading || isSummaryLoading || isAircraftLoading || isFlightsLoading || !isLoaded;
+
+  // Individual loading flags for granular skeletons
+  const isCurrencyLoading = isStatsLoading && !stats;
+  const isDashboardContentLoading = !isLoaded;
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col">
@@ -87,34 +109,30 @@ export default function DashboardPageClient() {
               Offline mode: showing cached data. Changes will sync when back online.
             </div>
           )}
+          
           <div className="flex flex-col gap-3 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+              <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Dashboard</h1>
               <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
                 <Link href="/dashboard/analytics">View analytics</Link>
               </Button>
             </div>
-            {/* Pilot Currency Status Card */}
-            {isLoading ? (
-              <>
-                {/* Pilot Currency Skeleton */}
+
+            {/* Pilot Currency Status Card Section */}
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+              {isCurrencyLoading ? (
                 <div className="w-full max-w-md mx-auto mb-4">
-                  <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 mb-1 animate-pulse" />
-                    <span className="font-semibold text-zinc-700 dark:text-zinc-200 text-base">Pilot Currency</span>
-                    <div className="h-7 w-40 my-1 bg-accent animate-pulse rounded" />
-                    <div className="h-6 w-28 mt-1 bg-accent animate-pulse rounded" />
+                  <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow shimmer">
+                    <div className="h-10 w-10 rounded-full bg-accent animate-pulse mb-1" />
+                    <div className="h-5 w-32 bg-accent animate-pulse rounded" />
+                    <div className="h-8 w-48 my-1 bg-accent animate-pulse rounded" />
+                    <div className="h-6 w-24 mt-1 bg-accent animate-pulse rounded" />
                   </div>
                 </div>
-                {/* Full Dashboard Skeleton */}
-                <DashboardSkeleton />
-              </>
-            ) : (
-              <>
-                {/* Pilot Currency Status Card */}
+              ) : (
                 <div className="mb-4">
                   <div className="w-full max-w-md mx-auto">
-                    <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow">
+                    <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow hover:shadow-lg transition-shadow duration-300">
                       <div className={`flex items-center justify-center w-10 h-10 rounded-full mb-1 ${stats?.compliance?.isCurrentForPassengers ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`}>
                         {stats?.compliance?.isCurrentForPassengers ? (
                           <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
@@ -124,31 +142,43 @@ export default function DashboardPageClient() {
                       </div>
                       <span className="font-semibold text-zinc-700 dark:text-zinc-200 text-base">Pilot Currency</span>
                       {stats?.compliance?.isCurrentForPassengers ? (
-                        <span className="inline-block px-3 py-1 rounded font-semibold text-sm mb-1 bg-green-600 text-white">✅ CURRENT / LEGAL TO FLY</span>
+                        <span className="inline-block px-3 py-1 rounded font-semibold text-sm mb-1 bg-green-600 text-white shadow-sm">✅ CURRENT / LEGAL TO FLY</span>
                       ) : (
-                        <span className="inline-block px-3 py-1 rounded font-semibold text-sm mb-1 bg-red-600 text-white">❌ NOT CURRENT / LOG LANDINGS</span>
+                        <span className="inline-block px-3 py-1 rounded font-semibold text-sm mb-1 bg-red-600 text-white shadow-sm">❌ NOT CURRENT / LOG LANDINGS</span>
                       )}
                       <span className="text-lg font-mono font-bold text-zinc-800 dark:text-zinc-100">{stats?.compliance?.totalLandingsLast90Days ?? 0} <span className="text-xs font-normal text-zinc-500">/ 3 Landings</span></span>
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                  <DashboardStatusCards />
-                </div>
-                <DashboardClient
-                  initialStats={stats ?? {
-                    totalFlights: 0,
-                    totalHours: 0,
-                    totalPicHours: 0,
-                    totalDualHours: 0,
-                    totalLandings: 0,
-                    compliance: null,
-                  }}
-                  initialFlights={flights ?? []}
-                  initialAircraft={aircraft ?? []}
-                />
-              </>
-            )}
+              )}
+            </div>
+
+            {/* Status Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <DashboardStatusCards 
+                initialData={{
+                  stats: initialData.stats,
+                  summary: initialData.summary,
+                  aircraft: initialData.aircraft
+                }} 
+              />
+            </div>
+
+            {/* Main Dashboard Client Section */}
+            <div className="animate-in fade-in duration-700 delay-150">
+              <DashboardClient
+                initialStats={stats ?? {
+                  totalFlights: 0,
+                  totalHours: 0,
+                  totalPicHours: 0,
+                  totalDualHours: 0,
+                  totalLandings: 0,
+                  compliance: null,
+                }}
+                initialFlights={flights ?? []}
+                initialAircraft={aircraft ?? []}
+              />
+            </div>
           </div>
         </div>
       </main>

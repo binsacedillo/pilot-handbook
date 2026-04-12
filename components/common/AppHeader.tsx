@@ -1,9 +1,9 @@
 "use client";
 
-import { UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser, SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Plane } from "lucide-react";
+import { Plane, LayoutDashboard } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function AppHeader() {
@@ -12,6 +12,7 @@ export default function AppHeader() {
 	const isAdmin = publicRole === "ADMIN";
 	const pathname = usePathname();
 	const isAdminPage = pathname?.startsWith("/admin");
+	const isMarketingPage = pathname === "/" || pathname?.startsWith("/privacy") || pathname?.startsWith("/terms") || pathname?.startsWith("/about") || pathname?.startsWith("/contact");
 
 	const mainNavItems = [
 		{ label: "Dashboard", href: "/dashboard" },
@@ -25,84 +26,77 @@ export default function AppHeader() {
 			<div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
 				<Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
 					<Plane className="w-6 h-6 text-blue-600" aria-hidden="true" />
-					<span className="hidden sm:inline text-xl font-bold text-slate-900 dark:text-slate-100">Pilot Handbook</span>
-					<span className="sm:hidden text-lg font-bold text-slate-900 dark:text-slate-100">PH</span>
+					<span className="text-xl font-bold text-slate-900 dark:text-slate-100">Pilot Handbook</span>
 				</Link>
 
-				<div className="flex items-center gap-1 sm:gap-4 ml-auto flex-wrap justify-end">
+				<div className="flex items-center gap-1 sm:gap-4 ml-auto">
 					{!isLoaded ? (
-						// Skeleton placeholder while auth is loading
 						<div className="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
 					) : (
 						<>
-							{!isAdminPage && (
-								<>
-									{mainNavItems.map((item) => {
-										const isActive = pathname === item.href;
-										return (
-											<Link
-												key={item.href}
-												href={item.href}
-												prefetch={false}
-												className="shrink-0"
-											>
-												<Button
-													variant="ghost"
-													data-active={isActive ? "true" : undefined}
-													aria-current={isActive ? "page" : undefined}
-													className={`text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-10 ${isActive ? "bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-slate-50 hover:bg-slate-200 dark:hover:bg-slate-800" : ""}`}
-												>
-													{item.label}
-												</Button>
-											</Link>
-										);
-									})}
-								</>
-							)}
-
-							{isAdminPage && isAdmin && (
-								<>
-									<Link href="/admin" className="shrink-0">
-										<Button
-											variant={pathname === "/admin" ? "default" : "ghost"}
-											className={`text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-10 ${pathname === "/admin" ? "" : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
-										>
-											Admin Panel
+							<SignedOut>
+								<div className="flex items-center gap-2 sm:gap-4">
+									<Link href="/sign-in">
+										<Button variant="ghost" className="text-sm font-medium">Sign In</Button>
+									</Link>
+									<Link href="/sign-up">
+										<Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-2 sm:px-4">
+											Get Started
 										</Button>
 									</Link>
+								</div>
+							</SignedOut>
 
-									<Link href="/dashboard" className="shrink-0 ml-auto">
-										<Button
-											variant="ghost"
-											aria-label="Back to dashboard"
-											className="text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-10"
-										>
-											<span className="hidden sm:inline">← Back to Dashboard</span>
-											<span className="sm:hidden" aria-hidden="true">← Back</span>
-										</Button>
-									</Link>
-								</>
-							)}
+							<SignedIn>
+								<div className="flex items-center gap-1 sm:gap-4">
+									{!isAdminPage && (
+										<div className="hidden md:flex items-center gap-1">
+											{mainNavItems.map((item) => {
+												const isActive = pathname === item.href;
+												return (
+													<Link key={item.href} href={item.href} prefetch={false}>
+														<Button
+															variant="ghost"
+															className={`text-slate-700 dark:text-slate-200 text-sm px-3 h-9 ${isActive ? "bg-slate-100 dark:bg-slate-800 font-semibold" : ""}`}
+														>
+															{item.label}
+														</Button>
+													</Link>
+												);
+											})}
+										</div>
+									)}
 
-							<div className="shrink-0">
-								<UserButton afterSignOutUrl="/">
-									<UserButton.MenuItems>
-										<UserButton.Link
-											label="Settings"
-											labelIcon={<span>⚙️</span>}
-											href="/settings"
-										/>
-										<UserButton.Action label="manageAccount" />
-										{isAdmin && (
-											<UserButton.Link
-												label="Admin Panel"
-												labelIcon={<span>👑</span>}
-												href="/admin"
-											/>
-										)}
-									</UserButton.MenuItems>
-								</UserButton>
-							</div>
+									{isAdminPage && isAdmin && (
+										<Link href="/dashboard">
+											<Button variant="ghost" className="text-sm">
+												<LayoutDashboard className="w-4 h-4 mr-2" />
+												Dashboard
+											</Button>
+										</Link>
+									)}
+
+									{(isMarketingPage || isAdminPage) && !isAdminPage && (
+										<Link href="/dashboard">
+											<Button variant="outline" className="text-sm font-medium border-blue-600 text-blue-600 hover:bg-blue-50">
+												Go to Dashboard
+											</Button>
+										</Link>
+									)}
+
+									<div className="shrink-0 ml-2">
+										<UserButton afterSignOutUrl="/">
+											<UserButton.MenuItems>
+												<UserButton.Link label="Settings" labelIcon={<span>⚙️</span>} href="/settings" />
+												<UserButton.Action label="manageAccount" />
+												{isAdmin && (
+													<UserButton.Link label="Admin Panel" labelIcon={<span>👑</span>} href="/admin" />
+												)}
+											</UserButton.MenuItems>
+										</UserButton>
+									</div>
+								</div>
+							</SignedIn>
 						</>
 					)}
 				</div>

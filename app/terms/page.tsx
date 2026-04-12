@@ -1,16 +1,16 @@
 import AppHeader from "@/components/common/AppHeader";
-import AppFooter from "@/components/common/AppFooter";
+import Footer from "@/components/landing/Footer";
 
 export default function TermsPage() {
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950">
       <AppHeader />
-      <section
-        className="max-w-3xl mx-auto my-12 md:my-20 px-4 md:px-8 py-10 md:py-16 bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        aria-labelledby="terms-title"
-        tabIndex={-1}
-      >
-        <header className="mb-8 text-center">
+      <main className="flex-grow py-12 px-4 md:px-6">
+        <section
+          className="max-w-4xl mx-auto px-6 md:px-12 py-12 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800"
+          aria-labelledby="terms-title"
+        >
+          <header className="mb-12 text-center">
           <h1
             id="terms-title"
             className="text-3xl md:text-4xl font-extrabold text-blue-700 dark:text-blue-300 mb-2 tracking-tight"
@@ -60,7 +60,8 @@ export default function TermsPage() {
           </section>
         </div>
       </section>
-      <AppFooter />
-    </>
+      </main>
+      <Footer />
+    </div>
   );
 }

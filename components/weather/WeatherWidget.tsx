@@ -38,7 +38,7 @@ interface WeatherWidgetProps {
     temperature: number | null;
     dewpoint: number | null;
     time: string;
-  };
+  } | null;
   isLoading?: boolean;
   error?: string | null;
   onAirportChange?: (icao: string) => void;
@@ -93,29 +93,7 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
     }
   };
 
-  const category = metar.flightCategory || "UNKNOWN";
-  const windDirection =
-    metar.wind.direction !== null && metar.wind.direction !== undefined
-      ? `${metar.wind.direction.toString().padStart(3, "0")}°`
-      : "VRB";
-  const windSpeed = metar.wind.speed !== null && metar.wind.speed !== undefined ? `${metar.wind.speed} ${metar.wind.unit}` : "Calm";
-  const windGust = metar.wind.gust ? ` G${metar.wind.gust}` : "";
-  const visibility =
-    metar.visibility.value !== null && metar.visibility.value !== undefined ? `${metar.visibility.value} ${metar.visibility.unit}` : "—";
-  const ceiling = metar.ceiling.value !== null && metar.ceiling.value !== undefined ? `${metar.ceiling.value} ${metar.ceiling.unit}` : "Unlimited";
-  const temperature = metar.temperature !== null && metar.temperature !== undefined ? `${metar.temperature}°C` : "—";
-  const dewpoint = metar.dewpoint !== null && metar.dewpoint !== undefined ? `${metar.dewpoint}°C` : "—";
-  const updatedTime = metar.time ? new Date(metar.time).toLocaleTimeString() : "—";
-
-  // Conditional header logic
-  const showHeader = metar.icao === metar.station ? metar.station : `${metar.station} - ${metar.icao}`;
-
-  if (isLoading) {
-    // Suggestion: The class `bg-gradient-to-br` can be written as `bg-linear-to-br` (suggestCanonicalClasses)
-    // .bg-gradient-to-br {
-    //   --tw-gradient-position: to bottom right in oklab;
-    //   background-image: linear-gradient(var(--tw-gradient-stops));
-    // }
+  if (isLoading || !metar) {
     return (
       <Card className="rounded-xl border bg-linear-to-br from-slate-900/80 via-slate-900/60 to-slate-900/20 text-white shadow-lg">
         <CardHeader className="pb-3">
@@ -127,7 +105,9 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-28">
-            <div className="animate-pulse text-slate-200">Loading weather...</div>
+            <div className="animate-pulse text-slate-200">
+              {isLoading ? "Fetching weather data..." : "No weather data available"}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -149,6 +129,23 @@ export function WeatherWidget({ metar, isLoading, error, onAirportChange, onRese
       </Card>
     );
   }
+
+  const category = metar.flightCategory || "UNKNOWN";
+  const windDirection =
+    metar.wind.direction !== null && metar.wind.direction !== undefined
+      ? `${metar.wind.direction.toString().padStart(3, "0")}°`
+      : "VRB";
+  const windSpeed = metar.wind.speed !== null && metar.wind.speed !== undefined ? `${metar.wind.speed} ${metar.wind.unit}` : "Calm";
+  const windGust = metar.wind.gust ? ` G${metar.wind.gust}` : "";
+  const visibility =
+    metar.visibility.value !== null && metar.visibility.value !== undefined ? `${metar.visibility.value} ${metar.visibility.unit}` : "—";
+  const ceiling = metar.ceiling.value !== null && metar.ceiling.value !== undefined ? `${metar.ceiling.value} ${metar.ceiling.unit}` : "Unlimited";
+  const temperature = metar.temperature !== null && metar.temperature !== undefined ? `${metar.temperature}°C` : "—";
+  const dewpoint = metar.dewpoint !== null && metar.dewpoint !== undefined ? `${metar.dewpoint}°C` : "—";
+  const updatedTime = metar.time ? new Date(metar.time).toLocaleTimeString() : "—";
+
+  // Conditional header logic
+  const showHeader = metar.icao === metar.station ? metar.station : `${metar.station} - ${metar.icao}`;
 
   return (
     <Card className="rounded-xl border bg-linear-to-br from-slate-900/90 via-slate-900/70 to-slate-900/30 text-white shadow-lg w-full max-w-md mx-auto lg:mx-0 lg:max-w-full p-2 lg:p-4">
