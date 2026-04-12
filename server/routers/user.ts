@@ -4,7 +4,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { z } from 'zod';
 
 export const userRouter = createTRPCRouter({
-  // Get current user profile
+  // Get current user profile with PilotProfile
   getProfile: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.user) {
       return null;
@@ -13,6 +13,7 @@ export const userRouter = createTRPCRouter({
       where: { id: ctx.user.id },
       include: {
         userPreferences: true,
+        pilotProfile: true,
       },
     });
     return user;
@@ -28,6 +29,7 @@ export const userRouter = createTRPCRouter({
       where: { id: ctx.user.id },
       include: {
         userPreferences: true,
+        pilotProfile: true,
       },
     });
 
@@ -38,7 +40,6 @@ export const userRouter = createTRPCRouter({
 
     if (!user) {
       // This shouldn't happen since protectedProcedure creates user
-      // But just in case, return ctx.user
       return ctx.user;
     } else if (!user.firstName || !user.lastName || !user.email) {
       // User exists but is missing name/email - update from Clerk
@@ -51,6 +52,7 @@ export const userRouter = createTRPCRouter({
         },
         include: {
           userPreferences: true,
+          pilotProfile: true,
         },
       });
     }
@@ -63,12 +65,41 @@ export const userRouter = createTRPCRouter({
     return { status: 'ok', timestamp: new Date() };
   }),
 
-  // Update user profile (name and license)
+  // Mutation to update the specialized PilotProfile
+  updatePilotProfile: protectedProcedure
+    .input(
+      z.object({
+        licenseNumber: z.string().optional(),
+        licenseType: z.string().optional(),
+        medicalClass: z.number().min(1).max(3).optional(),
+        medicalExpiry: z.coerce.date().optional().nullable(),
+        lastRestDate: z.coerce.date().optional().nullable(),
+        totalHoursGoal: z.number().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
+      }
+      
+      const profile = await ctx.db.pilotProfile.upsert({
+        where: { userId: ctx.user.id },
+        update: input,
+        create: {
+          ...input,
+          userId: ctx.user.id,
+        },
+      });
+
+      return profile;
+    }),
+
+  // Mutation to update basic user name (legacy license field kept for safety)
   updateProfile: protectedProcedure
     .input(
       z.object({
-        firstName: z.string().min(1, 'First name required').optional(),
-        lastName: z.string().min(1, 'Last name required').optional(),
+        firstName: z.string().min(1).optional(),
+        lastName: z.string().min(1).optional(),
         license: z.string().optional().nullable(),
       })
     )
@@ -78,13 +109,10 @@ export const userRouter = createTRPCRouter({
       }
       const user = await ctx.db.user.update({
         where: { id: ctx.user.id },
-        data: {
-          firstName: input.firstName,
-          lastName: input.lastName,
-          license: input.license,
-        },
+        data: input,
         include: {
           userPreferences: true,
+          pilotProfile: true,
         },
       });
       return user;
