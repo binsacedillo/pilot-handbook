@@ -3,6 +3,8 @@ export const dynamic = 'force-dynamic';
 import Navigation from "@/components/landing/Navigation";
 import Hero from "@/components/landing/Hero";
 import NextDynamic from "next/dynamic";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 const Features = NextDynamic(() => import("@/components/landing/Features"), {
   ssr: true,
@@ -23,6 +25,11 @@ const Footer = NextDynamic(() => import("@/components/landing/Footer"), {
 });
 
 export default async function Home() {
+  const { userId } = await auth();
+
+  if (userId) {
+    redirect("/dashboard");
+  }
 
   return (
     <>

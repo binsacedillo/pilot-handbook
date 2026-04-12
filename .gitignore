@@ -45,6 +45,6 @@ next-env.d.ts
 /lib/generated/prisma
 
 # internal docs and dev scripts
-internal-docs/
-/docs/
+# internal-docs/
+# /docs/
 check-db.ts

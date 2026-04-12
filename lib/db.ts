@@ -56,7 +56,16 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
 // Graceful shutdown handler (useful for local development)
 if (process.env.NODE_ENV !== "production") {
   process.on("beforeExit", async () => {
-    await db.$disconnect();
-    await globalForPrisma.pool?.end();
+    try {
+      if (globalForPrisma.prisma) {
+        await db.$disconnect();
+      }
+      if (globalForPrisma.pool) {
+        await globalForPrisma.pool.end();
+        globalForPrisma.pool = undefined;
+      }
+    } catch (e) {
+      // Quietly handle cleanup race conditions
+    }
   });
 }

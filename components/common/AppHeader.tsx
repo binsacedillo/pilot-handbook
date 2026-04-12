@@ -14,7 +14,6 @@ export default function AppHeader() {
 	const isAdminPage = pathname?.startsWith("/admin");
 
 	const mainNavItems = [
-		{ label: "Home", href: "/" },
 		{ label: "Dashboard", href: "/dashboard" },
 		{ label: "Flights", href: "/flights" },
 		{ label: "Aircraft", href: "/aircraft" },
@@ -24,7 +23,7 @@ export default function AppHeader() {
 	return (
 		<nav className="border-b-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 sticky top-0 z-50 shadow">
 			<div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
-				<Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
+				<Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
 					<Plane className="w-6 h-6 text-blue-600" aria-hidden="true" />
 					<span className="hidden sm:inline text-xl font-bold text-slate-900 dark:text-slate-100">Pilot Handbook</span>
 					<span className="sm:hidden text-lg font-bold text-slate-900 dark:text-slate-100">PH</span>
