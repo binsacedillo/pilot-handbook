@@ -89,4 +89,28 @@ export const userRouter = createTRPCRouter({
       });
       return user;
     }),
+  
+  // Log security events (e.g., inactivity logout) for audit purposes
+  logSecurityEvent: protectedProcedure
+    .input(
+      z.object({
+        type: z.enum(['INACTIVITY_LOGOUT', 'HARD_SESSION_LOGOUT', 'MANUAL_LOGOUT']),
+        details: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user) return null;
+
+      const { createAuditLog } = await import('@/lib/audit-logger');
+      
+      await createAuditLog({
+        userId: ctx.user.id,
+        action: 'UPDATE', // Using UPDATE as the closest match for session state changes
+        entityType: 'SESSION',
+        entityId: ctx.user.id,
+        changes: `Security event logged: ${input.type}${input.details ? ` - ${input.details}` : ''}`,
+      });
+
+      return { success: true };
+    }),
 });

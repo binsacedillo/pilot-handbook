@@ -9,6 +9,7 @@ import { ThemeWrapper } from "@/components/providers/ThemeWrapper";
 import DevWarningBanner from "@/components/dev/DevWarningBanner";
 import { FeedbackButton } from "@/components/feedback/feedback-index";
 import { SessionExpirationHandler } from "@/components/SessionExpirationHandler";
+import { IdleTimeoutManager } from "@/components/Security/IdleTimeoutManager";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -86,6 +87,7 @@ export default function RootLayout({
             <TRPCProvider>
               <ClerkProviderClient>
                 <SessionExpirationHandler />
+                <IdleTimeoutManager />
                 <ThemeWrapper>
                   <div className="flex flex-col min-h-screen">
                     <DevWarningBanner />
