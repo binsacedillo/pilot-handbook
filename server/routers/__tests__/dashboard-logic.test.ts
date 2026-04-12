@@ -18,11 +18,19 @@ describe('flightRouter.getStats', () => {
     ctx = createMockContext();
     ctx.user = {
       id: userId,
-      clerkId: ctx.user.clerkId,
-      email: ctx.user.email,
-      role: ctx.user.role,
+      clerkId: 'clerk-1',
+      email: 'pilot@example.com',
+      role: 'USER',
     };
     flightDb = [];
+    // Mock user lookup with profile and flights (Aligned with inclusion pattern)
+    ctx.db.user.findUnique.mockImplementation(() => Promise.resolve({
+      id: userId,
+      clerkId: 'clerk-1',
+      pilotProfile: { id: 'profile-1', userId, medicalExpiry: null, lastRestDate: null },
+      flights: flightDb
+    }));
+
     ctx.db.flight.findMany.mockImplementation(() => Promise.resolve(flightDb));
     caller = createTestCaller(ctx).flight;
   });

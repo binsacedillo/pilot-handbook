@@ -60,6 +60,16 @@ export const createMockContext = (overrides: Overrides = {}) => {
         count: vi.fn(),
         findMany: vi.fn(),
       },
+      pilotProfile: {
+        findUnique: vi.fn(),
+        findFirst: vi.fn(),
+        create: vi.fn(),
+        delete: vi.fn(),
+        update: vi.fn(),
+        count: vi.fn(),
+        findMany: vi.fn(),
+        upsert: vi.fn(),
+      },
       auditLog: {
         create: vi.fn(),
         findMany: vi.fn(),
