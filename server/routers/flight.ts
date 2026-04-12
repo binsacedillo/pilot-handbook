@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 import { idSchema, createFlightSchema, updateFlightSchema } from '@/lib/shared-schemas';
 import { createAuditLog } from '@/lib/audit-logger';
+import { FlightService } from '../services/flight-service';
 
 export const flightRouter = createTRPCRouter({
   // Get all flights for the current user with optional filters
@@ -355,9 +356,8 @@ export const flightRouter = createTRPCRouter({
       });
     }),
 
-  // Get flight statistics with enhanced compliance logic
+  // Get flight statistics with enhanced compliance logic (Delegated to Service)
   getStats: protectedProcedure.query(async ({ ctx }) => {
-    // Return zero stats if user not in database yet
     if (!ctx.user) {
       return {
         totalFlights: 0,
@@ -366,37 +366,19 @@ export const flightRouter = createTRPCRouter({
         totalDualHours: 0,
         totalLandings: 0,
         compliance: null,
+        legality: null,
+        profile: null,
       };
     }
 
-    // All-time stats
-    const flights = await ctx.db.flight.findMany({
-      where: { userId: ctx.user.id },
-      orderBy: { date: 'desc' },
-    });
-
-    const totalFlights = flights.length;
-    const totalHours = flights.reduce((sum, f) => sum + (f.duration ?? 0), 0);
-    const totalPicHours = flights.reduce((sum, f) => sum + (f.picTime ?? 0), 0);
-    const totalDualHours = flights.reduce((sum, f) => sum + (f.dualTime ?? 0), 0);
-    const totalLandings = flights.reduce((sum, f) => sum + ((f.dayLandings ?? 0) + (f.nightLandings ?? 0)), 0);
-
-    // Use Advanced Compliance Engine
-    const { calculateCurrency } = await import('@/lib/compliance-engine');
-    const compliance = calculateCurrency(flights.map(f => ({
-      date: f.date,
-      dayLandings: f.dayLandings,
-      nightLandings: f.nightLandings,
-      duration: f.duration
-    })));
-
-    return {
-      totalFlights,
-      totalHours: parseFloat(totalHours.toFixed(1)),
-      totalPicHours: parseFloat(totalPicHours.toFixed(1)),
-      totalDualHours: parseFloat(totalDualHours.toFixed(1)),
-      totalLandings,
-      compliance,
-    };
+    return FlightService.getStats(ctx.db as any, ctx.user.id);
   }),
+
+  // Get the single next upcoming flight (Delegated to Service)
+  getUpcoming: protectedProcedure
+    .input(z.object({ now: z.string() }))
+    .query(async ({ ctx, input }) => {
+      if (!ctx.user) return null;
+      return FlightService.getUpcomingMission(ctx.db as any, ctx.user.id, input.now);
+    }),
 });
