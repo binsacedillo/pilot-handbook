@@ -1,187 +1,112 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { trpc } from "@/trpc/client";
 import AppHeader from "@/components/common/AppHeader";
 import AppFooter from "@/components/common/AppFooter";
-import DashboardStatusCards from "@/components/dashboard/DashboardStatusCards";
+import PilotLegalityStatus from "@/components/dashboard/PilotLegalityStatus";
 import DashboardClient from "./dashboard-client";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useToast } from "@/components/ui/toast";
+import { type RouterOutputs } from "@/trpc/shared";
 
-export default function DashboardPageClient({ 
-  initialData 
-}: { 
+interface DashboardPageClientProps {
   initialData: {
-    stats: any;
-    summary: any;
-    aircraft: any;
-    flights: any;
-  }
-}) {
-  const { user, isLoaded } = useUser();
-  const { showToast } = useToast();
+    stats?: RouterOutputs["flight"]["getStats"] | null;
+    summary?: RouterOutputs["stats"]["getSummary"] | null;
+    aircraft: RouterOutputs["aircraft"]["getAll"];
+    flights: RouterOutputs["flight"]["getRecent"];
+    upcoming?: RouterOutputs["flight"]["getUpcoming"] | null;
+  };
+}
+
+export default function DashboardPageClient({
+  initialData
+}: DashboardPageClientProps) {
+  const { isLoaded, user } = useUser();
   const [isOffline, setIsOffline] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      setHasMounted(true);
-      if (typeof navigator !== "undefined") {
-        setIsOffline(!navigator.onLine);
-      }
-    });
+    setHasMounted(true);
+    if (typeof navigator !== "undefined") {
+      setIsOffline(!navigator.onLine);
+    }
 
     const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => {
-      setIsOffline(true);
-      showToast("You are offline. Some data may be stale until connection is restored.", "info");
-    };
+    const handleOffline = () => setIsOffline(true);
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
     return () => {
-      cancelAnimationFrame(frame);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [showToast]);
+  }, []);
 
-  const enabled = !!user && isLoaded;
+  if (!isLoaded) return <DashboardSkeleton />;
 
-  // Use initialData to provide instant updates while revalidating
-  const { data: stats, error: statsError, isLoading: isStatsLoading } = trpc.flight.getStats.useQuery(undefined, {
-    enabled,
-    initialData: initialData.stats,
-    refetchOnMount: false, // Use prefetched data
-    staleTime: 1000 * 60, // 1 minute
-  });
-
-  const { error: summaryError, isLoading: isSummaryLoading } = trpc.stats.getSummary.useQuery(undefined, {
-    enabled,
-    initialData: initialData.summary,
-    refetchOnMount: false,
-    staleTime: 1000 * 60,
-  });
-
-  const { data: aircraft, error: aircraftError, isLoading: isAircraftLoading } = trpc.aircraft.getAll.useQuery(undefined, {
-    enabled,
-    initialData: initialData.aircraft,
-    refetchOnMount: false,
-    staleTime: 1000 * 60,
-  });
-
-  const { data: flights, error: flightsError, isLoading: isFlightsLoading } = trpc.flight.getRecent.useQuery({ limit: 6 }, {
-    enabled,
-    initialData: initialData.flights,
-    refetchOnMount: false,
-    staleTime: 1000 * 60,
-  });
-
-  useEffect(() => {
-    const errorMessages: Array<[unknown, string]> = [
-      [statsError, "Failed to load stats. Please retry."],
-      [summaryError, "Failed to load summary data. Please retry."],
-      [aircraftError, "Failed to load aircraft. Please retry."],
-      [flightsError, "Failed to load flights. Please retry."],
-    ];
-
-    errorMessages.forEach(([error, message]) => {
-      if (error) {
-        showToast(message, "error");
-      }
-    });
-  }, [aircraftError, flightsError, showToast, statsError, summaryError]);
-
-  // Individual loading flags for granular skeletons
-  const isCurrencyLoading = isStatsLoading && !stats;
-  const isDashboardContentLoading = !isLoaded;
+  const pilotName = user?.fullName || user?.firstName || "Pilot";
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Decorative Cockpit Glows */}
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-blue-500/5 dark:bg-blue-600/5 blur-[120px] -z-10 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-indigo-500/5 dark:bg-indigo-600/5 blur-[150px] -z-10 pointer-events-none" />
+
       <AppHeader />
-      <main id="main-content" className="flex-1 w-full">
-        <div className="container mx-auto px-2 md:px-4 py-8">
+      
+      <main className="container mx-auto px-4 py-8 relative z-10">
+        <div className="flex flex-col gap-10">
+          
           {hasMounted && isOffline && (
-            <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 text-amber-800 px-4 py-3 text-sm">
-              Offline mode: showing cached data. Changes will sync when back online.
+            <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/5 text-amber-500 px-4 py-3 text-sm backdrop-blur-md animate-pulse">
+              <span className="font-black mr-2">!</span> Offline mode: showing cached data.
             </div>
           )}
-          
-          <div className="flex flex-col gap-3 mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Dashboard</h1>
-              <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
-                <Link href="/dashboard/analytics">View analytics</Link>
+
+          {/* Welcome Area */}
+          <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
+            <div className="space-y-2 animate-in fade-in slide-in-from-left-4 duration-700">
+              <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">
+                DASHBOARD<span className="text-blue-500">.</span>
+              </h1>
+              <p className="text-xs md:text-sm font-bold uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 light:text-slate-500">
+                System Status: <span className="text-emerald-500">ONLINE</span> • 
+                Active Pilot: <span className="text-foreground">{pilotName}</span>
+              </p>
+            </div>
+
+            <div className="flex gap-3 animate-in fade-in slide-in-from-right-4 duration-700">
+              <Button asChild variant="outline" className="h-12 px-6 rounded-xl border-[var(--glass-border)] text-[11px] font-black uppercase tracking-widest hover:border-blue-500/50 transition-all bg-background/50 backdrop-blur-md">
+                <Link href="/flights">Logbook</Link>
+              </Button>
+              <Button asChild className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95">
+                <Link href="/flights?new=true">Log Flight</Link>
               </Button>
             </div>
+          </header>
 
-            {/* Pilot Currency Status Card Section */}
-            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-              {isCurrencyLoading ? (
-                <div className="w-full max-w-md mx-auto mb-4">
-                  <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow shimmer">
-                    <div className="h-10 w-10 rounded-full bg-accent animate-pulse mb-1" />
-                    <div className="h-5 w-32 bg-accent animate-pulse rounded" />
-                    <div className="h-8 w-48 my-1 bg-accent animate-pulse rounded" />
-                    <div className="h-6 w-24 mt-1 bg-accent animate-pulse rounded" />
-                  </div>
-                </div>
-              ) : (
-                <div className="mb-4">
-                  <div className="w-full max-w-md mx-auto">
-                    <div className="flex flex-col items-center text-center gap-2 bg-card p-6 rounded-xl border-2 border-blue-400 dark:border-blue-500 shadow hover:shadow-lg transition-shadow duration-300">
-                      <div className={`flex items-center justify-center w-10 h-10 rounded-full mb-1 ${stats?.compliance?.isCurrentForPassengers ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`}>
-                        {stats?.compliance?.isCurrentForPassengers ? (
-                          <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                        ) : (
-                          <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                        )}
-                      </div>
-                      <span className="font-semibold text-zinc-700 dark:text-zinc-200 text-base">Pilot Currency</span>
-                      {stats?.compliance?.isCurrentForPassengers ? (
-                        <span className="inline-block px-3 py-1 rounded font-semibold text-sm mb-1 bg-green-600 text-white shadow-sm">✅ CURRENT / LEGAL TO FLY</span>
-                      ) : (
-                        <span className="inline-block px-3 py-1 rounded font-semibold text-sm mb-1 bg-red-600 text-white shadow-sm">❌ NOT CURRENT / LOG LANDINGS</span>
-                      )}
-                      <span className="text-lg font-mono font-bold text-zinc-800 dark:text-zinc-100">{stats?.compliance?.totalLandingsLast90Days ?? 0} <span className="text-xs font-normal text-zinc-500">/ 3 Landings</span></span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Status Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <DashboardStatusCards 
-                initialData={{
-                  stats: initialData.stats,
-                  summary: initialData.summary,
-                  aircraft: initialData.aircraft
-                }} 
+          <div className="flex flex-col gap-8">
+            {/* Header: Go/No-Go Status (Full Width) */}
+            <div className="animate-in fade-in slide-in-from-top-4 duration-700">
+              <PilotLegalityStatus
+                pilotName={pilotName}
+                initialStats={initialData.stats ?? undefined}
               />
             </div>
 
-            {/* Main Dashboard Client Section */}
-            <div className="animate-in fade-in duration-700 delay-150">
-              <DashboardClient
-                initialStats={stats ?? {
-                  totalFlights: 0,
-                  totalHours: 0,
-                  totalPicHours: 0,
-                  totalDualHours: 0,
-                  totalLandings: 0,
-                  compliance: null,
-                }}
-                initialFlights={flights ?? []}
-                initialAircraft={aircraft ?? []}
-              />
-            </div>
+            {/* Main Grid: Mission Data & Support (Trench Layout) */}
+            <DashboardClient 
+              initialStats={initialData.stats ?? undefined} 
+              initialFlights={initialData.flights} 
+              initialAircraft={initialData.aircraft}
+              initialUpcoming={initialData.upcoming ?? undefined}
+            />
           </div>
         </div>
       </main>
+      
       <AppFooter />
     </div>
   );
