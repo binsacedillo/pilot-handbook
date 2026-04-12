@@ -12,14 +12,29 @@ model User {
   email           String           @unique
   firstName       String?          @db.VarChar(100)
   lastName        String?          @db.VarChar(100)
-  license         String?          @db.VarChar(50)
-  licenseExpiry   DateTime?
+  license         String?          @db.VarChar(50) // @deprecated - moving to PilotProfile
+  licenseExpiry   DateTime?                         // @deprecated - moving to PilotProfile
   role            UserRole         @default(USER)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   aircraft        Aircraft[]
   flights         Flight[]
   userPreferences UserPreferences?
+  pilotProfile    PilotProfile?
+}
+
+model PilotProfile {
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  licenseNumber  String?   @db.VarChar(50)
+  licenseType    String?   @db.VarChar(50)
+  medicalClass   Int?      @default(3)
+  medicalExpiry  DateTime?
+  lastRestDate   DateTime?
+  totalHoursGoal Float     @default(1500)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Aircraft {
@@ -41,26 +56,26 @@ model Aircraft {
 }
 
 model Flight {
-  id            String   @id @default(uuid())
-  date          DateTime
-  departureCode String   @db.VarChar(4)
-  arrivalCode   String   @db.VarChar(4)
-  duration      Float
-  picTime       Float
-  dualTime      Float
-  landings      Int?     @default(1)
-  remarks       String?  @db.VarChar(500)
-  aircraftId    String
-  userId        String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  dayLandings   Int      @default(0)
-  nightLandings Int      @default(0)
-  isVerified    Boolean  @default(false)
+  id             String   @id @default(uuid())
+  date           DateTime
+  departureCode  String   @db.VarChar(4)
+  arrivalCode    String   @db.VarChar(4)
+  duration       Float
+  picTime        Float
+  dualTime       Float
+  landings       Int?     @default(1)
+  remarks        String?  @db.VarChar(500)
+  aircraftId     String
+  userId         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  dayLandings    Int      @default(0)
+  nightLandings  Int      @default(0)
+  isVerified     Boolean  @default(false)
   instructorName String?  @db.VarChar(100)
-  signatureData String?  @db.Text
-  aircraft      Aircraft @relation(fields: [aircraftId], references: [id])
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  signatureData  String?
+  aircraft       Aircraft @relation(fields: [aircraftId], references: [id])
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, date])
 }
