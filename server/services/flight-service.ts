@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { TRPCError } from "@trpc/server";
 
 /**
  * Service to handle complex flight statistics, legality calculations, and mission detection.

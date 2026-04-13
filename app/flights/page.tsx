@@ -7,6 +7,9 @@ import type { RouterOutputs } from "@/trpc/shared";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import FlightForm from "@/components/flights/FlightForm";
+import { FlightFilterBar } from "@/components/flights/FlightFilterBar";
+import EmptyState from "@/components/common/EmptyState";
+import { cn } from "@/lib/utils";
 import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -16,9 +19,14 @@ import {
   FileDown, FileJson, Upload, CheckCircle, ShieldCheck, Plus 
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { FlightFilterBar } from "@/components/flights/FlightFilterBar";
-import EmptyState from "@/components/common/EmptyState";
 import { useToast } from "@/components/ui/toast";
+import { FlightTable } from "@/components/flights/FlightTable";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { 
+  ChevronDown, 
+  Settings, 
+  LayoutGrid
+} from "lucide-react";
 
 import { exportFlightsToCSV, parseFlightsFromCSV } from "@/lib/csv-utils";
 import dynamic from "next/dynamic";
@@ -45,6 +53,7 @@ export default function FlightsPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [showForm, setShowForm] = useState(false);
+  const [pulseNew, setPulseNew] = useState(false);
   const { showToast } = useToast();
   const userName = user?.fullName || user?.primaryEmailAddress?.emailAddress || "Pilot";
 
@@ -72,12 +81,16 @@ export default function FlightsPage() {
     // URL Cleanup (UX Pro Move): Deep-link detection and query consumption
     if (searchParams.get("new") === "true") {
       setShowForm(true);
+      setPulseNew(true);
       
-      // Clean up the URL to prevent re-opening on refresh
+      // Clean up the URL
       const params = new URLSearchParams(searchParams.toString());
       params.delete("new");
       const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
       router.replace(nextUrl);
+
+      // Disable pulse after animation cycle
+      setTimeout(() => setPulseNew(false), 6000);
     }
   }, [searchParams, router, pathname]);
   
@@ -122,59 +135,108 @@ export default function FlightsPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <AppHeader />
       <main className="flex-1 max-w-6xl mx-auto p-6 md:p-8 w-full">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold">Flights</h1>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-2" onClick={() => {
-              const fileInput = document.createElement('input');
-              fileInput.type = 'file';
-              fileInput.accept = '.csv';
-              fileInput.onchange = async (e) => {
-                const file = (e.target as HTMLInputElement).files?.[0];
-                if (file) {
-                   try {
-                     const data = await parseFlightsFromCSV(file);
-                     showToast(`Parsed ${data.length} flights from CSV (Import logic would go here)`, "success");
-                     // Note: Real import would involve calling a multi-create mutation
-                   } catch {
-                     showToast("Failed to parse CSV", "error");
-                   }
-                }
-              };
-              fileInput.click();
-            }}>
-              <Upload className="w-4 h-4" /> Import CSV
-            </Button>
-            
-            <Button variant="outline" size="sm" className="gap-2" onClick={() => exportFlightsToCSV(filteredRows)}>
-              <FileJson className="w-4 h-4" /> Export CSV
-            </Button>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground uppercase italic">
+              FLIGHT LOGS<span className="text-blue-500">.</span>
+            </h1>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
+              {filteredRows.length} Missions Recorded • {userName}
+            </p>
+          </div>
 
-            {isMounted && (
-              <PDFDownloadLink
-                document={<FlightPDF flights={filteredRows} userName={userName} />}
-                fileName={`flights_report_${new Date().toISOString().split('T')[0]}.pdf`}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Secondary/Admin Actions Dropdown */}
+            <div className="relative group/ops">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-11 px-4 rounded-xl border border-[var(--glass-border)] bg-zinc-900/5 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-500 gap-2"
               >
-                {({ loading }) => (
-                  <Button variant="outline" size="sm" className="gap-2" disabled={loading}>
-                    <FileDown className="w-4 h-4" /> {loading ? "Preparing PDF..." : "Export PDF"}
-                  </Button>
-                )}
-              </PDFDownloadLink>
-            )}
+                <Settings className="w-3.5 h-3.5" />
+                Operations
+                <ChevronDown className="w-3 h-3 transition-transform group-hover/ops:rotate-180" />
+              </Button>
+              
+              <div className="absolute right-0 top-full mt-2 w-48 py-2 bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] rounded-xl shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover/ops:opacity-100 group-hover/ops:translate-y-0 group-hover/ops:pointer-events-auto transition-all duration-300 z-50">
+                <button 
+                  className="w-full px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-500 hover:bg-blue-500/10 transition-colors flex items-center gap-3"
+                  onClick={() => {
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.accept = '.csv';
+                    fileInput.onchange = async (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (file) {
+                         try {
+                           const data = await parseFlightsFromCSV(file);
+                           showToast(`Parsed ${data.length} flights from CSV (Import logic pending)`, "success");
+                         } catch {
+                           showToast("Failed to parse CSV", "error");
+                         }
+                      }
+                    };
+                    fileInput.click();
+                  }}
+                >
+                  <Upload className="w-3.5 h-3.5" /> Import CSV
+                </button>
+                
+                <div className="h-[1px] bg-[var(--glass-border)] my-1" />
+                
+                <button 
+                  className="w-full px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-500 hover:bg-blue-500/10 transition-colors flex items-center gap-3"
+                  onClick={() => exportFlightsToCSV(filteredRows)}
+                >
+                  <FileJson className="w-3.5 h-3.5" /> Export CSV
+                </button>
 
-            <Button onClick={() => setShowForm(true)} className="gap-2">
+                {isMounted && (
+                  <PDFDownloadLink
+                    document={<FlightPDF flights={filteredRows} userName={userName} />}
+                    fileName={`flights_report_${new Date().toISOString().split('T')[0]}.pdf`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    {({ loading }) => (
+                      <button 
+                        className="w-full px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-500 hover:bg-blue-500/10 transition-colors flex items-center gap-3 disabled:opacity-50"
+                        disabled={loading}
+                      >
+                        <FileDown className="w-3.5 h-3.5" /> {loading ? "Generating..." : "Download PDF"}
+                      </button>
+                    )}
+                  </PDFDownloadLink>
+                )}
+              </div>
+            </div>
+
+            {/* Primary Action */}
+            <Button 
+              onClick={() => setShowForm(true)} 
+              className="h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95 gap-2"
+            >
               <Plus className="w-4 h-4" /> Log New Flight
             </Button>
           </div>
         </div>
+
         {showForm && (
-          <div className="mb-8 bg-card border-2 border-blue-400 dark:border-blue-500 rounded-lg shadow p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Log New Flight</h2>
-              <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>Close</Button>
-            </div>
-            <FlightForm />
+          <div className={cn(
+            "mb-10 animate-in fade-in slide-in-from-top-4 duration-500",
+            pulseNew && "animate-master-caution"
+          )}>
+            <GlassCard className="relative border-blue-500/20">
+              <div className="px-6 py-4 border-b border-[var(--glass-border)] flex justify-between items-center bg-blue-500/5">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                  <h2 className="text-xs font-black uppercase tracking-widest text-blue-500">Mission Entry Panel</h2>
+                </div>
+                <Button size="sm" variant="ghost" className="h-8 text-[10px] font-black uppercase tracking-wider text-zinc-500 hover:text-foreground" onClick={() => setShowForm(false)}>Abort Entry</Button>
+              </div>
+              <div className="p-6">
+                <FlightForm />
+              </div>
+            </GlassCard>
           </div>
         )}
 
@@ -196,90 +258,23 @@ export default function FlightsPage() {
         />
 
         {filteredRows.length === 0 ? (
-          <EmptyState
-            icon="✈️"
-            title="No Flights Logged Yet"
-            description="Start building your logbook by logging your first flight. Track your hours, currencies, and achievements."
-            action={{
-              label: "Log Your First Flight",
-              onClick: () => setShowForm(true),
-            }}
-          />
-        ) : (
-          <div className="bg-card text-foreground rounded-lg border-2 border-orange-500 dark:border-orange-400 shadow overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead className="bg-muted text-muted-foreground text-left">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">Date</th>
-                  <th className="px-4 py-3 font-semibold">Route</th>
-                  <th className="px-4 py-3 font-semibold">Aircraft</th>
-                  <th className="px-4 py-3 font-semibold">Hours</th>
-                  <th className="px-4 py-3 font-semibold">PIC</th>
-                  <th className="px-4 py-3 font-semibold">Dual</th>
-                  <th className="px-4 py-3 font-semibold">Landings</th>
-                  <th className="px-4 py-3 font-semibold text-center">Status</th>
-                  <th className="px-4 py-3 font-semibold">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredRows.map((f: RouterOutputs["flight"]["getAll"][number]) => {
-                  return (
-                    <tr key={f.id} className="border-t border-border hover:bg-muted transition-colors">
-                      <td className="px-4 py-3">{new Date(f.date).toLocaleDateString()}</td>
-                      <td className="px-4 py-3">
-                        {f.departureCode} → {f.arrivalCode}
-                      </td>
-                      <td className="px-4 py-3">{f.aircraft?.registration}</td>
-                      <td className="px-4 py-3">{f.duration}h</td>
-                      <td className="px-4 py-3">{f.picTime}</td>
-                      <td className="px-4 py-3">{f.dualTime}</td>
-                      <td className="px-4 py-3">{f.landings}</td>
-                      <td className="px-4 py-3 text-center">
-                        {f.isVerified ? (
-                          <div className="flex justify-center" title={`Verified by ${f.instructorName || 'Instructor'}`}>
-                            <ShieldCheck className="w-5 h-5 text-green-500" />
-                          </div>
-                        ) : (
-                          <div className="flex justify-center opacity-20" title="Unverified">
-                            <CheckCircle className="w-5 h-5" />
-                          </div>
-                        )}
-                      </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Link href={`/flights/${f.id}/edit`}>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-primary hover:bg-muted/60"
-                            title="Edit flight"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        </Link>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-destructive hover:bg-destructive/10"
-                          onClick={() =>
-                            handleDeleteClick(
-                              f.id,
-                              `${f.departureCode} → ${f.arrivalCode}`
-                            )
-                          }
-                          disabled={deleteMutation.isPending}
-                          title="Delete flight"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-12 bg-[var(--glass-bg)]/30 backdrop-blur-sm">
+            <EmptyState
+              icon="✈️"
+              title="No Flights Logged Yet"
+              description="Start building your logbook by logging your first flight. Track your hours, currencies, and achievements."
+              action={{
+                label: "Log Your First Flight",
+                onClick: () => setShowForm(true),
+              }}
+            />
           </div>
+        ) : (
+          <FlightTable 
+            flights={filteredRows}
+            onDelete={handleDeleteClick}
+            isDeleting={deleteMutation.isPending}
+          />
         )}
       </main>
       <AppFooter />
