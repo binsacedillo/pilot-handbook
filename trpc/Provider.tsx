@@ -98,7 +98,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
           // 5 second timeout for HTTP requests
           fetch(url, options) {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
 
             return fetch(url, {
               ...options,

@@ -46,9 +46,17 @@ export function useIdleTimer({ onIdle, onHardLimit, onWarning }: UseIdleTimerPro
   }, []);
 
   useEffect(() => {
-    // Initialize session start time if not present
-    if (!localStorage.getItem(SESSION_CONFIG.STORAGE_KEY_SESSION_START)) {
-      localStorage.setItem(SESSION_CONFIG.STORAGE_KEY_SESSION_START, Date.now().toString());
+    // Initialize session start time if not present or too old (Security Best Practice)
+    const nowOnMount = Date.now();
+    const storedStart = localStorage.getItem(SESSION_CONFIG.STORAGE_KEY_SESSION_START);
+    const storedActivity = localStorage.getItem(SESSION_CONFIG.STORAGE_KEY_LAST_ACTIVITY);
+
+    if (!storedStart || (nowOnMount - parseInt(storedStart)) > SESSION_CONFIG.MAX_SESSION_MS) {
+      localStorage.setItem(SESSION_CONFIG.STORAGE_KEY_SESSION_START, nowOnMount.toString());
+      localStorage.setItem(SESSION_CONFIG.STORAGE_KEY_LAST_ACTIVITY, nowOnMount.toString());
+    } else if (storedActivity && (nowOnMount - parseInt(storedActivity)) > SESSION_CONFIG.IDLE_TIMEOUT_MS) {
+      // If idle for too long, we also reset start to prevent immediate hard-limit but keep logic consistent
+      localStorage.setItem(SESSION_CONFIG.STORAGE_KEY_LAST_ACTIVITY, nowOnMount.toString());
     }
 
     // Initialize broadcast channel for multi-tab sync

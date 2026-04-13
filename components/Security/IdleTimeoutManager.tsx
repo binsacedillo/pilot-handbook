@@ -52,6 +52,10 @@ export function IdleTimeoutManager() {
         // CATEGORY: NORMAL PROCEDURES
         // The server expired the session before the log could land.
         console.warn('🛡️ Security: Audit log attempted post-expiry. Session already terminated by server.');
+      } else if (e instanceof Error && e.name === 'AbortError') {
+        // CATEGORY: NORMAL PROCEDURES
+        // Request was aborted (likely due to the 5-10s tRPC timeout or page navigation).
+        console.warn('🛡️ Security: Audit log aborted. Proceeding with immediate sign-out for safety.');
       } else {
         // CATEGORY: SYSTEM FAILURE
         // Actual error (Network issue, Database failure, etc.)
