@@ -13,3 +13,30 @@
   --glass-bezel: inset 0 1px 1px rgba(255, 255, 255, 0.03);
   --annunciator-glow: 0 0 12px;
 }
+
+@keyframes master-caution-pulse {
+  0% { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
+  50% { border-color: rgba(245, 158, 11, 0.8); box-shadow: 0 0 15px 1px rgba(245, 158, 11, 0.2); }
+  100% { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
+}
+
+.animate-master-caution {
+  animation: master-caution-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.glass-sticky-header {
+  @apply sticky top-0 z-30 backdrop-blur-md bg-[var(--glass-bg)] border-b border-[var(--glass-border)];
+}
+
+/* Annunciator Styles */
+.annunciator-verified {
+  @apply bg-emerald-500/10 border-emerald-500/30 text-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.1)];
+}
+
+.annunciator-pending {
+  @apply bg-zinc-500/5 border-zinc-500/20 text-zinc-500/80;
+}
+
+.annunciator-flag {
+  @apply bg-amber-500/10 border-amber-500/30 text-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.1)];
+}
