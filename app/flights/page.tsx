@@ -141,7 +141,7 @@ export default function FlightsPage() {
               FLIGHT LOGS<span className="text-blue-500">.</span>
             </h1>
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
-              {filteredRows.length} Missions Recorded • {userName}
+              {filteredRows.length} Flights Logged • {userName}
             </p>
           </div>
 
@@ -229,7 +229,7 @@ export default function FlightsPage() {
               <div className="px-6 py-4 border-b border-[var(--glass-border)] flex justify-between items-center bg-blue-500/5">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                  <h2 className="text-xs font-black uppercase tracking-widest text-blue-500">Mission Entry Panel</h2>
+                  <h2 className="text-xs font-black uppercase tracking-widest text-blue-500">Flight Entry Panel</h2>
                 </div>
                 <Button size="sm" variant="ghost" className="h-8 text-[10px] font-black uppercase tracking-wider text-zinc-500 hover:text-foreground" onClick={() => setShowForm(false)}>Abort Entry</Button>
               </div>

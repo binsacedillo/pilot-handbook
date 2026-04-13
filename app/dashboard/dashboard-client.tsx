@@ -176,7 +176,7 @@ export default function DashboardClient({ initialStats, initialFlights, initialA
             <GlassCardHeader>
                <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 light:text-slate-500 flex items-center gap-2">
                  <Calendar className="w-3 h-3 text-emerald-500" />
-                 Upcoming Mission
+                 Upcoming Flight
                </h2>
             </GlassCardHeader>
             <GlassCardContent className="space-y-4">
@@ -214,7 +214,7 @@ export default function DashboardClient({ initialStats, initialFlights, initialA
                    </div>
                    <Button asChild variant="outline" size="sm" className="w-full h-9 text-[10px] font-black uppercase tracking-widest border-[var(--glass-border)] text-zinc-500 dark:text-zinc-500 hover:text-blue-500 hover:border-blue-500/30 transition-all bg-background/50">
                      <Link href="/flights?new=true">
-                       Schedule Mission
+                       Schedule Flight
                      </Link>
                    </Button>
                  </div>
