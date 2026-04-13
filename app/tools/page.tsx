@@ -60,7 +60,7 @@ export default function ToolsDashboard() {
           </div>
 
           <div className="animate-in fade-in slide-in-from-right-4 duration-700">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900/5 dark:bg-white/5 border border-[var(--glass-border)] backdrop-blur-md">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900/5 dark:bg-white/5 border border-(--glass-border) backdrop-blur-md">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">System Ready</span>
             </div>
@@ -79,7 +79,7 @@ export default function ToolsDashboard() {
             >
               <GlassCard className="h-full flex flex-col hover:border-blue-500/50 transition-all duration-500 overflow-hidden relative group p-1">
                 {tool.status === "Coming Soon" && (
-                  <div className="absolute top-6 right-6 bg-zinc-900/10 dark:bg-white/5 text-[9px] uppercase font-black px-2 py-1 rounded-lg tracking-widest text-zinc-500 border border-[var(--glass-border)]">
+                  <div className="absolute top-6 right-6 bg-zinc-900/10 dark:bg-white/5 text-[9px] uppercase font-black px-2 py-1 rounded-lg tracking-widest text-zinc  -500 border border-(--glass-border)">
                     Planned
                   </div>
                 )}

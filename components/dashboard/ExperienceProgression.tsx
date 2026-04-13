@@ -13,7 +13,7 @@ export default function ExperienceProgression({ totalHours, goalHours = 1500 }: 
   const percentage = Math.min(100, (totalHours / goalHours) * 100);
   
   return (
-    <div className="bg-[var(--glass-bg)] rounded-2xl border border-[var(--glass-border)] p-6 overflow-hidden relative shadow-[var(--glass-bezel)] backdrop-blur-xl">
+    <div className="bg-(--glass-bg) rounded-2xl border border-(--glass-border) p-6 overflow-hidden relative shadow-(--glass-bezel) backdrop-blur-xl">
       {/* Background Glow */}
       <div className="absolute -right-20 -top-20 w-64 h-64 bg-blue-500/2 dark:bg-blue-500/2 light:bg-blue-500/5 blur-[100px] pointer-events-none" />
 
@@ -37,7 +37,7 @@ export default function ExperienceProgression({ totalHours, goalHours = 1500 }: 
         </div>
       </div>
 
-      <div className="relative h-4 w-full bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-200 rounded-full border border-[var(--glass-border)] shadow-inner overflow-hidden">
+      <div className="relative h-4 w-full bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-200 rounded-full border border-(--glass-border) shadow-inner overflow-hidden">
         {/* Progress Bar with glow */}
         <div 
           className="h-full bg-linear-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-1000 ease-out relative"
@@ -49,7 +49,7 @@ export default function ExperienceProgression({ totalHours, goalHours = 1500 }: 
 
       <div className="mt-4 grid grid-cols-2 gap-4">
         <div className="flex items-center gap-3">
-            <div className="p-2 bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-200 border border-[var(--glass-border)] rounded-lg">
+            <div className="p-2 bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-200 border border-(--glass-border) rounded-lg">
                 <Clock className="w-4 h-4 text-zinc-400 dark:text-zinc-400 light:text-slate-600" />
             </div>
             <div className="flex flex-col">
@@ -58,7 +58,7 @@ export default function ExperienceProgression({ totalHours, goalHours = 1500 }: 
             </div>
         </div>
         <div className="flex items-center gap-3">
-            <div className="p-2 bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-200 border border-[var(--glass-border)] rounded-lg">
+            <div className="p-2 bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-200 border border-(--glass-border) rounded-lg">
                 <TrendingUp className="w-4 h-4 text-emerald-500" />
             </div>
             <div className="flex flex-col">

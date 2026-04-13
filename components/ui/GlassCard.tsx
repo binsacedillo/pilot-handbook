@@ -16,7 +16,7 @@ export function GlassCard({ children, className, bezel = true, ...props }: Glass
     <div
       className={cn(
         "relative overflow-hidden rounded-2xl transition-all duration-300 backdrop-blur-xl",
-        "bg-[var(--glass-bg)] border border-[var(--glass-border)] text-foreground shadow-[var(--glass-bezel)]",
+        "bg-(--glass-bg) border border-(--glass-border) text-foreground shadow-(--glass-bezel)",
         className
       )}
       {...props}
@@ -33,7 +33,7 @@ export function GlassCard({ children, className, bezel = true, ...props }: Glass
 
 export function GlassCardHeader({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("px-6 py-4 border-b border-[var(--glass-border)]", className)}>
+    <div className={cn("px-6 py-4 border-b border-(--glass-border)", className)}>
       {children}
     </div>
   );

@@ -103,10 +103,10 @@ export default function DashboardClient({ initialStats, initialFlights, initialA
                   {flights.slice(0, 4).map((flight: any) => (
                     <div 
                       key={flight.id} 
-                      className="group flex items-center justify-between p-3 rounded-xl border border-[var(--glass-border)] bg-zinc-900/10 dark:bg-zinc-900/20 light:bg-slate-50 hover:bg-zinc-900/50 dark:hover:bg-zinc-900/50 light:hover:bg-slate-100 hover:border-blue-500/30 transition-all duration-300"
+                      className="group flex items-center justify-between p-3 rounded-xl border border-(--glass-border) bg-zinc-900/10 dark:bg-zinc-900/20 light:bg-slate-50 hover:bg-zinc-900/50 dark:hover:bg-zinc-900/50 light:hover:bg-slate-100 hover:border-blue-500/30 transition-all duration-300"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-zinc-900 dark:bg-zinc-900 light:bg-slate-200 border border-[var(--glass-border)] flex items-center justify-center text-xs font-black text-zinc-500 dark:text-zinc-500 light:text-slate-600 group-hover:text-blue-500 transition-colors">
+                        <div className="w-10 h-10 rounded-lg bg-zinc-900 dark:bg-zinc-900 light:bg-slate-200 border border-(--glass-border) flex items-center justify-center text-xs font-black text-zinc-500 dark:text-zinc-500 light:text-slate-600 group-hover:text-blue-500 transition-colors">
                           {flight.aircraft?.registration.substring(0, 2)}
                         </div>
                         <div>
@@ -212,7 +212,7 @@ export default function DashboardClient({ initialStats, initialFlights, initialA
                    <div className="text-[10px] font-black text-zinc-500 dark:text-zinc-600 uppercase tracking-[0.2em] mb-4 text-center">
                      [ NO ACTIVE FLIGHT PLAN DETECTED ]
                    </div>
-                   <Button asChild variant="outline" size="sm" className="w-full h-9 text-[10px] font-black uppercase tracking-widest border-[var(--glass-border)] text-zinc-500 dark:text-zinc-500 hover:text-blue-500 hover:border-blue-500/30 transition-all bg-background/50">
+                   <Button asChild variant="outline" size="sm" className="w-full h-9 text-[10px] font-black uppercase tracking-widest border-(--glass-border) text-zinc-500 dark:text-zinc-500 hover:text-blue-500 hover:border-blue-500/30 transition-all bg-background/50">
                      <Link href="/flights?new=true">
                        Schedule Flight
                      </Link>
@@ -225,7 +225,7 @@ export default function DashboardClient({ initialStats, initialFlights, initialA
 
         {/* 3. Pilot Profile Summary */}
         <section className="animate-in fade-in slide-in-from-right-4 duration-700 delay-300">
-          <GlassCard bezel={true} className="bg-[var(--glass-bg)] dark:bg-zinc-950/60 light:bg-slate-50 overflow-hidden">
+          <GlassCard bezel={true} className="bg-(--glass-bg) dark:bg-zinc-950/60 light:bg-slate-50 overflow-hidden">
              <GlassCardContent className="p-0">
                 {/* Header Section */}
                 <div className="p-6 pb-4 flex items-center gap-5">
@@ -245,7 +245,7 @@ export default function DashboardClient({ initialStats, initialFlights, initialA
                    <ProfileMetric label="Ikaros ID" value={stats?.profile?.id.substring(0, 8).toUpperCase() || "N/A"} />
                    
                    <div className="pt-4">
-                     <Button asChild variant="outline" className="w-full justify-between h-11 text-[10px] font-black uppercase tracking-[0.2em] border-[var(--glass-border)] text-zinc-500 dark:text-zinc-400 light:text-slate-500 hover:text-blue-500 hover:border-blue-500/30 transition-all bg-background/50">
+                     <Button asChild variant="outline" className="w-full justify-between h-11 text-[10px] font-black uppercase tracking-[0.2em] border-(--glass-border) text-zinc-500 dark:text-zinc-400 light:text-slate-500 hover:text-blue-500 hover:border-blue-500/30 transition-all bg-background/50">
                        <Link href="/settings/profile">
                          Edit Pilot Profile <ExternalLink className="w-3 h-3 text-zinc-600 dark:text-zinc-600 light:text-slate-400 group-hover:text-blue-500" />
                        </Link>
@@ -264,7 +264,7 @@ export default function DashboardClient({ initialStats, initialFlights, initialA
 function QuickToolCard({ href, title, desc, color }: { href: string; title: string, desc: string, colorClass?: string; color: string }) {
   return (
     <Link href={href}>
-      <div className="group p-4 rounded-2xl border border-[var(--glass-border)] bg-zinc-900/10 dark:bg-zinc-900/10 light:bg-slate-50/50 hover:border-zinc-500 transition-all duration-300">
+      <div className="group p-4 rounded-2xl border border-(--glass-border) bg-zinc-900/10 dark:bg-zinc-900/10 light:bg-slate-50/50 hover:border-zinc-500 transition-all duration-300">
         <h3 className={cn("text-xs font-bold uppercase tracking-widest mb-1", color)}>{title}</h3>
         <p className="text-[10px] text-zinc-500 dark:text-zinc-500 light:text-slate-500 font-medium group-hover:text-foreground transition-colors">{desc}</p>
       </div>

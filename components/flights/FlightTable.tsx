@@ -16,15 +16,15 @@ interface FlightTableProps {
 
 export function FlightTable({ flights, onDelete, isDeleting }: FlightTableProps) {
   return (
-    <GlassCard className="p-0 overflow-hidden border-[var(--glass-border)] transition-all duration-500 shadow-2xl">
+    <GlassCard className="p-0 overflow-hidden border-(--glass-border) transition-all duration-500 shadow-2xl">
       <div className="overflow-x-auto custom-scrollbar">
         <table className="min-w-full border-collapse">
           <thead>
             <tr className="glass-sticky-header">
-              <th className="sticky left-0 z-40 bg-[var(--glass-bg)] px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 min-w-[120px]">
+              <th className="sticky left-0 z-40 bg-(--glass-bg) px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 min-w-[120px]">
                 Date
               </th>
-              <th className="sticky left-[120px] z-40 bg-[var(--glass-bg)] px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 min-w-[180px]">
+              <th className="sticky left-[120px] z-40 bg-(--glass-bg) px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 min-w-[180px]">
                 Route (DEP → ARR)
               </th>
               <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
@@ -50,7 +50,7 @@ export function FlightTable({ flights, onDelete, isDeleting }: FlightTableProps)
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--glass-border)]">
+          <tbody className="divide-y divide-(--glass-border)">
             {flights.map((f) => {
               return (
                 <tr 

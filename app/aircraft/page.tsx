@@ -148,7 +148,7 @@ export default function AircraftPage() {
           <div className="flex flex-wrap items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-700">
             <label className="flex items-center gap-2 cursor-pointer select-none group">
               <div className={cn(
-                "w-4 h-4 rounded border border-[var(--glass-border)] flex items-center justify-center transition-all",
+                "w-4 h-4 rounded border border-(--glass-border) flex items-center justify-center transition-all",
                 showArchived ? "bg-blue-600 border-blue-600" : "bg-zinc-900/10 dark:bg-white/5"
               )}>
                 <input
@@ -204,7 +204,7 @@ export default function AircraftPage() {
             <p className="text-zinc-500 font-black uppercase tracking-widest text-xs">Loading Fleet Data...</p>
           </GlassCard>
         ) : displayedAircraft.length === 0 ? (
-          <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-12 bg-[var(--glass-bg)]/30 backdrop-blur-sm">
+          <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-12 bg-(--glass-bg)/30 backdrop-blur-sm">
             <EmptyState
               icon={<Plane className="w-16 h-16 text-zinc-500" />}
               title={showArchived ? "No Archived Aircraft" : "No Aircraft Yet"}
@@ -255,7 +255,7 @@ export default function AircraftPage() {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="text-2xl font-black tracking-tighter text-foreground uppercase">{a.registration}</h3>
-                    <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-zinc-900/5 dark:bg-white/5 border border-[var(--glass-border)]">
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-zinc-900/5 dark:bg-white/5 border border-(--glass-border)">
                       <Clock className="w-3 h-3 text-blue-500" />
                       <span className="text-[11px] font-black tracking-widest text-foreground">{a.flightHours.toFixed(1)}H</span>
                     </div>
@@ -265,8 +265,8 @@ export default function AircraftPage() {
                     {a.make} {a.model}
                   </p>
 
-                  <div className="flex gap-2 pt-4 border-t border-[var(--glass-border)]">
-                    <Button asChild variant="outline" className="flex-1 h-10 rounded-xl border-[var(--glass-border)] text-[10px] font-black uppercase tracking-widest hover:border-blue-500/50 transition-all bg-background/50 backdrop-blur-md" disabled={a.isArchived}>
+                  <div className="flex gap-2 pt-4 border-t border-(--glass-border)">
+                    <Button asChild variant="outline" className="flex-1 h-10 rounded-xl border-(--glass-border) text-[10px] font-black uppercase tracking-widest hover:border-blue-500/50 transition-all bg-background/50 backdrop-blur-md" disabled={a.isArchived}>
                       <Link href={`/aircraft/${a.id}/edit`}>
                         <Edit2 className="w-3.5 h-3.5 mr-2" />
                         Configure
@@ -278,7 +278,7 @@ export default function AircraftPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="flex-1 h-10 rounded-xl border-[var(--glass-border)] text-emerald-500 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-500/30"
+                          className="flex-1 h-10 rounded-xl border-(--glass-border) text-emerald-500 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-500/30"
                           onClick={() => handleRestore(a.id)}
                           disabled={restoreMutation.isPending}
                         >

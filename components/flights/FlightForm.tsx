@@ -12,12 +12,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/trpc/client";
+import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast";
 import { isNetworkError, getNetworkErrorMessage, getServerErrorMessage } from "@/lib/error-utils";
 import SignaturePad from "@/components/common/SignaturePad";
-import { PenTool, CheckCircle2 } from "lucide-react";
+import { PenTool, CheckCircle2, CloudSync, LayoutGrid } from "lucide-react";
+import StatusAnnunciator from "@/components/common/StatusAnnunciator";
 
 type FlightFormData = {
   date: string;
@@ -52,6 +54,8 @@ export default function FlightForm({ initialData }: FlightFormProps) {
   const utils = trpc.useUtils();
   const { showToast } = useToast();
   const [showSignaturePad, setShowSignaturePad] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   
   const isEditMode = !!initialData;
 
@@ -121,9 +125,14 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       await utils.flight.getAll.invalidate();
       await utils.flight.getStats.invalidate();
     },
-    onSuccess: () => {
-      showToast("Flight created successfully.", "success");
-      router.push("/flights");
+    onSuccess: (data) => {
+      setIsSuccess(true);
+      setSuccessMessage(`FLIGHT LOG CREATED // ${data?.departureCode} -> ${data?.arrivalCode} // SYNC COMPLETE`);
+      
+      // Delay redirect for satisfying feedback
+      setTimeout(() => {
+        router.push("/flights");
+      }, 1500);
     },
   });
 
@@ -168,9 +177,14 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       await utils.flight.getAll.invalidate();
       await utils.flight.getStats.invalidate();
     },
-    onSuccess: () => {
-      showToast("Flight updated successfully.", "success");
-      router.push("/flights");
+    onSuccess: (data) => {
+      setIsSuccess(true);
+      setSuccessMessage(`FLIGHT LOG UPDATED // ${data?.departureCode} -> ${data?.arrivalCode} // DATA INTEGRITY VERIFIED`);
+      
+      // Delay redirect for satisfying feedback
+      setTimeout(() => {
+        router.push("/flights");
+      }, 1500);
     },
   });
 
@@ -270,7 +284,21 @@ export default function FlightForm({ initialData }: FlightFormProps) {
   const isPending = createFlight.isPending || updateFlight.isPending;
 
   return (
-    <form onSubmit={onSubmit} className="bg-card text-card-foreground rounded-lg border border-border shadow p-6 space-y-6">
+    <form onSubmit={onSubmit} className={cn(
+      "bg-card text-card-foreground rounded-lg border border-border shadow p-6 space-y-6 transition-all duration-700 relative overflow-hidden",
+      isSuccess && "success-pulse pointer-events-none opacity-80"
+    )}>
+      {isSuccess && (
+        <div className="absolute inset-0 z-50 flex items-start justify-center p-4 bg-background/20 backdrop-blur-[2px] animate-in fade-in duration-500">
+          <StatusAnnunciator 
+            type="success" 
+            title="System Synchronization" 
+            message={successMessage}
+            className="shadow-2xl shadow-emerald-500/20 max-w-lg"
+          />
+        </div>
+      )}
+
       {formError && (
         <div className="bg-red-100 text-red-700 rounded px-4 py-2 mb-2 text-sm border border-red-300">
           {formError}

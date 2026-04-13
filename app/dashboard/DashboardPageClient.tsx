@@ -78,7 +78,7 @@ export default function DashboardPageClient({
             </div>
 
             <div className="flex gap-3 animate-in fade-in slide-in-from-right-4 duration-700">
-              <Button asChild variant="outline" className="h-12 px-6 rounded-xl border-[var(--glass-border)] text-[11px] font-black uppercase tracking-widest hover:border-blue-500/50 transition-all bg-background/50 backdrop-blur-md">
+              <Button asChild variant="outline" className="h-12 px-6 rounded-xl border-(--glass-border) text-[11px] font-black uppercase tracking-widest hover:border-blue-500/50 transition-all bg-background/50 backdrop-blur-md">
                 <Link href="/flights">Logbook</Link>
               </Button>
               <Button asChild className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95">

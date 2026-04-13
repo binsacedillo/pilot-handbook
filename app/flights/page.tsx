@@ -5,7 +5,7 @@ import AppFooter from "@/components/common/AppFooter";
 import { trpc } from "@/trpc/client";
 import type { RouterOutputs } from "@/trpc/shared";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import FlightForm from "@/components/flights/FlightForm";
 import { FlightFilterBar } from "@/components/flights/FlightFilterBar";
 import EmptyState from "@/components/common/EmptyState";
@@ -102,6 +102,21 @@ export default function FlightsPage() {
     flightRoute: string | null;
   }>({ open: false, flightId: null, flightRoute: null });
 
+  // ISO UX Dropdown State
+  const [showOpsMenu, setShowOpsMenu] = useState(false);
+  const opsMenuRef = useRef<HTMLDivElement>(null);
+
+  // Click outside listener for accessibility
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (opsMenuRef.current && !opsMenuRef.current.contains(event.target as Node)) {
+        setShowOpsMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const filteredRows = useMemo(() => {
     if (!flights) return [];
     const filtered = (flights || []).filter((f: RouterOutputs["flight"]["getAll"][number]) => !optimisticFlights.includes(f.id));
@@ -147,18 +162,27 @@ export default function FlightsPage() {
 
           <div className="flex flex-wrap items-center gap-3">
             {/* Secondary/Admin Actions Dropdown */}
-            <div className="relative group/ops">
+            <div className="relative" ref={opsMenuRef}>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-11 px-4 rounded-xl border border-[var(--glass-border)] bg-zinc-900/5 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-500 gap-2"
+                className={cn(
+                  "h-11 px-4 rounded-xl border border-(--glass-border) bg-zinc-900/5 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-500 gap-2 transition-all",
+                  showOpsMenu && "border-blue-500/50 bg-blue-500/5 text-blue-500"
+                )}
+                onClick={() => setShowOpsMenu(!showOpsMenu)}
               >
                 <Settings className="w-3.5 h-3.5" />
                 Operations
-                <ChevronDown className="w-3 h-3 transition-transform group-hover/ops:rotate-180" />
+                <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", showOpsMenu && "rotate-180")} />
               </Button>
               
-              <div className="absolute right-0 top-full mt-2 w-48 py-2 bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] rounded-xl shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover/ops:opacity-100 group-hover/ops:translate-y-0 group-hover/ops:pointer-events-auto transition-all duration-300 z-50">
+              <div className={cn(
+                "absolute right-0 top-full mt-2 w-48 py-2 bg-(--glass-bg) backdrop-blur-xl border border-(--glass-border) rounded-xl shadow-2xl transition-all duration-300 z-50",
+                showOpsMenu 
+                  ? "opacity-100 translate-y-0 pointer-events-auto" 
+                  : "opacity-0 translate-y-2 pointer-events-none"
+              )}>
                 <button 
                   className="w-full px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-500 hover:bg-blue-500/10 transition-colors flex items-center gap-3"
                   onClick={() => {
@@ -182,7 +206,7 @@ export default function FlightsPage() {
                   <Upload className="w-3.5 h-3.5" /> Import CSV
                 </button>
                 
-                <div className="h-[1px] bg-[var(--glass-border)] my-1" />
+                <div className="h-[1px] bg-(--glass-border) my-1" />
                 
                 <button 
                   className="w-full px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-500 hover:bg-blue-500/10 transition-colors flex items-center gap-3"
@@ -226,7 +250,7 @@ export default function FlightsPage() {
             pulseNew && "animate-master-caution"
           )}>
             <GlassCard className="relative border-blue-500/20">
-              <div className="px-6 py-4 border-b border-[var(--glass-border)] flex justify-between items-center bg-blue-500/5">
+              <div className="px-6 py-4 border-b border-(--glass-border) flex justify-between items-center bg-blue-500/5">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                   <h2 className="text-xs font-black uppercase tracking-widest text-blue-500">Flight Entry Panel</h2>
@@ -258,7 +282,7 @@ export default function FlightsPage() {
         />
 
         {filteredRows.length === 0 ? (
-          <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-12 bg-[var(--glass-bg)]/30 backdrop-blur-sm">
+          <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-12 bg-(--glass-bg)/30 backdrop-blur-sm">
             <EmptyState
               icon="✈️"
               title="No Flights Logged Yet"

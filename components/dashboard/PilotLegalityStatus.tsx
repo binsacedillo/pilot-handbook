@@ -83,9 +83,9 @@ export default function PilotLegalityStatus({ pilotName, initialStats }: PilotLe
       </div>
 
       <GlassCard className={cn("border-l-4 transition-all duration-700 shadow-lg", isGo ? "border-l-emerald-500 shadow-emerald-500/5" : "border-l-red-500 shadow-red-500/5")} bezel={true}>
-        <div className="px-6 py-3 bg-zinc-950/40 dark:bg-zinc-950/40 light:bg-slate-50/50 border-b border-[var(--glass-border)] flex flex-wrap items-center justify-between gap-4">
+        <div className="px-6 py-3 bg-zinc-950/40 dark:bg-zinc-950/40 light:bg-slate-50/50 border-b border-(--glass-border) flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-zinc-900 dark:bg-zinc-900 light:bg-slate-200 rounded-lg border border-[var(--glass-border)]">
+            <div className="p-2 bg-zinc-900 dark:bg-zinc-900 light:bg-slate-200 rounded-lg border border-(--glass-border)">
               <User className="w-4 h-4 text-zinc-500 dark:text-zinc-500 light:text-slate-600" />
             </div>
             <div className="flex flex-col">
@@ -97,7 +97,7 @@ export default function PilotLegalityStatus({ pilotName, initialStats }: PilotLe
           </div>
 
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900/40 border border-[var(--glass-border)]">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900/40 border border-(--glass-border)">
               <IdCard className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-500 light:text-slate-500" />
               <div className="flex flex-col">
                 <span className="text-[8px] uppercase font-black text-zinc-500 dark:text-zinc-500 light:text-slate-500 tracking-tighter leading-none mb-0.5">License / Ratings</span>
@@ -109,12 +109,12 @@ export default function PilotLegalityStatus({ pilotName, initialStats }: PilotLe
 
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
-                <button className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--glass-border)] bg-zinc-900/60 text-zinc-500 hover:text-blue-500 hover:border-blue-500/50 transition-all text-[9px] font-black uppercase tracking-widest shadow-inner">
+                <button className="flex items-center gap-2 px-3 py-2 rounded-lg border border-(--glass-border) bg-zinc-900/60 text-zinc-500 hover:text-blue-500 hover:border-blue-500/50 transition-all text-[9px] font-black uppercase tracking-widest shadow-inner">
                   <Settings2 className="w-3 h-3" />
                   Configure System
                 </button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl bg-[var(--glass-bg)] border-[var(--glass-border)] p-0 overflow-hidden shadow-2xl backdrop-blur-3xl">
+              <DialogContent className="max-w-2xl bg-(--glass-bg) border-(--glass-border) p-0 overflow-hidden shadow-2xl backdrop-blur-3xl">
                 <DialogHeader className="sr-only">
                   <DialogTitle>Configure Pilot Profile</DialogTitle>
                   <DialogDescription>Update your aviation credentials.</DialogDescription>
@@ -184,7 +184,7 @@ export default function PilotLegalityStatus({ pilotName, initialStats }: PilotLe
         {legality?.alerts && legality.alerts.length > 0 && (
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-2">
             {legality.alerts.map((alert, i) => (
-              <div key={i} className="flex items-center gap-3 px-4 py-2.5 bg-zinc-950/20 border border-[var(--glass-border)] rounded-lg text-[10px] font-bold text-zinc-400 group/alert">
+              <div key={i} className="flex items-center gap-3 px-4 py-2.5 bg-zinc-950/20 border border-(--glass-border) rounded-lg text-[10px] font-bold text-zinc-400 group/alert">
                 <AlertTriangle className={cn("w-3.5 h-3.5 shrink-0", alert.includes("Critical") || alert.includes("expired") ? "text-red-500" : "text-amber-500")} />
                 <span className="tracking-tight group-hover/alert:text-zinc-200 transition-colors line-clamp-1">{alert}</span>
               </div>
@@ -199,7 +199,7 @@ export default function PilotLegalityStatus({ pilotName, initialStats }: PilotLe
 
 function StatusIcon({ label, value, isOk, icon }: { label: string; value: string; isOk: boolean; icon: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 p-4 bg-zinc-950/20 dark:bg-zinc-950/20 light:bg-slate-100/50 rounded-xl border border-[var(--glass-border)] hover:border-zinc-500/30 transition-colors">
+    <div className="flex items-center gap-3 p-4 bg-zinc-950/20 dark:bg-zinc-950/20 light:bg-slate-100/50 rounded-xl border border-(--glass-border) hover:border-zinc-500/30 transition-colors">
       <div className={cn(
         "p-2.5 rounded-lg border",
         isOk ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10" : "bg-red-500/5 text-red-500 border-red-500/10"

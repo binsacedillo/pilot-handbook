@@ -98,9 +98,9 @@ export function WeatherWidget({
     <div className="space-y-4">
       <GlassCard bezel={true} className="overflow-hidden">
         {/* HEADER: High Intensity Category & Station */}
-        <div className="flex items-stretch border-b border-[var(--glass-border)] h-16">
+        <div className="flex items-stretch border-b border-(--glass-border) h-16">
           <div className={cn(
-            "w-24 flex items-center justify-center border-r border-[var(--glass-border)]",
+            "w-24 flex items-center justify-center border-r border-(--glass-border)",
             getCategoryColorStyle(category)
           )}>
             <span className="text-xl font-black italic tracking-tighter">{category}</span>
@@ -116,7 +116,7 @@ export function WeatherWidget({
             
             <button 
               onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-              className="p-3 bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-200/50 rounded-lg border border-[var(--glass-border)] text-zinc-400 dark:text-zinc-400 light:text-slate-600 hover:text-blue-500 transition-all active:scale-95"
+              className="p-3 bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-200/50 rounded-lg border border-(--glass-border) text-zinc-400 dark:text-zinc-400 light:text-slate-600 hover:text-blue-500 transition-all active:scale-95"
             >
               <Search className="w-4 h-4" />
             </button>
@@ -125,14 +125,14 @@ export function WeatherWidget({
 
         {/* SEARCH DRAWER */}
         {isSearchExpanded && (
-          <div className="p-4 bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-100/50 border-b border-[var(--glass-border)] animate-in slide-in-from-top duration-300">
+          <div className="p-4 bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-100/50 border-b border-(--glass-border) animate-in slide-in-from-top duration-300">
              <div className="flex gap-2">
                 <Input 
                   placeholder="ICAO" 
                   value={inputValue}
                   onChange={e => setInputValue(e.target.value.toUpperCase())}
                   onKeyDown={handleKeyDown}
-                  className="h-12 bg-zinc-950 dark:bg-zinc-950 light:bg-white border-[var(--glass-border)] text-lg font-black tracking-widest text-blue-500 placeholder:text-zinc-800 dark:placeholder:text-zinc-800 light:placeholder:text-slate-300" 
+                  className="h-12 bg-zinc-950 dark:bg-zinc-950 light:bg-white border-(--glass-border) text-lg font-black tracking-widest text-blue-500 placeholder:text-zinc-800 dark:placeholder:text-zinc-800 light:placeholder:text-slate-300" 
                   maxLength={4}
                 />
                 <Button onClick={handleSearch} className="h-12 px-6 bg-blue-600 hover:bg-blue-500 font-bold uppercase">SET</Button>
@@ -157,7 +157,7 @@ export function WeatherWidget({
                  <span className="text-2xl font-black text-zinc-600 dark:text-zinc-600 light:text-slate-400 italic">°C</span>
               </div>
               
-              <div className="flex items-center gap-4 p-4 bg-zinc-950/20 dark:bg-zinc-950/20 light:bg-slate-50/50 border border-[var(--glass-border)] rounded-2xl">
+              <div className="flex items-center gap-4 p-4 bg-zinc-950/20 dark:bg-zinc-950/20 light:bg-slate-50/50 border border-(--glass-border) rounded-2xl">
                  <div className="p-3 bg-zinc-900/50 dark:bg-zinc-900/50 light:bg-slate-200 rounded-xl">
                     <Wind className="w-6 h-6 text-blue-500" />
                  </div>
@@ -217,7 +217,7 @@ export function WeatherWidget({
         </button>
         
         {isRawExpanded && (
-          <div className="mt-2 p-4 bg-black/50 dark:bg-black/50 light:bg-slate-100 border border-[var(--glass-border)] rounded-xl font-mono text-[10px] text-zinc-400 dark:text-zinc-400 light:text-slate-600 leading-relaxed animate-in fade-in duration-300">
+          <div className="mt-2 p-4 bg-black/50 dark:bg-black/50 light:bg-slate-100 border border-(--glass-border) rounded-xl font-mono text-[10px] text-zinc-400 dark:text-zinc-400 light:text-slate-600 leading-relaxed animate-in fade-in duration-300">
             {metar.raw}
           </div>
         )}
@@ -230,7 +230,7 @@ function InstrumentTile({ label, value, icon, mono = false, isWarning = false, a
   return (
     <div className={cn(
       "p-3 rounded-xl border flex flex-col transition-colors",
-      isWarning ? "bg-red-500/10 border-red-500/30" : "bg-zinc-950/10 dark:bg-zinc-950/20 light:bg-slate-50/50 border-[var(--glass-border)] hover:border-zinc-700"
+      isWarning ? "bg-red-500/10 border-red-500/30" : "bg-zinc-950/10 dark:bg-zinc-950/20 light:bg-slate-50/50 border-(--glass-border) hover:border-zinc-700"
     )}>
       <div className="flex items-center gap-2 text-zinc-500 mb-1">
         {icon}
