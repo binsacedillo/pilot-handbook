@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { trpc } from "@/trpc/client";
@@ -16,8 +16,19 @@ import {
   ShieldCheck, 
   Calendar, 
   Clock, 
-  ExternalLink 
+  ExternalLink,
+  Medal,
+  Award,
+  GraduationCap,
+  Star
 } from "lucide-react";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 
 // Schema for PilotProfile validation
 const pilotProfileSchema = z.object({
@@ -48,7 +59,7 @@ export default function EditPilotProfileForm({ initialData, onSuccess }: EditPil
   };
 
   const {
-    register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting, isDirty },
@@ -111,27 +122,50 @@ export default function EditPilotProfileForm({ initialData, onSuccess }: EditPil
                 <Label htmlFor="licenseNumber" className="text-[10px] font-black uppercase tracking-wider text-zinc-500 ml-1">License Number</Label>
                 <Input 
                   id="licenseNumber"
-                  {...register("licenseNumber")}
+                  {...control.register("licenseNumber")}
                   className="bg-zinc-950/50 border-zinc-800 focus:border-blue-500/50 text-zinc-100 h-11 text-base font-mono"
                   placeholder="e.g. 1234567"
                 />
                 {errors.licenseNumber && <p className="text-[10px] text-red-500 mt-1">{errors.licenseNumber.message}</p>}
               </div>
 
-              <div className="space-y-2.5">
-                <Label htmlFor="licenseType" className="text-[10px] font-black uppercase tracking-wider text-zinc-500 ml-1">Certificate Type</Label>
-                <select 
-                  id="licenseType"
-                  {...register("licenseType")}
-                  className="w-full h-11 rounded-xl bg-zinc-950/50 border border-zinc-800 text-zinc-100 text-sm px-4 focus:outline-hidden focus:ring-1 focus:ring-blue-500 transition-all font-bold"
-                >
-                  <option value="PPL">Private Pilot (PPL)</option>
-                  <option value="CPL">Commercial Pilot (CPL)</option>
-                  <option value="ATPL">Airline Transport (ATP)</option>
-                  <option value="SPL">Student Pilot (SPL)</option>
-                </select>
-                {errors.licenseType && <p className="text-[10px] text-red-500 mt-1">{errors.licenseType.message}</p>}
-              </div>
+                <Controller
+                  name="licenseType"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                      <SelectTrigger className="w-full h-11 rounded-xl bg-zinc-950/50 border-zinc-800 text-zinc-100 text-sm px-4 font-bold focus:ring-blue-500 focus:border-blue-500/50">
+                        <SelectValue placeholder="Select license type..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-zinc-950/90 border-zinc-800 backdrop-blur-xl">
+                        <SelectItem value="SPL" className="focus:bg-blue-500/20 focus:text-blue-400">
+                          <div className="flex items-center gap-2">
+                             <GraduationCap className="w-4 h-4 text-zinc-500" />
+                             <span>Student Pilot (SPL)</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="PPL" className="focus:bg-blue-500/20 focus:text-blue-400">
+                          <div className="flex items-center gap-2">
+                             <Medal className="w-4 h-4 text-blue-500" />
+                             <span>Private Pilot (PPL)</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="CPL" className="focus:bg-blue-500/20 focus:text-blue-400">
+                          <div className="flex items-center gap-2">
+                             <Award className="w-4 h-4 text-emerald-500" />
+                             <span>Commercial Pilot (CPL)</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="ATPL" className="focus:bg-blue-500/20 focus:text-blue-400">
+                          <div className="flex items-center gap-2">
+                             <Star className="w-4 h-4 text-amber-500" />
+                             <span>Airline Transport (ATP)</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
             </div>
 
             {/* Medical & Rest Section */}
@@ -148,7 +182,7 @@ export default function EditPilotProfileForm({ initialData, onSuccess }: EditPil
                   <Input 
                     id="medicalExpiry"
                     type="date"
-                    {...register("medicalExpiry")}
+                    {...control.register("medicalExpiry")}
                     className="bg-zinc-950/50 border-zinc-800 focus:border-blue-500/50 text-zinc-100 h-11 pl-11"
                   />
                   <div className="absolute left-4 top-3.5 text-zinc-500 group-focus-within:text-blue-500 transition-colors">
@@ -164,7 +198,7 @@ export default function EditPilotProfileForm({ initialData, onSuccess }: EditPil
                   <Input 
                     id="lastRestDate"
                     type="datetime-local"
-                    {...register("lastRestDate")}
+                    {...control.register("lastRestDate")}
                     className="bg-zinc-950/50 border-zinc-800 focus:border-blue-500/50 text-zinc-100 h-11 pl-11"
                   />
                   <div className="absolute left-4 top-3.5 text-zinc-500 group-focus-within:text-blue-500 transition-colors">
@@ -186,7 +220,7 @@ export default function EditPilotProfileForm({ initialData, onSuccess }: EditPil
                  <Input 
                    id="totalHoursGoal"
                    type="number"
-                   {...register("totalHoursGoal", { valueAsNumber: true })}
+                   {...control.register("totalHoursGoal", { valueAsNumber: true })}
                    className="bg-zinc-950 border-zinc-800 text-zinc-100 h-11 w-32 font-black text-center text-blue-500"
                  />
                </div>
