@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { AlertTriangle, X } from "lucide-react";
+import { ShieldCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DevWarningBannerProps {
@@ -47,16 +47,16 @@ export default function DevWarningBanner({
   if (!isVisible) return null;
 
   return (
-    <div className="bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800">
+    <div className="bg-zinc-950/90 backdrop-blur-md border-b border-emerald-500/30 shadow-[0_4px_20px_rgba(16,185,129,0.1)] relative z-100">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1">
-            <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-500 shrink-0" />
+            <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0" />
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-              <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 whitespace-nowrap">
                 Technical Release
               </p>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+              <p className="text-xs font-bold text-zinc-300 uppercase tracking-tight">
                 {message}
               </p>
             </div>
@@ -65,10 +65,10 @@ export default function DevWarningBanner({
             variant="ghost"
             size="sm"
             onClick={handleDismiss}
-            className="shrink-0 h-8 w-8 p-0 hover:bg-yellow-100 dark:hover:bg-yellow-900/40"
+            className="shrink-0 h-8 w-8 p-0 hover:bg-emerald-500/10 text-zinc-500 hover:text-emerald-500 transition-colors"
             aria-label="Dismiss warning"
           >
-            <X className="w-4 h-4 text-yellow-700 dark:text-yellow-400" />
+            <X className="w-4 h-4" />
           </Button>
         </div>
       </div>
