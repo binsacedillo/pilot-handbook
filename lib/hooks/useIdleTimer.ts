@@ -13,6 +13,7 @@ interface UseIdleTimerProps {
 
 export function useIdleTimer({ onIdle, onHardLimit, onWarning }: UseIdleTimerProps = {}) {
   const [status, setStatus] = useState<IdleStatus>('active');
+  const statusRef = useRef<IdleStatus>(status);
   const [timeLeft, setTimeLeft] = useState<number>(SESSION_CONFIG.IDLE_TIMEOUT_MS);
   
   // Use refs to avoid closure staleness issues with intervals
@@ -22,11 +23,13 @@ export function useIdleTimer({ onIdle, onHardLimit, onWarning }: UseIdleTimerPro
 
   const logout = useCallback(() => {
     setStatus('expired');
+    statusRef.current = 'expired';
     onIdle?.();
   }, [onIdle]);
 
   const hardLogout = useCallback(() => {
     setStatus('hard-limit-expired');
+    statusRef.current = 'hard-limit-expired';
     onHardLimit?.();
   }, [onHardLimit]);
 
@@ -34,6 +37,7 @@ export function useIdleTimer({ onIdle, onHardLimit, onWarning }: UseIdleTimerPro
     const now = Date.now();
     localStorage.setItem(SESSION_CONFIG.STORAGE_KEY_LAST_ACTIVITY, now.toString());
     setStatus('active');
+    statusRef.current = 'active';
     autoSaveTriggered.current = false;
     
     if (sync && channelRef.current) {
@@ -77,6 +81,12 @@ export function useIdleTimer({ onIdle, onHardLimit, onWarning }: UseIdleTimerPro
 
     // Main Tick Interval
     timerRef.current = setInterval(() => {
+      // 0. Protection: If already expired, stop the interval logic immediately
+      if (statusRef.current === 'expired' || statusRef.current === 'hard-limit-expired') {
+        if (timerRef.current) clearInterval(timerRef.current);
+        return;
+      }
+
       const now = Date.now();
       const lastActivity = parseInt(localStorage.getItem(SESSION_CONFIG.STORAGE_KEY_LAST_ACTIVITY) || now.toString());
       const sessionStart = parseInt(localStorage.getItem(SESSION_CONFIG.STORAGE_KEY_SESSION_START) || now.toString());
@@ -131,7 +141,7 @@ export function useIdleTimer({ onIdle, onHardLimit, onWarning }: UseIdleTimerPro
         channelRef.current = null;
       }
     };
-  }, [resetTimer, logout, hardLogout, onWarning]);
+  }, [resetTimer, logout, hardLogout, onWarning, status]);
 
   return { status, timeLeft, resetTimer };
 }

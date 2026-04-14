@@ -37,8 +37,12 @@ export function IdleTimeoutManager() {
   const [open, setOpen] = useState(false);
   const [isHardLimit, setIsHardLimit] = useState(false);
   const toastTriggered = useRef(false);
+  const isLoggingOut = useRef(false);
 
   const handleLogout = async (type: 'INACTIVITY_LOGOUT' | 'HARD_SESSION_LOGOUT') => {
+    if (isLoggingOut.current) return;
+    isLoggingOut.current = true;
+
     try {
       // 1. Audit log the event on the server (Only if we still have a frontend session)
       if (isSignedIn) {
@@ -63,6 +67,7 @@ export function IdleTimeoutManager() {
       }
     } finally {
       // 2. Perform the actual sign out with context recovery URL
+      // We don't await this as the redirect will happen via Clerk's internal logic
       signOut({ redirectUrl: pathname });
     }
   };
