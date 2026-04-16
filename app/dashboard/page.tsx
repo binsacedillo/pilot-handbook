@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import DashboardPageClient from "./DashboardPageClient";
+import DashboardClient from "./DashboardClient";
 import { api, createTRPCContext } from "@/trpc/server";
 import { headers } from "next/headers";
 import { Suspense } from "react";
@@ -30,7 +30,7 @@ export default async function Page() {
 
   return (
     <Suspense fallback={<DashboardSkeleton />}>
-      <DashboardPageClient 
+      <DashboardClient 
         initialData={{
           stats: initialStats,
           summary: initialSummary,
