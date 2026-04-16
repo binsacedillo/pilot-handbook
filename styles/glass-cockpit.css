@@ -20,8 +20,18 @@
   100% { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
 }
 
+@keyframes hud-highlight-pulse {
+  0% { border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.2); }
+  50% { border-color: rgba(59, 130, 246, 0.7); box-shadow: 0 0 20px 2px rgba(59, 130, 246, 0.15); }
+  100% { border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.2); }
+}
+
 .animate-master-caution {
   animation: master-caution-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-hud-highlight {
+  animation: hud-highlight-pulse 2s cubic-bezier(0.4, 0, 0.2, 1) 3;
 }
 
 .glass-sticky-header {
@@ -42,7 +52,7 @@
 }
 @keyframes success-pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } } 
 
-.success-pulse { animation: success-pulse-glow 2s infinite; border-color: rgba(16, 185, 129, 0.5) !important; }
+.success-pulse { animation: success-pulse-glow 2s infinite; border-color: rgba(16, 185, 129, 0.5); }
 
 /* HUD/Instrument Animations */
 @keyframes hud-scanline {
@@ -82,5 +92,30 @@
 
 .animate-hud-blink {
   animation: hud-blink 1s ease-in-out infinite;
+}
+
+/* Data-Heavy View (ISO Readability Mode) */
+.data-heavy-view {
+  @apply bg-background border-zinc-800 shadow-sm transition-all duration-300;
+  backdrop-filter: none;
+}
+
+.data-heavy-view th {
+  @apply bg-zinc-900/50 text-zinc-400 font-bold border-b border-zinc-800;
+  backdrop-filter: none;
+}
+
+.data-heavy-view td {
+  @apply bg-transparent border-zinc-800;
+  backdrop-filter: none;
+}
+
+.data-heavy-view .sticky {
+  background-color: var(--background);
+  backdrop-filter: none;
+}
+
+.high-contrast-label {
+  @apply text-foreground font-black tracking-tight brightness-110;
 }
 

@@ -15,11 +15,9 @@ import { trpc } from "@/trpc/client";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useToast } from "@/components/ui/toast";
-import { isNetworkError, getNetworkErrorMessage, getServerErrorMessage } from "@/lib/error-utils";
-import SignaturePad from "@/components/common/SignaturePad";
-import { PenTool, CheckCircle2, CloudSync, LayoutGrid } from "lucide-react";
 import StatusAnnunciator from "@/components/common/StatusAnnunciator";
+import { useFlightMutations } from "@/hooks/useFlightMutations";
+import { InstructorVerification } from "./InstructorVerification";
 
 type FlightFormData = {
   date: string;
@@ -36,13 +34,9 @@ type FlightFormData = {
   signatureData: string | null;
 };
 
-
-
-
 // Inferred types from tRPC router output
 type FlightData = RouterOutputs["flight"]["getAll"][number];
 type AircraftData = RouterOutputs["aircraft"]["getAll"][number];
-
 
 interface FlightFormProps {
   initialData?: FlightData | null;
@@ -51,142 +45,9 @@ interface FlightFormProps {
 export default function FlightForm({ initialData }: FlightFormProps) {
   const router = useRouter();
   const { data: aircraft } = trpc.aircraft.getAll.useQuery();
-  const utils = trpc.useUtils();
-  const { showToast } = useToast();
-  const [showSignaturePad, setShowSignaturePad] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   
   const isEditMode = !!initialData;
-
-
-
-
-  const createFlight = trpc.flight.create.useMutation({
-    onMutate: async (newFlight) => {
-      await utils.flight.getAll.cancel();
-      const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightData[] | undefined;
-      
-      if (previousFlights) {
-        const selectedAircraft = aircraft?.find((a: AircraftData) => a.id === newFlight.aircraftId);
-        
-        const fallbackAircraft = {
-          id: newFlight.aircraftId,
-          registration: "",
-          make: "",
-          model: "",
-          status: "",
-          imageUrl: "",
-          isArchived: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          flightHours: 0,
-          userId: "",
-        };
-
-        const optimisticAircraft = { ...fallbackAircraft, ...(selectedAircraft ?? {}) };
-        
-        const optimisticItem = {
-          ...newFlight,
-          id: "optimistic",
-          aircraft: optimisticAircraft,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          userId: "",
-          isVerified: false,
-          instructorName: newFlight.instructorName ?? null,
-          signatureData: newFlight.signatureData ?? null,
-          landings: (newFlight.dayLandings ?? 0) + (newFlight.nightLandings ?? 0),
-          remarks: newFlight.remarks ?? null,
-        } as FlightData;
-
-        utils.flight.getAll.setData(
-          {} as Record<string, unknown>,
-          [optimisticItem, ...previousFlights]
-        );
-      }
-      return { previousFlights };
-    },
-    onError: (err, newFlight, context) => {
-      if (context?.previousFlights) {
-        utils.flight.getAll.setData({} as Record<string, unknown>, context.previousFlights);
-      }
-      const errorMessage = isNetworkError(err)
-        ? getNetworkErrorMessage("create flight")
-        : getServerErrorMessage("create flight", err);
-      showToast(errorMessage, "error", {
-        action: {
-          label: "Retry",
-          onClick: () => createFlight.mutate(newFlight),
-        },
-      });
-    },
-    onSettled: async () => {
-      await utils.flight.getAll.invalidate();
-      await utils.flight.getStats.invalidate();
-    },
-    onSuccess: (data) => {
-      setIsSuccess(true);
-      setSuccessMessage(`FLIGHT LOG CREATED // ${data?.departureCode} -> ${data?.arrivalCode} // SYNC COMPLETE`);
-      
-      // Delay redirect for satisfying feedback
-      setTimeout(() => {
-        router.push("/flights");
-      }, 1500);
-    },
-  });
-
-  const updateFlight = trpc.flight.update.useMutation({
-    onMutate: async (updatedFlight) => {
-      await utils.flight.getAll.cancel();
-      const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightData[] | undefined;
-      
-      if (previousFlights) {
-        utils.flight.getAll.setData(
-          {} as Record<string, unknown>,
-          previousFlights.map(f => {
-            if (f.id !== updatedFlight.id) return f;
-            
-            return { 
-              ...f, 
-              ...updatedFlight,
-              isVerified: f.isVerified,
-              instructorName: updatedFlight.instructorName ?? f.instructorName,
-              signatureData: updatedFlight.signatureData ?? f.signatureData,
-            } as FlightData;
-          })
-        );
-      }
-      return { previousFlights };
-    },
-    onError: (err, updatedFlight, context) => {
-      if (context?.previousFlights) {
-        utils.flight.getAll.setData({} as Record<string, unknown>, context.previousFlights);
-      }
-      const errorMessage = isNetworkError(err)
-        ? getNetworkErrorMessage("update flight")
-        : getServerErrorMessage("update flight", err);
-      showToast(errorMessage, "error", {
-        action: {
-          label: "Retry",
-          onClick: () => updateFlight.mutate(updatedFlight),
-        },
-      });
-    },
-    onSettled: async () => {
-      await utils.flight.getAll.invalidate();
-      await utils.flight.getStats.invalidate();
-    },
-    onSuccess: (data) => {
-      setIsSuccess(true);
-      setSuccessMessage(`FLIGHT LOG UPDATED // ${data?.departureCode} -> ${data?.arrivalCode} // DATA INTEGRITY VERIFIED`);
-      
-      // Delay redirect for satisfying feedback
-      setTimeout(() => {
-        router.push("/flights");
-      }, 1500);
-    },
-  });
+  const { createFlight, updateFlight, isPending, isSuccess, successMessage } = useFlightMutations({ aircraft });
 
   // Compute initial form state based on initialData (Edit Mode) or defaults (Create Mode)
   const getInitialFormState = (): FlightFormData => {
@@ -229,7 +90,6 @@ export default function FlightForm({ initialData }: FlightFormProps) {
   };
 
   const [form, setForm] = useState<FlightFormData>(getInitialFormState);
-
   const [formError, setFormError] = useState<string | null>(null);
 
   function onSubmit(e: React.FormEvent) {
@@ -269,65 +129,62 @@ export default function FlightForm({ initialData }: FlightFormProps) {
         setFormError("Unable to update flight: missing flight ID.");
         return;
       }
-
-      // Edit Mode: Call update.mutate
       updateFlight.mutate({
         id: initialData.id,
         ...flightData,
       });
     } else {
-      // Create Mode: Call create.mutate
       createFlight.mutate(flightData);
     }
   }
 
-  const isPending = createFlight.isPending || updateFlight.isPending;
-
   return (
     <form onSubmit={onSubmit} className={cn(
-      "bg-card text-card-foreground rounded-lg border border-border shadow p-6 space-y-6 transition-all duration-700 relative overflow-hidden",
+      "space-y-6 transition-all duration-700 relative overflow-hidden",
       isSuccess && "success-pulse pointer-events-none opacity-80"
     )}>
       {isSuccess && (
-        <div className="absolute inset-0 z-50 flex items-start justify-center p-4 bg-background/20 backdrop-blur-[2px] animate-in fade-in duration-500">
+        <div className="absolute inset-0 z-50 flex items-start justify-center p-4 bg-background/20 backdrop-blur-[2px] animate-in fade-in duration-500 rounded-xl">
           <StatusAnnunciator 
             type="success" 
-            title="System Synchronization" 
+            title="Success" 
             message={successMessage}
-            className="shadow-2xl shadow-emerald-500/20 max-w-lg"
+            className="shadow-2xl shadow-emerald-500/20 max-w-lg mt-10"
           />
         </div>
       )}
 
       {formError && (
-        <div className="bg-red-100 text-red-700 rounded px-4 py-2 mb-2 text-sm border border-red-300">
-          {formError}
+        <div className="bg-rose-500/10 text-rose-500 rounded-md px-4 py-3 mb-2 text-xs font-mono uppercase tracking-widest border border-rose-500/20 flex items-center gap-2">
+          <span className="font-bold">Error:</span> {formError}
         </div>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="date">Date</Label>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="date" className="text-[10px] font-black uppercase tracking-widest text-blue-500">Flight Date</Label>
           <Input
             id="date"
             type="date"
             required
             value={form.date}
             onChange={(e) => setForm({ ...form, date: e.target.value })}
+            className="bg-zinc-900/50 border-zinc-800 focus:border-blue-500 text-white font-mono text-sm h-11"
           />
         </div>
-        <div>
-          <Label htmlFor="aircraft">Aircraft</Label>
+        <div className="space-y-2">
+          <Label htmlFor="aircraft" className="text-[10px] font-black uppercase tracking-widest text-blue-500">Aircraft Configuration</Label>
           <Select
             value={form.aircraftId}
             onValueChange={(value) => setForm({ ...form, aircraftId: value })}
           >
-            <SelectTrigger id="aircraft" className="w-full">
+            <SelectTrigger id="aircraft" className="w-full bg-zinc-900/50 border-zinc-800 focus:ring-blue-500 text-white font-mono text-sm h-11">
               <SelectValue placeholder="Select aircraft…" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-zinc-950 border-zinc-800 text-zinc-300">
               {(aircraft ?? []).map((a: AircraftData) => (
-                <SelectItem key={a.id} value={a.id}>
-                  {a.registration} • {a.make} {a.model}
+                <SelectItem key={a.id} value={a.id} className="focus:bg-blue-500/20 py-2">
+                  <span className="font-mono text-blue-400">{a.registration}</span> <span className="text-zinc-500">•</span> {a.make} {a.model}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -335,31 +192,33 @@ export default function FlightForm({ initialData }: FlightFormProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <Label htmlFor="dep">Departure</Label>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="dep" className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Departure</Label>
           <Input
             id="dep"
-            placeholder="e.g., KJFK"
+            placeholder="KJFK"
             maxLength={4}
             required
             value={form.departureCode}
             onChange={(e) => setForm({ ...form, departureCode: e.target.value })}
+            className="bg-zinc-900/50 border-zinc-800 focus:border-blue-500 text-white font-mono text-center tracking-widest text-lg h-12 uppercase"
           />
         </div>
-        <div>
-          <Label htmlFor="arr">Arrival</Label>
+        <div className="space-y-2">
+          <Label htmlFor="arr" className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Arrival</Label>
           <Input
             id="arr"
-            placeholder="e.g., KBOS"
+            placeholder="KBOS"
             maxLength={4}
             required
             value={form.arrivalCode}
             onChange={(e) => setForm({ ...form, arrivalCode: e.target.value })}
+            className="bg-zinc-900/50 border-zinc-800 focus:border-blue-500 text-white font-mono text-center tracking-widest text-lg h-12 uppercase"
           />
         </div>
-        <div>
-          <Label htmlFor="duration">Duration (hrs)</Label>
+        <div className="space-y-2">
+          <Label htmlFor="duration" className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Total Duration (hrs)</Label>
           <Input
             id="duration"
             type="number"
@@ -368,13 +227,14 @@ export default function FlightForm({ initialData }: FlightFormProps) {
             required
             value={form.duration}
             onChange={(e) => setForm({ ...form, duration: e.target.value })}
+            className="bg-zinc-900/50 border-zinc-800 focus:border-blue-500 text-blue-400 font-mono text-center text-lg h-12"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <Label htmlFor="pic">PIC Time</Label>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-xl border border-zinc-800/50 bg-zinc-900/20">
+        <div className="space-y-2">
+          <Label htmlFor="pic" className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">PIC Time</Label>
           <Input
             id="pic"
             type="number"
@@ -382,10 +242,11 @@ export default function FlightForm({ initialData }: FlightFormProps) {
             step="0.1"
             value={form.picTime}
             onChange={(e) => setForm({ ...form, picTime: e.target.value })}
+            className="bg-zinc-900/80 border-zinc-800 focus:border-blue-500 text-white font-mono text-center h-10"
           />
         </div>
-        <div>
-          <Label htmlFor="dual">Dual Time</Label>
+        <div className="space-y-2">
+          <Label htmlFor="dual" className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Dual Time</Label>
           <Input
             id="dual"
             type="number"
@@ -393,10 +254,11 @@ export default function FlightForm({ initialData }: FlightFormProps) {
             step="0.1"
             value={form.dualTime}
             onChange={(e) => setForm({ ...form, dualTime: e.target.value })}
+            className="bg-zinc-900/80 border-zinc-800 focus:border-blue-500 text-white font-mono text-center h-10"
           />
         </div>
-        <div>
-          <Label htmlFor="dayLandings">Day Landings</Label>
+        <div className="space-y-2">
+          <Label htmlFor="dayLandings" className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Day Landings</Label>
           <Input
             id="dayLandings"
             type="number"
@@ -404,10 +266,11 @@ export default function FlightForm({ initialData }: FlightFormProps) {
             step="1"
             value={form.dayLandings}
             onChange={(e) => setForm({ ...form, dayLandings: e.target.value })}
+            className="bg-zinc-900/80 border-zinc-800 focus:border-blue-500 text-white font-mono text-center h-10"
           />
         </div>
-        <div>
-          <Label htmlFor="nightLandings">Night Landings</Label>
+        <div className="space-y-2">
+          <Label htmlFor="nightLandings" className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Night Landings</Label>
           <Input
             id="nightLandings"
             type="number"
@@ -415,82 +278,50 @@ export default function FlightForm({ initialData }: FlightFormProps) {
             step="1"
             value={form.nightLandings}
             onChange={(e) => setForm({ ...form, nightLandings: e.target.value })}
+            className="bg-zinc-900/80 border-zinc-800 focus:border-blue-500 text-white font-mono text-center h-10"
           />
         </div>
       </div>
 
-      <div>
-        <Label htmlFor="remarks">Remarks</Label>
+      <div className="space-y-2">
+        <Label htmlFor="remarks" className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Remarks / Operational Notes</Label>
         <Input
           id="remarks"
-          placeholder="Optional notes"
+          placeholder="System notes..."
           maxLength={500}
           value={form.remarks}
           onChange={(e) => setForm({ ...form, remarks: e.target.value })}
+          className="bg-zinc-900/50 border-zinc-800 focus:border-blue-500 text-white font-mono text-sm h-11 placeholder:text-zinc-700"
         />
       </div>
 
-      <div className="border-t pt-4 space-y-4">
-        <h3 className="text-sm font-medium flex items-center gap-2">
-          <PenTool className="w-4 h-4" /> Instructor Verification (Optional)
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-          <div>
-            <Label htmlFor="instructorName">Instructor Name</Label>
-            <Input
-              id="instructorName"
-              placeholder="Full Name"
-              value={form.instructorName}
-              onChange={(e) => setForm({ ...form, instructorName: e.target.value })}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-             {form.signatureData ? (
-               <div className="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 p-2 rounded border border-green-200 dark:border-green-800">
-                 <CheckCircle2 className="w-4 h-4 text-green-500" />
-                 <span className="text-xs text-green-700 dark:text-green-400 font-medium">Signed</span>
-                 <Button 
-                   type="button" 
-                   variant="ghost" 
-                   size="sm" 
-                   className="text-xs ml-auto h-7"
-                   onClick={() => setForm({ ...form, signatureData: null })}
-                 >
-                   Clear Signature
-                 </Button>
-               </div>
-             ) : (
-               <Button 
-                 type="button" 
-                 variant="outline" 
-                 onClick={() => setShowSignaturePad(true)}
-                 className="w-full"
-               >
-                 Add Signature
-               </Button>
-             )}
-          </div>
-        </div>
-      </div>
+      <InstructorVerification 
+        instructorName={form.instructorName || ""} 
+        signatureData={form.signatureData} 
+        onInstructorNameChange={(val) => setForm({ ...form, instructorName: val })} 
+        onSignatureChange={(val) => setForm({ ...form, signatureData: val })} 
+      />
 
-      {showSignaturePad && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <SignaturePad 
-            onSave={(data) => {
-              setForm({ ...form, signatureData: data });
-              setShowSignaturePad(false);
-            }} 
-            onCancel={() => setShowSignaturePad(false)} 
-          />
-        </div>
-      )}
-
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={isPending}>
-          {isPending ? "Saving…" : isEditMode ? "Update Flight" : "Save Flight"}
-        </Button>
-        <Button type="button" variant="ghost" onClick={() => router.back()}>
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800/50 mt-8">
+        <Button 
+          type="button" 
+          variant="ghost" 
+          onClick={() => router.back()}
+          className="h-11 px-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-white hover:bg-zinc-800"
+        >
           Cancel
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={isPending}
+          className="h-11 px-8 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all active:scale-95"
+        >
+          {isPending 
+            ? "Saving..." 
+            : isEditMode 
+              ? "Update Flight Log" 
+              : "Save Flight Log"
+          }
         </Button>
       </div>
     </form>

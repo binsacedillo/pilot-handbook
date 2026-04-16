@@ -16,15 +16,15 @@ interface FlightTableProps {
 
 export function FlightTable({ flights, onDelete, isDeleting }: FlightTableProps) {
   return (
-    <GlassCard className="p-0 overflow-hidden border-(--glass-border) transition-all duration-500 shadow-2xl">
+    <div className="data-heavy-view rounded-xl border border-zinc-800 shadow-2xl overflow-hidden group/table">
       <div className="overflow-x-auto custom-scrollbar">
         <table className="min-w-full border-collapse">
           <thead>
-            <tr className="glass-sticky-header">
-              <th className="sticky left-0 z-40 bg-(--glass-bg) px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 min-w-[120px]">
+            <tr className="border-b border-zinc-800 bg-zinc-900/50">
+              <th className="sticky left-0 z-40 bg-zinc-900 px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 min-w-[120px]">
                 Date
               </th>
-              <th className="sticky left-[120px] z-40 bg-(--glass-bg) px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 min-w-[180px]">
+              <th className="sticky left-[120px] z-40 bg-zinc-900 px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 min-w-[200px]">
                 Route (DEP → ARR)
               </th>
               <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
@@ -55,9 +55,9 @@ export function FlightTable({ flights, onDelete, isDeleting }: FlightTableProps)
               return (
                 <tr 
                   key={f.id} 
-                  className="group relative hover:bg-white/5 transition-all duration-300 ease-out"
+                  className="group relative hover:bg-blue-500/5 border-b border-zinc-900 transition-all duration-150 ease-out"
                 >
-                  <td className="sticky left-0 z-30 bg-background/80 backdrop-blur-md px-6 py-4 text-xs font-bold text-foreground w-[120px] min-w-[120px]">
+                  <td className="sticky left-0 z-30 bg-background px-6 py-4 text-xs font-bold text-foreground w-[120px] min-w-[120px]">
                     {/* Selection Indicator Glow */}
                     <div className="absolute left-0 inset-y-0 w-[2.5px] bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-[0_0_12px_rgba(59,130,246,0.5)]" />
                     
@@ -67,7 +67,7 @@ export function FlightTable({ flights, onDelete, isDeleting }: FlightTableProps)
                       day: '2-digit'
                     })}
                   </td>
-                  <td className="sticky left-[120px] z-30 bg-background/80 backdrop-blur-md px-6 py-4 w-[180px] min-w-[180px]">
+                  <td className="sticky left-[120px] z-30 bg-background px-6 py-4 w-[200px] min-w-[200px]">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-black tracking-tight text-foreground">
                         {f.departureCode}
@@ -138,6 +138,6 @@ export function FlightTable({ flights, onDelete, isDeleting }: FlightTableProps)
           </tbody>
         </table>
       </div>
-    </GlassCard>
+    </div>
   );
 }

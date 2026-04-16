@@ -123,7 +123,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
                 DASHBOARD<span className="text-blue-500">.</span>
               </h1>
               <p className="text-xs md:text-sm font-bold uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 light:text-slate-500">
-                System Status: <span className="text-emerald-500">ONLINE</span> • 
+                Connectivity: <span className="text-emerald-500">ONLINE</span> • 
                 Active Pilot: <span className="text-foreground">{pilotName}</span>
               </p>
             </div>
@@ -243,7 +243,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
                             </div>
                             <div className="text-[10px] font-black text-emerald-500 uppercase tracking-tighter mb-2 flex items-center gap-1">
                               <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                              Active Flight Detected
+                              Upcoming Flight Status
                             </div>
                             <div className="text-lg font-black text-foreground mb-1 leading-tight">
                               {upcomingFlight.departureCode} → {upcomingFlight.arrivalCode}
