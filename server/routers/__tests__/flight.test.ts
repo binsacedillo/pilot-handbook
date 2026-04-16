@@ -174,7 +174,6 @@ beforeEach(() => {
     // Stateful flight.create
     ctx.db.flight.create.mockImplementation(async (args) => {
       const data = args && args.input ? args.input : args?.data ?? args;
-      console.log('Create input duration:', data?.duration);
       const baseFlight = {
         id: 'test-flight-' + Date.now(),
         createdAt: new Date(),
@@ -206,7 +205,6 @@ beforeEach(() => {
         ...data,
         duration: Number(data?.duration ?? baseFlight.duration ?? 0),
       };
-      console.log('Saved duration:', newFlight.duration);
       flightDb.push(newFlight);
       return newFlight;
     });
@@ -253,6 +251,23 @@ describe('Flight Router', () => {
     };
     const result = await caller.flight.create(input);
     expect(result.id).toBeDefined();
+  });
+
+  it('should handle a Quick Log entry (picTime equals duration)', async () => {
+    const input = {
+      aircraftId: 'aircraft-1',
+      departureCode: 'KPHL',
+      arrivalCode: 'KEWR',
+      date: new Date(),
+      duration: 0.8,
+      picTime: 0.8, // Quick Log pattern
+      dualTime: 0,
+      dayLandings: 1,
+      nightLandings: 0,
+    };
+    const result = await caller.flight.create(input);
+    expect(result.duration).toBe(0.8);
+    expect(result.picTime).toBe(result.duration);
   });
 
   it('should get a flight by id', async () => {
