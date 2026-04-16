@@ -2,42 +2,46 @@ import Link from "next/link";
 import { Plane } from "lucide-react";
 
 export default function AppFooter() {
-	const currentYear = new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
 
-	return (
-		<footer className="bg-card border-t-2 border-slate-300 dark:border-slate-700 mt-auto">
-			<div className="max-w-7xl mx-auto px-4 py-6 text-muted-foreground">
-				{/* Main Footer Content */}
-				<div className="flex flex-col md:flex-row justify-between items-center gap-4">
-					{/* Brand */}
-					<div className="flex items-center gap-2 text-foreground">
-						<Plane className="w-4 h-4 text-primary" />
-						<span className="text-sm font-semibold">Pilot Handbook</span>
-					</div>
+  return (
+    <footer className="mt-auto border-t border-zinc-800 bg-zinc-950/80 backdrop-blur-xl relative z-10 w-full">
+      <div className="absolute top-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          {/* Brand */}
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-500">
+              <Plane className="w-5 h-5" />
+            </div>
+            <span className="text-sm font-black tracking-widest uppercase text-foreground">Pilot Handbook</span>
+          </div>
 
-					{/* Links */}
-					<div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-						<Link href="/about" className="hover:text-foreground transition-colors">
-							About
-						</Link>
-						<Link href="/terms" className="hover:text-foreground transition-colors">
-							Terms of Service
-						</Link>
-						<Link href="/privacy" className="hover:text-foreground transition-colors">
-							Privacy Policy
-						</Link>
-						<Link href="/contact" className="hover:text-foreground transition-colors">
-							Contact
-						</Link>
-						<Link href="/help" className="hover:text-foreground transition-colors">
-							Help Center
-						</Link>
-					</div>
+          {/* Links */}
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            <Link href="/about" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
+              About
+            </Link>
+            <Link href="/terms" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
+              Terms of Service
+            </Link>
+            <Link href="/privacy" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/contact" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
+              Contact
+            </Link>
+            <Link href="/help" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
+              Help Center
+            </Link>
+          </div>
 
-					{/* Copyright */}
-					<div className="text-sm">© {currentYear} All rights reserved</div>
-				</div>
-			</div>
-		</footer>
-	);
+          {/* Copyright */}
+          <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
+            © {currentYear} SYSTEM INIT
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
 }

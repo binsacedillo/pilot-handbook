@@ -82,6 +82,12 @@ export default function AircraftPage() {
     aircraftRegistration: string | null;
   }>({ open: false, aircraftId: null, aircraftRegistration: null });
 
+  const [restoreDialogState, setRestoreDialogState] = useState<{
+    open: boolean;
+    aircraftId: string | null;
+    aircraftRegistration: string | null;
+  }>({ open: false, aircraftId: null, aircraftRegistration: null });
+
   // Show only archived when checkbox is enabled; otherwise show active only
   const displayedAircraft = showArchived
     ? (aircraft ?? []).filter((a) => a.isArchived)
@@ -97,6 +103,14 @@ export default function AircraftPage() {
 
   const handlePermanentDeleteClick = (aircraftId: string, registration: string) => {
     setPermanentDeleteDialogState({
+      open: true,
+      aircraftId,
+      aircraftRegistration: registration,
+    });
+  };
+
+  const handleRestoreClick = (aircraftId: string, registration: string) => {
+    setRestoreDialogState({
       open: true,
       aircraftId,
       aircraftRegistration: registration,
@@ -123,8 +137,14 @@ export default function AircraftPage() {
     }
   };
 
-  const handleRestore = async (aircraftId: string) => {
-    await restoreMutation.mutateAsync({ id: aircraftId });
+  const handleConfirmRestore = async () => {
+    if (!restoreDialogState.aircraftId) return;
+    const aircraftId = restoreDialogState.aircraftId;
+    try {
+      await restoreMutation.mutateAsync({ id: aircraftId });
+    } catch {
+      // Error handled in onError
+    }
   };
 
   return (
@@ -198,6 +218,21 @@ export default function AircraftPage() {
           onConfirm={handleConfirmPermanentDelete}
           confirmLabel="Delete Permanently"
           requireConfirmText="DELETE"
+        />
+
+        <DeleteDialog
+          open={restoreDialogState.open}
+          onOpenChange={(open: boolean) =>
+            setRestoreDialogState((prev) => ({ ...prev, open }))
+          }
+          title="Restore Aircraft"
+          description="Are you sure you want to restore this aircraft to the active fleet?"
+          itemName={restoreDialogState.aircraftRegistration || ""}
+          isLoading={restoreMutation.isPending}
+          onConfirm={handleConfirmRestore}
+          confirmLabel="Restore to Fleet"
+          confirmVariant="default"
+          titleClassName="text-emerald-500"
         />
 
         {isLoading ? (
@@ -283,7 +318,7 @@ export default function AircraftPage() {
                           variant="outline"
                           size="sm"
                           className="flex-1 h-10 rounded-xl border-(--glass-border) text-emerald-500 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-500/30"
-                          onClick={() => handleRestore(a.id)}
+                          onClick={() => handleRestoreClick(a.id, a.registration)}
                           disabled={restoreMutation.isPending}
                         >
                           <RefreshCw className={cn("w-3.5 h-3.5", restoreMutation.isPending && "animate-spin")} />

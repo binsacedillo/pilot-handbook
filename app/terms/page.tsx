@@ -1,67 +1,72 @@
 import AppHeader from "@/components/common/AppHeader";
-import Footer from "@/components/landing/Footer";
+import AppFooter from "@/components/common/AppFooter";
 
 export default function TermsPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
+      {/* Decorative Cockpit Glows */}
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-blue-500/5 blur-[120px] -z-10 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-indigo-500/5 blur-[150px] -z-10 pointer-events-none" />
       <AppHeader />
-      <main className="flex-grow py-12 px-4 md:px-6">
+      <main className="flex-1 max-w-4xl mx-auto p-6 md:p-12 w-full relative z-10 my-10">
         <section
-          className="max-w-4xl mx-auto px-6 md:px-12 py-12 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800"
+          className="rounded-2xl bg-zinc-950/40 backdrop-blur-3xl border border-zinc-800 shadow-2xl p-8 md:p-12 overflow-hidden relative"
           aria-labelledby="terms-title"
         >
-          <header className="mb-12 text-center">
-          <h1
-            id="terms-title"
-            className="text-3xl md:text-4xl font-extrabold text-blue-700 dark:text-blue-300 mb-2 tracking-tight"
-          >
-            Terms of Service
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            <em>Last updated: January 11, 2026</em>
-          </p>
-        </header>
-        <div className="space-y-8 text-base leading-relaxed text-slate-800 dark:text-slate-200">
-          <section>
-            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">Effective Date</h2>
-            <p>January 11, 2026</p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">Project Status</h2>
-            <p>Pilot Handbook is currently under development. The following terms are provided for transparency and may be updated prior to public launch.</p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">1. Acceptance of Terms</h2>
-            <p>By accessing or using Pilot Handbook, you agree to be bound by these Terms of Service. If you do not agree, you may not use the platform.</p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">2. Use of the Platform</h2>
-            <p>You may use Pilot Handbook only for lawful purposes and in accordance with these terms. The platform is provided &quot;as is&quot; during the development phase and may be subject to change or downtime.</p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">3. User Accounts</h2>
-            <p>If you create an account, you are responsible for maintaining the confidentiality of your credentials and for all activities that occur under your account.</p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">4. Intellectual Property</h2>
-            <p>All content, trademarks, and intellectual property on Pilot Handbook remain the property of their respective owners. You may not copy, modify, or distribute any part of the platform without permission.</p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">5. Disclaimer &amp; Limitation of Liability</h2>
-            <p>Pilot Handbook is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We make no warranties regarding the accuracy, reliability, or availability of the platform. To the fullest extent permitted by law, we disclaim all liability for any damages arising from your use of the platform.</p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">6. Changes to Terms</h2>
-            <p>We reserve the right to update these Terms of Service at any time. Changes will be posted on this page with an updated effective date.</p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 mb-2">7. Contact</h2>
-            <p>For questions about these Terms of Service, please contact the project team. Official contact details will be provided upon public release.</p>
-          </section>
-        </div>
-      </section>
+          {/* decorative hud line */}
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+          <header className="mb-12 border-b border-zinc-800 pb-8 text-center md:text-left">
+            <h1
+              id="terms-title"
+              className="text-3xl md:text-5xl font-black tracking-tighter text-foreground uppercase mb-4"
+            >
+              Terms of <span className="text-blue-500">Service</span>
+            </h1>
+            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+              [ EFFECTIVE DATE: JANUARY 11, 2026 ]
+            </p>
+          </header>
+          <div className="space-y-10 text-sm leading-relaxed text-zinc-300">
+            <section>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Project Status</h2>
+              <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-lg">
+                <p className="text-zinc-400 font-mono text-xs">
+                  Pilot Handbook is currently under development. The following terms are provided for transparency and may be updated prior to public launch.
+                </p>
+              </div>
+            </section>
+            <section>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">1. Acceptance of Terms</h2>
+              <p>By accessing or using Pilot Handbook, you agree to be bound by these Terms of Service. If you do not agree, you may not use the platform.</p>
+            </section>
+            <section>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">2. Use of the Platform</h2>
+              <p>You may use Pilot Handbook only for lawful purposes and in accordance with these terms. The platform is provided &quot;as is&quot; during the development phase and may be subject to change or downtime.</p>
+            </section>
+            <section>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">3. User Accounts</h2>
+              <p>If you create an account, you are responsible for maintaining the confidentiality of your credentials and for all activities that occur under your account.</p>
+            </section>
+            <section>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">4. Intellectual Property</h2>
+              <p>All content, trademarks, and intellectual property on Pilot Handbook remain the property of their respective owners. You may not copy, modify, or distribute any part of the platform without permission.</p>
+            </section>
+            <section>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">5. Disclaimer &amp; Limitation of Liability</h2>
+              <p>Pilot Handbook is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We make no warranties regarding the accuracy, reliability, or availability of the platform. To the fullest extent permitted by law, we disclaim all liability for any damages arising from your use of the platform.</p>
+            </section>
+            <section>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">6. Changes to Terms</h2>
+              <p>We reserve the right to update these Terms of Service at any time. Changes will be posted on this page with an updated effective date.</p>
+            </section>
+            <section>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">7. Contact</h2>
+              <p>For questions about these Terms of Service, please contact the project team. Official contact details will be provided upon public release.</p>
+            </section>
+          </div>
+        </section>
       </main>
-      <Footer />
+      <AppFooter />
     </div>
   );
 }
