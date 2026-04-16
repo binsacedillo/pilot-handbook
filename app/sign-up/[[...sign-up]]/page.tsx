@@ -85,15 +85,7 @@ export default function SignUpPage() {
 						</div>
 					</div>
 
-					<div className="relative z-10 border-l-4 border-blue-600 pl-6 py-2">
-						<p className="text-gray-400 text-sm italic">
-							&ldquo;This logbook has transformed how I track my hours. It&apos;s intuitive,
-							reliable, and exactly what I needed.&rdquo;
-						</p>
-						<p className="text-white font-semibold mt-2">
-							— Capt. Sarah Chen, Commercial Pilot
-						</p>
-					</div>
+
 				</div>
 
 				{/* Right Side - Sign Up Form */}

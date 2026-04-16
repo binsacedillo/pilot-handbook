@@ -19,6 +19,16 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "upload.wikimedia.org",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "img.clerk.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
         hostname: "*.gstatic.com",
         pathname: "**",
       },
