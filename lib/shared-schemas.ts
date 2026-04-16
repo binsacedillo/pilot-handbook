@@ -35,7 +35,7 @@ export const updateAircraftSchema = createAircraftSchema.partial().extend({
 // ============================================================================
 
 const flightBaseSchema = z.object({
-  date: z.date().max(new Date(), { message: 'Flight date cannot be in the future' }),
+  date: z.date().refine((d) => d <= new Date(), { message: 'Flight date cannot be in the future' }),
   departureCode: z.string().min(3).max(4),
   arrivalCode: z.string().min(3).max(4),
   duration: z.number().min(0.1, 'Duration must be at least 0.1 hours'),
