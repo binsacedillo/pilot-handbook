@@ -379,6 +379,6 @@ export const flightRouter = createTRPCRouter({
     .input(z.object({ now: z.string() }))
     .query(async ({ ctx, input }) => {
       if (!ctx.user) return null;
-      return FlightService.getUpcomingMission(ctx.db as any, ctx.user.id, input.now);
+      return FlightService.getUpcomingFlight(ctx.db as any, ctx.user.id, input.now);
     }),
 });

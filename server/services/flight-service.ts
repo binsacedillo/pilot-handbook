@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 /**
- * Service to handle complex flight statistics, legality calculations, and mission detection.
+ * Service to handle complex flight statistics, legality calculations, and flight itinerary tracking.
  * Separates business logic from the tRPC transport layer.
  */
 export const FlightService = {
@@ -66,9 +66,9 @@ export const FlightService = {
   },
 
   /**
-   * Detects the single next upcoming mission for a pilot.
+   * Identifies the single next upcoming flight for a pilot.
    */
-  async getUpcomingMission(db: PrismaClient, userId: string, now: string) {
+  async getUpcomingFlight(db: PrismaClient, userId: string, now: string) {
     const upcoming = await (db as any).flight.findFirst({
       where: {
         userId,
