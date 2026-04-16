@@ -1,4 +1,5 @@
 "use client";
+import type { MetarData } from "@/types/weather";
 
 import React, { useState, type KeyboardEvent } from "react";
 import { 
@@ -19,31 +20,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface WeatherWidgetProps {
-  metar: {
-    icao: string;
-    raw: string;
-    station: string;
-    flightCategory: string;
-    wind: {
-      direction: number | null;
-      speed: number | null;
-      gust: number | null;
-      unit: string;
-    };
-    visibility: {
-      value: number | null;
-      unit: string;
-    };
-    ceiling: {
-      value: number | null;
-      unit: string;
-    };
-    temperature: number | null;
-    dewpoint: number | null;
-    altimeter: number | null;
-    altimeterUnit: string;
-    time: string;
-  } | null;
+  metar: MetarData | null;
   isLoading?: boolean;
   error?: string | null;
   onAirportChange?: (icao: string) => void;
@@ -199,9 +176,38 @@ export function WeatherWidget({
             </div>
           </div>
 
-          <div className="mt-6 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-600 light:text-slate-400">
-             <span>Station Updated {new Date(metar.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-             {isFavorite && <span className="text-blue-500/50">Primary Station</span>}
+          <div className="mt-6 pt-4 border-t border-(--glass-border) flex flex-wrap items-center justify-between gap-y-2">
+             <div className="flex items-center gap-4">
+               <div className="flex flex-col">
+                 <span className="text-[8px] text-zinc-500 font-black uppercase">Local Time</span>
+                 <span className="text-xs font-bold text-foreground">
+                   {new Date(metar.time).toLocaleTimeString([], {
+                     hour: "2-digit",
+                     minute: "2-digit",
+                     timeZone: metar.timezone
+                   })}
+                 </span>
+               </div>
+               <div className="w-px h-6 bg-(--glass-border)" />
+               <div className="flex flex-col">
+                 <span className="text-[8px] text-zinc-500 font-black uppercase">Zulu (UTC)</span>
+                 <span className="text-xs font-bold text-blue-500/80">
+                   {new Date(metar.time).toLocaleTimeString([], {
+                     hour: "2-digit",
+                     minute: "2-digit",
+                     hour12: false,
+                     timeZone: "UTC"
+                   })}Z
+                 </span>
+               </div>
+             </div>
+             
+             <div className="flex items-center gap-2">
+               {isFavorite && <span className="inline-block px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 text-[8px] font-black uppercase">Primary</span>}
+               <span className="text-[8px] text-zinc-600 font-black uppercase tracking-widest bg-zinc-900/50 px-2 py-1 rounded border border-(--glass-border)">
+                 Observed Day {new Date(metar.time).getDate()}
+               </span>
+             </div>
           </div>
         </GlassCardContent>
       </GlassCard>
