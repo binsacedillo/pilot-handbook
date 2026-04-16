@@ -7,6 +7,7 @@ import type { RouterOutputs } from "@/trpc/shared";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import FlightForm from "@/components/flights/FlightForm";
+import QuickFlightForm from "@/components/flights/QuickFlightForm";
 import { FlightFilterBar } from "@/components/flights/FlightFilterBar";
 import EmptyState from "@/components/common/EmptyState";
 import { cn } from "@/lib/utils";
@@ -54,6 +55,7 @@ export default function FlightsPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [showForm, setShowForm] = useState(false);
+  const [isQuickMode, setIsQuickMode] = useState(false);
   const [pulseNew, setPulseNew] = useState(false);
   const { showToast } = useToast();
   const userName = user?.fullName || user?.primaryEmailAddress?.emailAddress || "Pilot";
@@ -82,16 +84,23 @@ export default function FlightsPage() {
     // URL Cleanup (UX Pro Move): Deep-link detection and query consumption
     if (searchParams.get("new") === "true") {
       setShowForm(true);
-      setPulseNew(true);
       
-      // Clean up the URL
-      const params = new URLSearchParams(searchParams.toString());
+      // Delay the highlight pulse until the page has fully "settled" after the loading HUD
+      const settleTimeout = setTimeout(() => setPulseNew(true), 500);
+      
+      // Clean up the URL Silently (Avoids triggering Next.js Router transitions and double loading)
+      const params = new URLSearchParams(window.location.search);
       params.delete("new");
-      const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
-      router.replace(nextUrl);
+      const nextUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+      window.history.replaceState({ ...window.history.state, as: nextUrl, url: nextUrl }, '', nextUrl);
 
-      // Disable pulse after animation cycle
-      setTimeout(() => setPulseNew(false), 6000);
+      // Disable pulse after animation cycle (3 pulses @ 2s each)
+      const clearPulseTimeout = setTimeout(() => setPulseNew(false), 6500);
+
+      return () => {
+        clearTimeout(settleTimeout);
+        clearTimeout(clearPulseTimeout);
+      };
     }
   }, [searchParams, router, pathname]);
   
@@ -247,19 +256,41 @@ export default function FlightsPage() {
 
         {showForm && (
           <div className={cn(
-            "mb-10 animate-in fade-in slide-in-from-top-4 duration-500",
-            pulseNew && "animate-master-caution"
+            "mb-10 animate-in fade-in slide-in-from-top-4 duration-500 rounded-2xl",
+            pulseNew && "animate-hud-highlight"
           )}>
             <GlassCard className="relative border-blue-500/20">
               <div className="px-6 py-4 border-b border-(--glass-border) flex justify-between items-center bg-blue-500/5">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                  <h2 className="text-xs font-black uppercase tracking-widest text-blue-500">Flight Entry Panel</h2>
+                  <h2 className="text-xs font-black uppercase tracking-widest text-blue-500">Create New Flight</h2>
                 </div>
-                <Button size="sm" variant="ghost" className="h-8 text-[10px] font-black uppercase tracking-wider text-zinc-500 hover:text-foreground" onClick={() => setShowForm(false)}>Abort Entry</Button>
+                <div className="flex items-center gap-4">
+                  <div className="flex bg-zinc-900/40 p-1 rounded-lg border border-zinc-800">
+                    <button 
+                      onClick={() => setIsQuickMode(false)}
+                      className={cn(
+                        "px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all",
+                        !isQuickMode ? "bg-blue-600 text-white shadow-lg" : "text-zinc-500 hover:text-zinc-300"
+                      )}
+                    >
+                      Full Detail
+                    </button>
+                    <button 
+                      onClick={() => setIsQuickMode(true)}
+                      className={cn(
+                        "px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all",
+                        isQuickMode ? "bg-blue-600 text-white shadow-lg" : "text-zinc-500 hover:text-zinc-300"
+                      )}
+                    >
+                      Quick Log
+                    </button>
+                  </div>
+                  <Button size="sm" variant="ghost" className="h-8 text-[10px] font-black uppercase tracking-wider text-zinc-500 hover:text-foreground" onClick={() => setShowForm(false)}>Cancel</Button>
+                </div>
               </div>
               <div className="p-6">
-                <FlightForm />
+                {isQuickMode ? <QuickFlightForm /> : <FlightForm />}
               </div>
             </GlassCard>
           </div>
