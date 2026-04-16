@@ -1,16 +1,17 @@
 "use client";
+
 import React, { useState } from 'react';
 import { trpc } from '@/trpc/client';
-import { Card } from '@/components/ui/card';
+import { GlassCard, GlassCardContent, GlassCardHeader } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/button';
 import { DeleteDialog } from '@/components/common/DeleteDialog';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Users, ChevronLeft, ChevronRight, UserCog } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 import { isNetworkError, getNetworkErrorMessage, getServerErrorMessage } from '@/lib/error-utils';
+import { cn } from '@/lib/utils';
 
 const UserManagementTable = () => {
   const { showToast } = useToast();
-  // Only pagination is used; search argument removed as backend does not support it
   const [page, setPage] = useState(0);
   const [deleteDialogState, setDeleteDialogState] = useState<{
     open: boolean;
@@ -24,13 +25,9 @@ const UserManagementTable = () => {
     take: 10,
   });
 
-  // Verify pilot mutation with proper cache invalidation
   const verifyPilotMutation = trpc.admin.verifyPilot.useMutation({
     onMutate: async ({ userId, verified }) => {
-      // Cancel outgoing refetches to avoid race conditions
       await utils.admin.getAllUsers.cancel();
-
-      // Optimistically update the cache
       const previousData = utils.admin.getAllUsers.getData({ skip: page * 10, take: 10 });
       if (previousData) {
         utils.admin.getAllUsers.setData(
@@ -48,7 +45,6 @@ const UserManagementTable = () => {
       return { previousData };
     },
     onError: (err, variables, context) => {
-      // Rollback on error
       if (context?.previousData) {
         utils.admin.getAllUsers.setData(
           { skip: page * 10, take: 10 },
@@ -58,89 +54,27 @@ const UserManagementTable = () => {
       const errorMessage = isNetworkError(err)
         ? getNetworkErrorMessage("update user verification")
         : getServerErrorMessage("update user verification", err);
-      showToast(errorMessage, "error", {
-        action: {
-          label: "Retry",
-          onClick: () => verifyPilotMutation.mutate(variables),
-        },
-      });
+      showToast(errorMessage, "error");
     },
     onSettled: async () => {
-      // Refetch to sync with server
       await utils.admin.getAllUsers.invalidate();
       await utils.admin.getStats.invalidate();
-      await utils.admin.recentUsers.invalidate();
     },
   });
 
-  // Delete user mutation with proper cache invalidation
   const deleteUserMutation = trpc.admin.deleteUser.useMutation({
-    onMutate: async ({ userId }) => {
-      // Cancel outgoing refetches
-      await utils.admin.getAllUsers.cancel();
-
-      // Optimistically remove from cache
-      const previousData = utils.admin.getAllUsers.getData({ skip: page * 10, take: 10 });
-      if (previousData) {
-        utils.admin.getAllUsers.setData(
-          { skip: page * 10, take: 10 },
-          {
-            ...previousData,
-            users: previousData.users.filter(user => user.id !== userId),
-            total: previousData.total - 1,
-          }
-        );
-      }
-      return { previousData };
-    },
-    onError: (err, variables, context) => {
-      // Rollback on error
-      if (context?.previousData) {
-        utils.admin.getAllUsers.setData(
-          { skip: page * 10, take: 10 },
-          context.previousData
-        );
-      }
-      const errorMessage = isNetworkError(err)
-        ? getNetworkErrorMessage("delete user")
-        : getServerErrorMessage("delete user", err);
-      showToast(errorMessage, "error", {
-        action: {
-          label: "Retry",
-          onClick: () => deleteUserMutation.mutate(variables),
-        },
-      });
-    },
     onSuccess: () => {
       setDeleteDialogState({ open: false, userId: null, userName: null });
+      showToast("User record removed from system", "success");
     },
     onSettled: async () => {
-      // Invalidate all admin queries to sync with server
       await utils.admin.getAllUsers.invalidate();
       await utils.admin.getStats.invalidate();
-      await utils.admin.recentUsers.invalidate();
     },
   });
 
-  // Role change is not implemented, so we do not handle it here
-
-  const handleTogglePilotVerification = (
-    userId: string,
-    action: 'verify' | 'unverify'
-  ) => {
-    // Backend expects a boolean 'verified', not a string 'action'
-    verifyPilotMutation.mutate({
-      userId,
-      verified: action === 'verify',
-    });
-  };
-
-  const handleDeleteClick = (userId: string, userName: string) => {
-    setDeleteDialogState({
-      open: true,
-      userId,
-      userName,
-    });
+  const handleVerify = (userId: string, verified: boolean) => {
+    verifyPilotMutation.mutate({ userId, verified });
   };
 
   const handleConfirmDelete = async () => {
@@ -150,129 +84,126 @@ const UserManagementTable = () => {
 
   if (isLoading) {
     return (
-      <Card className="p-8">
-        <div className="flex items-center justify-center" role="status" aria-live="polite" aria-busy="true">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <span className="sr-only">Loading users...</span>
+      <div className="p-8 text-center bg-zinc-950/20 rounded-xl border border-zinc-800">
+        <div className="inline-block relative w-12 h-12">
+            <div className="absolute inset-0 rounded-full border-2 border-blue-500/20" />
+            <div className="absolute inset-0 rounded-full border-t-2 border-blue-500 animate-spin" />
         </div>
-      </Card>
+        <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-blue-500/50">Synchronizing Directory...</p>
+      </div>
     );
   }
 
   return (
-    <Card className="overflow-hidden">
-      {/* Search input removed as backend does not support search */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-border">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Joined Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-background divide-y divide-border">
-            {data?.users.map((user) => (
-              <tr key={user.id} className="hover:bg-muted/30 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                  {user.firstName} {user.lastName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{user.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' :
-                      user.role === 'PILOT' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-                    }`}>
-                    {user.role}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                  {new Date(user.createdAt).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <div className="flex items-center gap-2">
-                    <select
-                      className="border border-input bg-background px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer hover:bg-muted/50 transition"
-                      defaultValue=""
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (!value) return;
-                        if (value === 'verify') {
-                          handleTogglePilotVerification(user.id, 'verify');
-                        } else if (value === 'unverify') {
-                          handleTogglePilotVerification(user.id, 'unverify');
-                        }
-                        e.target.value = '';
-                      }}
-                    >
-                      <option value="">Select action</option>
-                      <option value="verify">Verify Pilot</option>
-                      <option value="unverify">Unverify Pilot</option>
-                    </select>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteClick(user.id, `${user.firstName} ${user.lastName}`)}
-                      title="Delete user"
-                      aria-label={`Delete user ${user.firstName} ${user.lastName}`}
-                    >
-                      <Trash2 className="h-4 w-4" aria-hidden="true" />
-                    </Button>
-                  </div>
-                  {/*
-                    Promote/Demote Admin button and mutation are commented out for now.
-                    Uncomment and implement when backend is ready.
-                    Example:
-                    <button
-                      onClick={() => promoteDemoteMutation.mutate({ userId: user.id, promote: true })}
-                      className="ml-2 p-2 bg-yellow-500 text-white rounded"
-                    >
-                      Promote to Admin
-                    </button>
-                  */}
-                </td>
+    <div className="space-y-4">
+      <div className="overflow-hidden border border-zinc-800/50 rounded-xl bg-zinc-950/20 backdrop-blur-md">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-zinc-800 bg-zinc-900/40">
+                <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Account Identifier</th>
+                <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">User Details</th>
+                <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-[var(--glass-text-dim)]">Access Level</th>
+                <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Registration Date</th>
+                <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-zinc-500 text-right">User Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="px-6 py-4 bg-muted/50 border-t border-border flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing {page * 10 + 1} to {Math.min((page + 1) * 10, (data?.users?.length ?? 0) + page * 10)} of {data?.total ?? 0} users
+            </thead>
+            <tbody className="divide-y divide-zinc-800/30">
+              {data?.users.map((user) => (
+                <tr key={user.id} className="hover:bg-blue-500/5 transition-colors group">
+                  <td className="py-4 px-6">
+                    <p className="text-sm font-bold text-foreground font-mono">{user.email}</p>
+                  </td>
+                  <td className="py-4 px-6">
+                    <p className="text-sm font-semibold text-zinc-400">
+                      {user.firstName} {user.lastName}
+                    </p>
+                  </td>
+                  <td className="py-4 px-6">
+                    <span className={cn(
+                      "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border",
+                      user.role === 'ADMIN' ? "bg-purple-500/10 text-purple-500 border-purple-500/20" : 
+                      user.role === 'PILOT' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : 
+                      "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"
+                    )}>
+                      {user.role}
+                    </span>
+                  </td>
+                  <td className="py-4 px-6">
+                    <p className="text-[10px] font-mono text-zinc-500">
+                      {new Date(user.createdAt).toISOString().split('T')[0]}
+                    </p>
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleVerify(user.id, user.role !== 'PILOT')}
+                        className={cn(
+                          "h-8 text-[9px] font-black uppercase tracking-widest border border-zinc-800",
+                          user.role === 'PILOT' ? "text-amber-500 hover:bg-amber-500/10" : "text-emerald-500 hover:bg-emerald-500/10"
+                        )}
+                      >
+                         {user.role === 'PILOT' ? 'Revoke Cert' : 'Approve Pilot'}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setDeleteDialogState({ open: true, userId: user.id, userName: `${user.firstName} ${user.lastName}` })}
+                        className="h-8 w-8 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 border border-zinc-800"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-            disabled={page === 0}
-            variant="outline"
-            size="sm"
-          >
-            Previous
-          </Button>
-          <Button
-            onClick={() => setPage((prev) => prev + 1)}
-            disabled={(data?.users?.length ?? 0) < 10}
-            variant="outline"
-            size="sm"
-          >
-            Next
-          </Button>
+
+        {/* HUD Pagination */}
+        <div className="px-6 py-4 bg-zinc-900/50 border-t border-zinc-800 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest px-2 py-1 bg-zinc-950/50 rounded border border-zinc-800">
+              RECORDS: {page * 10 + 1}-{Math.min((page + 1) * 10, (data?.total ?? 0))} of {data?.total}
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+              disabled={page === 0}
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0 border-zinc-800 bg-zinc-900/50 hover:bg-blue-600/20 hover:text-blue-500"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={() => setPage((prev) => prev + 1)}
+              disabled={(data?.users?.length ?? 0) < 10}
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0 border-zinc-800 bg-zinc-900/50 hover:bg-blue-600/20 hover:text-blue-500"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
       <DeleteDialog
         open={deleteDialogState.open}
         onOpenChange={(open) => setDeleteDialogState({ open, userId: null, userName: null })}
-        title="Delete User"
-        description="⚠️ CRITICAL: This will permanently delete this user's account and ALL their flight data. This includes all flight hours, aircraft records, and logbook entries. This action CANNOT be undone and may affect the pilot's legal records."
+        title="Attention: Account Deactivation"
+        description="WARNING: You are about to permanently remove this user from the system. This action will delete all associated flight history, aircraft records, and logbook data. This cannot be reversed."
         itemName={deleteDialogState.userName || undefined}
         isLoading={deleteUserMutation.isPending}
         onConfirm={handleConfirmDelete}
         requireConfirmText="DELETE"
       />
-    </Card>
+    </div>
   );
 };
 
