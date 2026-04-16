@@ -34,10 +34,19 @@ function getSmartTimezone(info: StationInfo | undefined): string {
   // 1. Primary Database Match
   if (info.tz) return info.tz;
   
-  // 2. Regional High-Accuracy Overrides
-  if (info.country === 'PH') return 'Asia/Manila';
-  
-  // 3. Universal Longitude Fallback (15° = 1 hour)
+  	// 2. Regional High-Accuracy Overrides
+	// These ensure DST is handled correctly for major aviation hubs
+	if (info.country === 'PH') return 'Asia/Manila';
+	if (info.country === 'US') {
+		// New York/East Coast Logic
+		if (info.longitude !== undefined && info.longitude > -80 && info.longitude < -66) return 'America/New_York';
+		// West Coast Logic
+		if (info.longitude !== undefined && info.longitude < -114) return 'America/Los_Angeles';
+		// Default US Fallback
+		return 'America/Chicago'; 
+	}
+	
+	// 3. Universal Longitude Fallback (15° = 1 hour)
   if (info.longitude !== undefined) {
     const offset = Math.round(info.longitude / 15);
     // Note: Etc/GMT signs are POSIX inverted (UTC+8 is Etc/GMT-8)
