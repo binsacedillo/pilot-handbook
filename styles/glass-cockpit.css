@@ -40,4 +40,47 @@
 .annunciator-flag {
   @apply bg-amber-500/10 border-amber-500/30 text-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.1)];
 }
-@keyframes success-pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } } .success-pulse { animation: success-pulse-glow 2s infinite; border-color: rgba(16, 185, 129, 0.5) !important; }
+@keyframes success-pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } } 
+
+.success-pulse { animation: success-pulse-glow 2s infinite; border-color: rgba(16, 185, 129, 0.5) !important; }
+
+/* HUD/Instrument Animations */
+@keyframes hud-scanline {
+  0% { transform: translateY(-100%); opacity: 0; }
+  5% { opacity: 0.5; }
+  50% { opacity: 0.3; }
+  95% { opacity: 0.5; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes hud-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes hud-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-hud-scanline {
+  animation: hud-scanline 8s linear infinite;
+}
+
+.animate-hud-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.05) 25%,
+    rgba(59, 130, 246, 0.1) 50%,
+    rgba(59, 130, 246, 0.05) 75%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: hud-shimmer 2.5s infinite linear;
+}
+
+.animate-hud-blink {
+  animation: hud-blink 1s ease-in-out infinite;
+}
+

@@ -8,9 +8,6 @@ import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 
 export default async function Page() {
   const { userId } = await auth();
-  if (!userId) {
-    redirect("/sign-in");
-  }
 
   // Create tRPC caller for the server
   const trpc = api(await createTRPCContext({ 

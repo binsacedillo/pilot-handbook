@@ -17,6 +17,7 @@ import Image from "next/image";
 import { useToast } from "@/components/ui/toast";
 import EmptyState from "@/components/common/EmptyState";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { AircraftSkeleton } from "@/components/aircraft/AircraftSkeleton";
 
 export default function AircraftPage() {
   const { user } = useUser();
@@ -159,7 +160,7 @@ export default function AircraftPage() {
                 />
                 {showArchived && <Plus className="w-3 h-3 text-white rotate-45" />}
               </div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 group-hover:text-foreground transition-colors">Archived Only</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 group-hover:text-foreground transition-colors">System Archives</span>
             </label>
 
             <Button asChild className="h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95 gap-2">
@@ -200,23 +201,21 @@ export default function AircraftPage() {
         />
 
         {isLoading ? (
-          <GlassCard className="p-12 text-center animate-pulse">
-            <p className="text-zinc-500 font-black uppercase tracking-widest text-xs">Loading Fleet Data...</p>
-          </GlassCard>
+          <AircraftSkeleton />
         ) : displayedAircraft.length === 0 ? (
-          <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-12 bg-(--glass-bg)/30 backdrop-blur-sm">
+          <div className="rounded-2xl bg-(--glass-bg)/10 backdrop-blur-sm border border-(--glass-border) animate-in fade-in duration-500">
             <EmptyState
-              icon={<Plane className="w-16 h-16 text-zinc-500" />}
-              title={showArchived ? "No Archived Aircraft" : "No Aircraft Yet"}
+              icon={<Plane className="w-16 h-16 text-zinc-500/50" />}
+              title={showArchived ? "Archive Stream Empty" : "Fleet Status: Null"}
               description={
                 showArchived
-                  ? "You don't have any archived aircraft. Archive an aircraft to manage it here."
-                  : "Start building your fleet by adding your first aircraft. You'll be able to track flights and manage your aviation logbook."
+                  ? "No historical records found in the archive repository."
+                  : "Your fleet database is currently uninitialized. Register your first aircraft to begin operational tracking."
               }
               action={
                 showArchived
-                  ? { label: "Show Active Aircraft", onClick: () => setShowArchived(false) }
-                  : { label: "Add Your First Aircraft", href: "/aircraft/new" }
+                  ? { label: "Return to Active Fleet", onClick: () => setShowArchived(false) }
+                  : { label: "Register Aircraft", href: "/aircraft/new" }
               }
             />
           </div>
@@ -228,6 +227,11 @@ export default function AircraftPage() {
                 a.isArchived && "opacity-60 grayscale hover:grayscale-0 transition-all duration-500"
               )}>
                 <div className="relative h-48 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900/50">
+                  {/* Card HUD Scanline */}
+                  <div className="absolute inset-0 pointer-events-none overflow-hidden z-20 opacity-20">
+                    <div className="w-full h-[1px] bg-blue-500/30 blur-[1px] animate-hud-scanline" />
+                  </div>
+
                   {a.imageUrl ? (
                     <Image
                       src={a.imageUrl}
@@ -237,17 +241,17 @@ export default function AircraftPage() {
                       className="object-cover transition-transform group-hover:scale-105 duration-700"
                     />
                   ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <Plane className="w-12 h-12 text-zinc-300 dark:text-zinc-800" />
+                    <div className="flex items-center justify-center h-full bg-gradient-to-br from-zinc-900/10 to-transparent">
+                      <Plane className="w-12 h-12 text-zinc-300 dark:text-zinc-800/50" />
                     </div>
                   )}
-                  <div className="absolute top-3 right-3">
+                  <div className="absolute top-3 right-3 z-30">
                     <span className={cn(
-                      "text-[9px] px-2.5 py-1 rounded-lg uppercase font-black tracking-widest shadow-sm backdrop-blur-md border border-white/10",
-                      a.status === 'operational' ? 'bg-emerald-500/90 text-white' :
-                        a.status === 'maintenance' ? 'bg-amber-500/90 text-white' : 'bg-rose-500/90 text-white'
+                      "text-[9px] px-2.5 py-1 rounded-sm uppercase font-black tracking-widest shadow-lg border border-white/10 backdrop-blur-md",
+                      a.status === 'operational' ? 'annunciator-verified' :
+                        a.status === 'maintenance' ? 'annunciator-flag' : 'bg-rose-500/90 text-white'
                     )}>
-                      {a.status}
+                      {a.status === 'operational' ? '[ OPERATIONAL ]' : `[ ${a.status.toUpperCase()} ]`}
                     </span>
                   </div>
                 </div>

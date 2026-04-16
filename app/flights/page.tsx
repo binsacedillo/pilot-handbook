@@ -21,6 +21,7 @@ import {
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast";
 import { FlightTable } from "@/components/flights/FlightTable";
+import { FlightLogSkeleton } from "@/components/flights/FlightLogSkeleton";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { 
   ChevronDown, 
@@ -70,7 +71,7 @@ export default function FlightsPage() {
     aircraftId: searchParams.get("aircraftId") || undefined,
   };
 
-  const { data: flights } = trpc.flight.getAll.useQuery(filters);
+  const { data: flights, isLoading } = trpc.flight.getAll.useQuery(filters);
   const deleteMutation = trpc.flight.delete.useMutation();
   const queryClient = useQueryClient();
 
@@ -281,14 +282,16 @@ export default function FlightsPage() {
           onConfirm={handleConfirmDelete}
         />
 
-        {filteredRows.length === 0 ? (
-          <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-12 bg-(--glass-bg)/30 backdrop-blur-sm">
+        {isLoading ? (
+          <FlightLogSkeleton />
+        ) : filteredRows.length === 0 ? (
+          <div className="rounded-2xl bg-(--glass-bg)/10 backdrop-blur-sm border border-(--glass-border)">
             <EmptyState
               icon="✈️"
-              title="No Flights Logged Yet"
-              description="Start building your logbook by logging your first flight. Track your hours, currencies, and achievements."
+              title="No Flights Logged"
+              description="Your logbook represents your legal experience. Start logging to track your transition from student to professional pilot."
               action={{
-                label: "Log Your First Flight",
+                label: "Initialize First Log",
                 onClick: () => setShowForm(true),
               }}
             />
