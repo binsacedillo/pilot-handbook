@@ -130,11 +130,16 @@ export default function FlightForm({ initialData }: FlightFormProps) {
         return;
       }
       updateFlight.mutate({
-        id: initialData.id,
-        ...flightData,
+        operation: "UPDATE_FLIGHT",
+        flightId: initialData.id,
+        changes: flightData,
+        clientVersion: initialData.version ?? 1,
       });
     } else {
-      createFlight.mutate(flightData);
+      createFlight.mutate({
+        operation: "CREATE_FLIGHT",
+        data: flightData,
+      });
     }
   }
 

@@ -146,7 +146,10 @@ export default function FlightsPage() {
     const flightId = deleteDialogState.flightId;
     setOptimisticFlights((prev) => [...prev, flightId]);
     try {
-      await deleteMutation.mutateAsync({ id: flightId });
+      await deleteMutation.mutateAsync({
+        operation: "DELETE_FLIGHT",
+        flightId: flightId,
+      });
       await queryClient.invalidateQueries({ queryKey: ["flight.getAll"] });
       showToast("Flight deleted successfully", "success");
     } catch (error) {

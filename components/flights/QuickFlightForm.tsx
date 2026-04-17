@@ -39,15 +39,18 @@ export default function QuickFlightForm() {
     }
 
     createFlight.mutate({
-      date: new Date(form.date),
-      departureCode: form.departureCode.toUpperCase(),
-      arrivalCode: form.arrivalCode.toUpperCase(),
-      duration: Number(form.duration),
-      picTime: Number(form.duration), // Default PIC to total duration for speed
-      dualTime: 0,
-      nightLandings: 0,
-      aircraftId: form.aircraftId,
-      dayLandings: 1, // Common default
+      operation: "CREATE_FLIGHT",
+      data: {
+        date: new Date(form.date),
+        departureCode: form.departureCode.toUpperCase(),
+        arrivalCode: form.arrivalCode.toUpperCase(),
+        duration: Number(form.duration),
+        picTime: Number(form.duration), // Default PIC to total duration for speed
+        dualTime: 0,
+        nightLandings: 0,
+        aircraftId: form.aircraftId,
+        dayLandings: 1, // Common default
+      },
     });
   }
 

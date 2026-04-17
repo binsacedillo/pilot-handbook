@@ -1,9 +1,16 @@
 import { TRPCError } from '@trpc/server';
+import { Flight } from '@prisma/client';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 import { idSchema, createFlightSchema, updateFlightSchema } from '@/lib/shared-schemas';
 import { createAuditLog } from '@/lib/audit-logger';
 import { FlightService } from '../services/flight-service';
+import { CommandService } from '../services/command-service';
+import { 
+  createFlightCommandSchema, 
+  updateFlightCommandSchema, 
+  deleteFlightCommandSchema 
+} from '@/lib/shared-schemas';
 
 export const flightRouter = createTRPCRouter({
   // Get all flights for the current user with optional filters
@@ -99,6 +106,7 @@ export const flightRouter = createTRPCRouter({
           createdAt: true,
           updatedAt: true,
           userId: true,
+          version: true,
           aircraft: {
             select: {
               id: true,
@@ -162,6 +170,7 @@ export const flightRouter = createTRPCRouter({
           createdAt: true,
           updatedAt: true,
           userId: true,
+          version: true,
           aircraft: {
             select: {
               id: true,
@@ -182,156 +191,36 @@ export const flightRouter = createTRPCRouter({
       return flight;
     }),
 
-  // Create a new flight
   create: protectedProcedure
-    .input(createFlightSchema)
+    .input(createFlightCommandSchema)
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
-        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
       }
 
-      // Verify aircraft belongs to user
-      const aircraft = await ctx.db.aircraft.findFirst({
-        where: {
-          id: input.aircraftId,
-          userId: ctx.user.id,
-        },
-      });
-
-      if (!aircraft) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Aircraft not found' });
-      }
-
-      const flight = await ctx.db.flight.create({
-        data: {
-          ...input,
-          userId: ctx.user.id,
-          isVerified: input.isVerified ?? false,
-          instructorName: input.instructorName,
-          signatureData: input.signatureData,
-          landings: input.dayLandings + input.nightLandings, // for backward compatibility
-        },
-        include: {
-          aircraft: true,
-        },
-      });
-
-      // Audit log: Flight creation
-      await createAuditLog({
-        userId: ctx.user.id,
-        action: 'CREATE',
-        entityType: 'Flight',
-        entityId: flight.id,
-        newValues: {
-          date: flight.date,
-          departureCode: flight.departureCode,
-          arrivalCode: flight.arrivalCode,
-          duration: flight.duration,
-          aircraftId: flight.aircraftId,
-        },
-        changes: `Created flight: ${flight.departureCode} → ${flight.arrivalCode} (${flight.duration}h)`,
-      });
-
-      return flight;
+      return CommandService.createFlight(ctx.db, ctx.user.id, input) as Promise<Flight>;
     }),
 
-  // Update a flight
+  // Update a flight (Refactored to Command Pattern)
   update: protectedProcedure
-    .input(updateFlightSchema)
+    .input(updateFlightCommandSchema) // Now expects the specific update command
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
-        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
       }
 
-      const { id, ...data } = input;
-
-      // Fetch old values for audit trail
-      const oldFlight = await ctx.db.flight.findUnique({
-        where: { id },
-      });
-
-      if (!oldFlight || oldFlight.userId !== ctx.user.id) {
-        throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Flight not found or unauthorized',
-        });
-      }
-
-      // Use update instead of updateMany for better error handling
-      const flight = await ctx.db.flight.update({
-        where: {
-          id,
-          userId: ctx.user.id, // Security Check!
-        },
-        data,
-      });
-
-      // Log audit event
-      await createAuditLog({
-        userId: ctx.user.id,
-        action: 'UPDATE',
-        entityType: 'flight',
-        entityId: id,
-        oldValues: oldFlight,
-        newValues: flight,
-        changes: `Updated flight: ${Object.keys(data).join(', ')}`,
-      });
-
-      return flight;
+      return CommandService.updateFlight(ctx.db, ctx.user.id, input) as Promise<Flight>;
     }),
 
-  // Delete a flight
+  // Delete a flight (Refactored to Command Pattern)
   delete: protectedProcedure
-    .input(idSchema)
+    .input(deleteFlightCommandSchema)
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
-        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
       }
 
-      // Fetch flight before deletion for audit trail
-      const flightToDelete = await ctx.db.flight.findUnique({
-        where: { id: input.id },
-        select: {
-          id: true,
-          date: true,
-          departureCode: true,
-          arrivalCode: true,
-          duration: true,
-          userId: true,
-        },
-      });
-
-      if (!flightToDelete || flightToDelete.userId !== ctx.user.id) {
-        throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Flight not found or unauthorized',
-        });
-      }
-
-      // Delete the flight
-      const flight = await ctx.db.flight.delete({
-        where: {
-          id: input.id,
-          userId: ctx.user.id, // Security Check!
-        },
-      });
-
-      // Audit log: Flight deletion
-      await createAuditLog({
-        userId: ctx.user.id,
-        action: 'DELETE',
-        entityType: 'Flight',
-        entityId: input.id,
-        oldValues: {
-          date: flightToDelete.date,
-          departureCode: flightToDelete.departureCode,
-          arrivalCode: flightToDelete.arrivalCode,
-          duration: flightToDelete.duration,
-        },
-        changes: `Deleted flight: ${flightToDelete.departureCode} → ${flightToDelete.arrivalCode}`,
-      });
-
-      return flight;
+      return CommandService.deleteFlight(ctx.db, ctx.user.id, input) as Promise<{ success: boolean }>;
     }),
 
   // Get recent flights (last 10) for the current user

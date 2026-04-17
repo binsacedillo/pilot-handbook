@@ -23,7 +23,10 @@ export function useFlightMutations({ aircraft }: UseFlightMutationsProps) {
   const [successMessage, setSuccessMessage] = useState("");
 
   const createFlight = trpc.flight.create.useMutation({
-    onMutate: async (newFlight) => {
+    onMutate: async (command) => {
+      if (command.operation !== "CREATE_FLIGHT") return;
+      const newFlight = command.data;
+      
       await utils.flight.getAll.cancel();
       const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightData[] | undefined;
       
@@ -42,6 +45,7 @@ export function useFlightMutations({ aircraft }: UseFlightMutationsProps) {
           updatedAt: new Date(),
           flightHours: 0,
           userId: "",
+          version: 1,
         };
 
         const optimisticAircraft = { ...fallbackAircraft, ...(selectedAircraft ?? {}) };
@@ -58,6 +62,7 @@ export function useFlightMutations({ aircraft }: UseFlightMutationsProps) {
           signatureData: newFlight.signatureData ?? null,
           landings: (newFlight.dayLandings ?? 0) + (newFlight.nightLandings ?? 0),
           remarks: newFlight.remarks ?? null,
+          version: 1,
         } as FlightData;
 
         utils.flight.getAll.setData(
@@ -67,7 +72,7 @@ export function useFlightMutations({ aircraft }: UseFlightMutationsProps) {
       }
       return { previousFlights };
     },
-    onError: (err, newFlight, context) => {
+    onError: (err, command, context) => {
       if (context?.previousFlights) {
         utils.flight.getAll.setData({} as Record<string, unknown>, context.previousFlights);
       }
@@ -77,7 +82,7 @@ export function useFlightMutations({ aircraft }: UseFlightMutationsProps) {
       showToast(errorMessage, "error", {
         action: {
           label: "Retry",
-          onClick: () => createFlight.mutate(newFlight),
+          onClick: () => createFlight.mutate(command),
         },
       });
     },
@@ -97,7 +102,7 @@ export function useFlightMutations({ aircraft }: UseFlightMutationsProps) {
   });
 
   const updateFlight = trpc.flight.update.useMutation({
-    onMutate: async (updatedFlight) => {
+    onMutate: async (command) => {
       await utils.flight.getAll.cancel();
       const previousFlights = utils.flight.getAll.getData({} as Record<string, unknown>) as FlightData[] | undefined;
       
@@ -105,21 +110,20 @@ export function useFlightMutations({ aircraft }: UseFlightMutationsProps) {
         utils.flight.getAll.setData(
           {} as Record<string, unknown>,
           previousFlights.map(f => {
-            if (f.id !== updatedFlight.id) return f;
+            if (f.id !== command.flightId) return f;
             
             return { 
               ...f, 
-              ...updatedFlight,
+              ...command.changes,
               isVerified: f.isVerified,
-              instructorName: updatedFlight.instructorName ?? f.instructorName,
-              signatureData: updatedFlight.signatureData ?? f.signatureData,
+              version: f.version + 1, // Optimistic version bump
             } as FlightData;
           })
         );
       }
       return { previousFlights };
     },
-    onError: (err, updatedFlight, context) => {
+    onError: (err, command, context) => {
       if (context?.previousFlights) {
         utils.flight.getAll.setData({} as Record<string, unknown>, context.previousFlights);
       }
@@ -129,7 +133,7 @@ export function useFlightMutations({ aircraft }: UseFlightMutationsProps) {
       showToast(errorMessage, "error", {
         action: {
           label: "Retry",
-          onClick: () => updateFlight.mutate(updatedFlight),
+          onClick: () => updateFlight.mutate(command),
         },
       });
     },
