@@ -1,52 +1,45 @@
 # ✈️ **Pilot Handbook** | ![Next.js 16](https://img.shields.io/badge/Next.js-16-000000) ![React 19](https://img.shields.io/badge/React-19-61DAFB) ![Tailwind 4](https://img.shields.io/badge/Tailwind-4-38B2AC) ![Clerk v6](https://img.shields.io/badge/Clerk-v6-orange)
 
+> **Professional-Grade Electronic Flight Bag (EFB) for Civilian Aviation.**
+
 ---
 
-## 🗺️ Roadmap
+## 🗺️ Operational Roadmap
 
-### ✅ Completed
-- **Unified Design System**: Premium "Glass Cockpit" aesthetic using Tailwind 4, glassmorphism (`GlassCard`), and interactive ambient lighting.
-- **Security Hardening**: 5-layer defense including `IdleTimeoutManager` with session security (FAA/CAA friendly logic).
-- **Admin logic**: Role-based access control (RBAC), user management, and detailed audit logging.
-- **Clerk v6 Integration**: Modern authentication with secure metadata synchronization and dual-write patterns.
-- **Aircraft Registry**: Full lifecycle management with soft-delete/archive support for historical sequence integrity.
-- **Flight Logging**: Advanced logging with real-time reactivity and multi-parameter filtering (URL state-synced).
-- **Server-side Validation**: Strict Zod schemas and type-safe tRPC procedures.
-- **Weather Integration**: AVWX METAR integration with intelligent caching and fallback logic.
-- **Analytics Dashboard**: High-clarity statistics, recency tracking (90-day currency), and flight trends.
-- **Test Suite (97 tests)**: Full coverage of critical business logic and security guardrails.
-- **Mobile-first Design**: ISO 9241-11 compliant interface, touch-friendly targets, and responsive data tables.
+### ✅ Completed (Civilian Hardened)
+- **Instrument-Grade UI (IGO)**: High-fidelity, zero-distraction operational environment using Tailwind 4 and a strict `Zinc-950` solid-surface architecture.
+- **Flight Operations Suite**: Unified preflight dispatch system combining **Weight & Balance**, **Fuel Planning**, and **Performance Analysis (DA)**.
+- **EFB-Standard HUD**: Aggressive responsive hardening for cockpit-use viewports (iPad Portrait/Landscape, iPhone), featuring 48pt+ tactical touch targets.
+- **Safety Protocol 01 Integration**: Mandatory high-visibility safety anchors ensuring AFM (Airplane Flight Manual) precedence and PIC (Pilot in Command) authority.
+- **Security Hardening**: 5-layer defense including `IdleTimeoutManager` with "Master Caution" session protection.
+- **Aircraft Lifecycle Management**: Full history-safe registry with soft-delete patterns for logging integrity (FAA/CAA compliant).
+- **AVWX Weather Integration**: Intelligent METAR fetching with high-ratio contrast support for direct-sunlight readability.
+- **Logbook Analytics**: Currency tracking (90-day FAA/CAA), flight trends, and operational records sync.
 
-### 🚧 Pending / WIP
-- Bulk import/export for flight logs (CSV/Manual)
-- Contribution guidelines for community contributors
-- Automated deployment scripts for AWS/Azure environments
+### 🚧 Mission Targets
+- Bulk CSV import/export for legacy logbook synchronization.
+- Fleet-grade maintenance tracking and squawk integration.
+- Automated Pilot Records Database (PRD) compliance reports.
 
-# 📊 **Current Status:**
+---
 
-**Progress Scores (April 2026 Audit):**
-- **Core Logic**: 98% (Soft Delete, client-side tRPC, master caution alerts)
-- **UI/UX**: 100% (Premium Pilot-grade HUD, no stale data flashes, high-contrast support)
-- **Infrastructure/Perf**: 97% (Neon Serverless Postgres, strict protectedProcedure auth)
-- **Security**: 100% (Token-bucket rate limiting, session idle protection, strict Zod)
+## 🏗️ Software Architecture
 
-For a detailed breakdown of completed features, WIPs, and the audit log, please see [PROJECT_STATUS_REPORT.md](./internal-docs/PROJECT_STATUS_REPORT.md).
+### **Instrument-Grade Design System (IGO)**
+The PilotHandbook adopts a specialized design language inspired by professional civilian avionics (Garmin G3000/G5000):
+- **Zero-Distraction Strategy**: Removed legacy "carbon-fibre" and "cinematic glows" to prioritize static clarity and numeric acquisition.
+- **Hierarchy Locking**: Critical safety data follows a strict sizing protocol: **Primary Value > Unit Label > Operational Context**.
+- **Stress-Mode UX**: Minimized animations and transitions on mobile viewports to ensure the system remains stable and responsive under high-workload conditions.
 
-# 🏢 **Software Architecture**
+### **Safety & Compliance Architecture**
+- **AFM Precedence**: The system is architected to reinforce that calculations are for supplemental use only, requiring PIC verification against the certified AFM.
+- **Logging Integrity**: Utilizes a dual-write and soft-delete pattern to ensure that every flight hour remains part of the audited historical record, even if parent aircraft or users are modified.
 
-### Premium Design System ("Glass Cockpit")
-The application utilizes a specialized design language inspired by modern avionics (Garmin G3000 style):
-- **Atmospheric Lighting**: Context-aware background blurs (`blur-150px`) that adjust based on session state.
-- **Glassmorphism**: Backdrop blurs and high-clarity borders via the `GlassCard` design token.
-- **High-Impact Typography**: `font-black` headings with specialized tracking for maximum readability in high-stress operational environments.
+---
 
-### Security & Compliance
-- **Inactivity Protection**: Automatic session monitoring with the `IdleTimeoutManager`, providing a "Master Caution" alert before automatic logout.
-- **FAA/CAA Data Integrity**: Soft-delete architecture ensures all historical flight hours are preserved for logging requirements even if an aircraft or user is archived.
+## 🛠️ Tech Stack ("The T3 Turbo Stack")
 
-## 🛠️ Tech Stack
-
-**Core**
+**Core Engine**
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript 5
 - **Library**: React 19 (Server Components & Actions)
@@ -62,88 +55,77 @@ The application utilizes a specialized design language inspired by modern avioni
 
 ```bash
 ├── app/                # Next.js App Router (UI, pages, layouts)
-│   ├── (dashboard)/    # Grouped dashboard features (stats, flights, aircraft)
-│   ├── admin/          # Protected admin dashboard (RBAC)
-│   ├── tools/          # Operational tools (performance, weight/balance)
-│   ├── settings/       # User account preferences
-│   └── ...             # Auth and public pages
-├── components/         # Shared React components
-│   ├── common/         # AppHeader, AppFooter, Glows
-│   ├── dashboard/      # Status cards and analytics widgets
-│   ├── flights/        # Flight log tables and forms
-│   └── ui/             # Atomic design tokens (GlassCard, Button)
-├── lib/                # Core utilities, DB, and custom hooks
-├── prisma/             # Schema and database migrations
-├── server/             # tRPC API routers and backend logic
+│   ├── (dashboard)/    # Flight operations, analytics, fleet
+│   ├── admin/          # RBAC & system monitoring
+│   ├── tools/          # Dispatch tools (W&B, Fuel, Performance)
+│   └── ...             # Auth & Public operational pages
+├── components/         # Shared React components (EFB-Modular)
+│   ├── tools/          # Operational calculator logic
+│   ├── ui/             # Atomic tactical tokens
+│   └── ...
+├── lib/                # Core engines (Decision, Validation, DB)
+├── server/             # trpc Procedures & Route definitions
 └── ...
 ```
 
-## 🏁 Getting Started
+---
 
-### Prerequisites
-- **Node.js** 20+
-- **pnpm** (recommended) or npm
-- **Neon/Postgres** connection string
+## 🏁 Operational Setup
 
-### 1. Clone & Install
+### 1. Repository Synchronization
 ```bash
 git clone https://github.com/binsacedillo/pilot-handbook.git
 cd pilothandbook
-pnpm install
+npm install
 ```
 
-### 2. Configure Environment
-Create a `.env` file:
+### 2. Environment Calibration
+Create a `.env` file with the following variables:
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=***
 CLERK_SECRET_KEY=***
 DATABASE_URL=postgresql://...
 CLERK_WEBHOOK_SECRET=***
-UPSTASH_REDIS_REST_URL=***
-UPSTASH_REDIS_REST_TOKEN=***
+AVWX_API_KEY=***
 ```
 
-### 3. Initialize
+### 3. Initialize System
 ```bash
-pnpm prisma generate
-pnpm prisma db push
-pnpm dev
+npx prisma generate
+npx prisma db push
+npm run dev
 ```
 
 ---
 
-## 🧪 Testing Suite
+## 🧪 Operational Validation
 
-The application includes **97 passing tests** covering:
-- **Admin Security**: RBAC verification and audit trail integrity.
-- **Rate Limiting**: Token-bucket algorithm and IP isolation.
-- **Business Logic**: FAA recency rules (Day/Night/IFR) and float precision.
-- **Weather Reliability**: Cache hit/miss and API fallback logic.
+The suite includes **97 passing tests** ensuring the integrity of the following systems:
+- **Linguistic Compliance**: Verified civilian aviation terminology across all HUD components.
+- **Rate Limiting**: Advanced token-bucket isolation for API security.
+- **Business Logic**: FAA recency rules, float precision for fuel calculations, and CG envelope validation.
+- **Weather Reliability**: Cache hit/miss and AVWX fallback stability.
 
-Run the suite:
 ```bash
 npm run test          # Headless (Vitest)
 npm run test:ui       # Interactive Dashboard
 npm run test:coverage # Compliance Audit
 ```
 
-## 🚀 Deployment
+---
+
+## 🚀 Deployment Optimization
 
 Optimized for **Vercel** + **Neon**:
-1. Connect via Git for automatic CI/CD.
-2. Ensure `CLERK_WEBHOOK_SECRET` is set for user lifecycle sync.
-3. Run `npx prisma migrate deploy` in build pipeline for schema synchronization.
+1. Connect via Git for automatic CI/CD deployment.
+2. Configure `CLERK_WEBHOOK_SECRET` for real-time user lifecycle synchronization.
+3. The build pipeline automatically runs `npx prisma generate` for schema alignment.
 
 ---
 
 ## ⚖️ License
-Private and Proprietary. Built for professional aviators.
-ontributions are welcome! Please feel free to submit a Pull Request.
+**Private and Proprietary.** This system is built for professional aviators and is not for unauthorized distribution.
 
-## License
+---
 
-This project is private and proprietary.
-
-## Support
-
-For questions or issues, please open an issue in the repository.
+*Professional Aviation Software. No place for placeholders. No room for error.* 🚀✈️🛡️
