@@ -4,6 +4,8 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
+		"dev:clean": "rmdir /s /q .next .turbopack 2>nul & npm run dev",
+		"dev:full-clean": "rmdir /s /q .next .turbopack node_modules\\.cache 2>nul & npm run dev",
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint . --ext .ts,.tsx",

@@ -3,15 +3,9 @@
 import { QueryCache, MutationCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { useState } from 'react';
-import superjson from 'superjson';
+import { getUrl, transformer } from './shared';
 import { trpc } from './client';
 import { useToast } from '@/components/ui/toast';
-
-function getBaseUrl() {
-  if (typeof window !== 'undefined') return '';
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return `http://localhost:${process.env.PORT ?? 3000}`;
-}
 
 // Exponential backoff with jitter for retries
 function getRetryDelay(attemptIndex: number): number {
@@ -93,8 +87,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: `${getBaseUrl()}/api/trpc`,
-          transformer: superjson,
+          url: getUrl(),
+          transformer,
           // 5 second timeout for HTTP requests
           fetch(url, options) {
             const controller = new AbortController();
