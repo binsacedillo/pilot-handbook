@@ -21,6 +21,7 @@ model User {
   flights         Flight[]
   userPreferences UserPreferences?
   pilotProfile    PilotProfile?
+  safetySnapshots SafetySnapshot[]
 }
 
 model PilotProfile {
@@ -52,6 +53,7 @@ model Aircraft {
   version      Int      @default(1)
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   flights      Flight[]
+  safetySnapshots SafetySnapshot[]
 
   @@unique([userId, registration])
 }
@@ -141,4 +143,22 @@ enum AuditAction {
   ROLE_CHANGE
   VERIFY
   UNVERIFY
+}
+
+model SafetySnapshot {
+  id             String   @id @default(uuid())
+  type           String   // 'DENSITY_ALTITUDE' | 'WEIGHT_BALANCE' | 'FUEL'
+  userId         String
+  aircraftId     String?
+  inputs         Json
+  results        Json
+  calculatedAt   DateTime @default(now())
+  status         String   // 'GO' | 'CAUTION' | 'NO_GO' | 'INVALID'
+  reason         String?
+  recommendation String?
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aircraft       Aircraft? @relation(fields: [aircraftId], references: [id])
+
+  @@index([userId, calculatedAt])
 }
