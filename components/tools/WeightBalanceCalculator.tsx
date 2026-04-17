@@ -47,7 +47,9 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
   );
 
   const handleWeightChange = (id: string, value: string) => {
-    const num = parseFloat(value) || 0;
+    let num = parseFloat(value) || 0;
+    // Guardrail: No negative weights in aviation
+    if (num < 0) num = 0;
     setWeights(prev => ({ ...prev, [id]: num }));
   };
 
@@ -80,34 +82,50 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
 
   if (isCompact) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <div className="grid gap-4">
+      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 sm:gap-8 font-sans">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
              {C172S_DEFAULT.stations.map((station) => (
-               <div key={station.id} className="flex items-center gap-4">
-                 <Label htmlFor={station.id} className="w-32 text-xs font-bold uppercase truncate text-zinc-400">{station.name}</Label>
-                 <Input
-                   id={station.id}
-                   type="number"
-                   placeholder="0"
-                   className="h-10 rounded-lg flex-1 bg-zinc-900 border-white/5"
-                   value={weights[station.id] || ""}
-                   onChange={(e) => handleWeightChange(station.id, e.target.value)}
-                 />
-                 <span className="text-[10px] w-8 text-zinc-500">lbs</span>
+               <div key={station.id} className="flex flex-col gap-1 sm:gap-2">
+                 <Label htmlFor={station.id} className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-zinc-500">
+                   {station.name}
+                 </Label>
+                 <div className="relative">
+                   <Input
+                     id={station.id}
+                     type="number"
+                     placeholder="0"
+                     className="h-11 sm:h-12 rounded-xl bg-zinc-900 border-white/5 text-base"
+                     value={weights[station.id] || ""}
+                     onChange={(e) => handleWeightChange(station.id, e.target.value)}
+                   />
+                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-zinc-600 uppercase">lbs</span>
+                 </div>
                </div>
              ))}
           </div>
         </div>
+
         <div className="space-y-4">
-          <div className="p-6 bg-zinc-900 rounded-3xl border border-white/5 flex justify-between items-center text-center">
-             <div className="flex-1 border-r border-white/5">
-                <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Total Weight</p>
-                <p className={`text-2xl font-black ${results.isOverweight ? 'text-red-500' : 'text-white'}`}>{Math.round(results.totalWeight)} lbs</p>
+          {/* Result HUD: Hierarchy Lock */}
+          <div className="p-5 sm:p-6 bg-zinc-900 rounded-3xl border border-white/5 grid grid-cols-2 gap-4">
+             <div className="space-y-1">
+                <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest">Gross Weight</p>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-2xl sm:text-4xl font-black italic tracking-tighter ${results.isOverweight ? 'text-red-500' : 'text-white'}`}>
+                    {Math.round(results.totalWeight)}
+                  </span>
+                  <span className="text-[10px] font-bold text-zinc-600 uppercase">lbs</span>
+                </div>
              </div>
-             <div className="flex-1">
-                <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">CG Location</p>
-                <p className={`text-2xl font-black ${results.isOutOfCG ? 'text-red-500' : 'text-white'}`}>{results.centerOfGravity.toFixed(2)} in</p>
+             <div className="space-y-1 border-l border-white/5 pl-4">
+                <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest">CG Arm</p>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-2xl sm:text-4xl font-black italic tracking-tighter ${results.isOutOfCG ? 'text-red-500' : 'text-white'}`}>
+                    {results.centerOfGravity.toFixed(1)}
+                  </span>
+                  <span className="text-[10px] font-bold text-zinc-600 uppercase">in</span>
+                </div>
              </div>
           </div>
           
@@ -118,10 +136,15 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
           }`}>
             <div className="flex items-center gap-2 mb-1">
                {results.decision?.status === 'GO' ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
-               <p className="text-xs font-black uppercase tracking-widest">{results.decision?.status || 'GO'}</p>
+               <p className="text-[10px] font-black uppercase tracking-widest">Flight Safety Risk: {results.decision?.status || 'GO'}</p>
             </div>
-            <p className="text-[11px] leading-tight opacity-80">{results.decision?.recommendation || 'Flight parameters within normal limits.'}</p>
+            <p className="text-[11px] leading-tight opacity-70 italic">{results.decision?.recommendation || 'Flight parameters within normal limits.'}</p>
           </div>
+
+          {/* Progressive Disclosure: Hidden on Mobile, Toggle option could go here for iPad */}
+          <p className="text-[9px] text-zinc-600 text-center uppercase tracking-widest px-4 leading-tight">
+            Numeric Verification Required. Analyze audit on larger display.
+          </p>
         </div>
       </div>
     );
@@ -190,7 +213,7 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
           <div className={`h-2 w-full transition-colors duration-500 ${results.isOverweight || results.isOutOfCG ? "bg-red-500" : "bg-emerald-500"}`} />
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl italic uppercase tracking-tighter">Mission Safety Analysis</CardTitle>
+              <CardTitle className="text-xl italic uppercase tracking-tighter">Aero Safety Analysis</CardTitle>
               {results.decision && (
                 <Badge className={`font-black uppercase tracking-widest ${
                   results.decision.status === 'GO' ? 'bg-emerald-500' : 'bg-red-500'

@@ -74,45 +74,70 @@ export default function DensityAltitudeCalculator({ isCompact = false, onResultC
 
   if (isCompact) {
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-white">
-          <div className="space-y-6">
+      <div className="space-y-6 sm:space-y-8 font-sans">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 sm:gap-8 text-white">
+          <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-zinc-400">Elevation (ft)</Label>
-                <Input value={elevation} onChange={(e) => setElevation(e.target.value)} className="bg-zinc-900 border-white/5" />
+              <div className="space-y-1.5 sm:space-y-2 text-left">
+                <Label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-zinc-500">Elevation (ft)</Label>
+                <Input type="number" value={elevation} onChange={(e) => setElevation(e.target.value)} className="h-11 sm:h-12 bg-zinc-900 border-white/5 text-base" />
               </div>
-              <div className="space-y-2">
-                <Label className="text-zinc-400">Altimeter (inHg)</Label>
-                <Input value={altimeter} onChange={(e) => setAltimeter(e.target.value)} className="bg-zinc-900 border-white/5" />
+              <div className="space-y-1.5 sm:space-y-2 text-left">
+                <Label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-zinc-500">Altimeter (inHg)</Label>
+                <Input type="number" step="0.01" value={altimeter} onChange={(e) => setAltimeter(e.target.value)} className="h-11 sm:h-12 bg-zinc-900 border-white/5 text-base" />
               </div>
-              <div className="space-y-2">
-                <Label className="text-zinc-400">Temp (°C)</Label>
-                <Input value={temperature} onChange={(e) => setTemperature(e.target.value)} className="bg-zinc-900 border-white/5" />
+              <div className="space-y-1.5 sm:space-y-2 text-left">
+                <Label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-zinc-500">Temp (°C)</Label>
+                <Input type="number" value={temperature} onChange={(e) => setTemperature(e.target.value)} className="h-11 sm:h-12 bg-zinc-900 border-white/5 text-base" />
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col justify-center items-center p-6 bg-zinc-900 rounded-3xl border border-white/5 relative">
+          <div className="flex flex-col justify-center items-center p-5 sm:p-8 bg-zinc-900 rounded-3xl border border-white/5 relative shadow-xl">
             {results && (
               <div className="text-center space-y-4 w-full">
-                <div className="flex items-center justify-center gap-2">
-                  <Thermometer className={`w-8 h-8 ${results.densityAltitude > results.pressureAltitude ? "text-red-500" : "text-blue-500"}`} />
-                  <p className="text-5xl font-black italic tracking-tighter">
-                    {results.densityAltitude.toLocaleString()} <span className="text-xl text-zinc-500 ml-1">ft</span>
-                  </p>
+                <div className="space-y-1">
+                  <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest">Computed Density Altitude</p>
+                  <div className="flex items-center justify-center gap-2">
+                    <Thermometer className={`w-8 h-8 sm:w-10 sm:h-10 ${results.densityAltitude > results.pressureAltitude ? "text-red-500 animate-pulse" : "text-blue-500"}`} />
+                    <p className="text-4xl sm:text-5xl font-black italic tracking-tighter">
+                      {results.densityAltitude.toLocaleString()} <span className="text-lg sm:text-xl text-zinc-500 ml-1 not-italic">FT</span>
+                    </p>
+                  </div>
                 </div>
                 
-                <div className="text-right border-t border-white/5 pt-4">
-                  <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Aero Deviation</p>
-                  <p className={`text-xl font-black italic tracking-tighter ${results.densityAltitude > results.pressureAltitude ? "text-red-500 animate-pulse" : "text-emerald-500"}`}>
-                    {results.densityAltitude > results.pressureAltitude ? "+" : ""}{(results.densityAltitude - results.pressureAltitude).toLocaleString()} ft
-                  </p>
+                <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-4">
+                  <div className="text-left">
+                    <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest leading-none mb-1">Pressure Alt</p>
+                    <p className="text-lg sm:text-xl font-bold tracking-tight text-zinc-300">
+                      {results.pressureAltitude.toLocaleString()}<span className="text-[10px] ml-1">ft</span>
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest leading-none mb-1">Aero Deviation</p>
+                    <p className={`text-lg sm:text-xl font-black italic tracking-tight ${results.densityAltitude > results.pressureAltitude ? "text-red-500" : "text-emerald-500"}`}>
+                      {results.densityAltitude > results.pressureAltitude ? "+" : ""}{(results.densityAltitude - results.pressureAltitude).toLocaleString()} ft
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
           </div>
         </div>
+
+        {results?.decision && results.decision.status !== 'GO' && (
+          <div className={`p-4 rounded-2xl border-l-4 transition-all duration-300 ${
+            results.decision.status === 'CAUTION' ? 'bg-amber-500/10 border-amber-500 text-amber-200' : 'bg-red-500/10 border-red-500 text-red-200'
+          }`}>
+             <div className="flex items-start gap-3">
+                <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest">Aero Performance Risk: {results.decision.status}</p>
+                  <p className="text-[11px] leading-tight opacity-80 italic">{results.decision.recommendation}</p>
+                </div>
+             </div>
+          </div>
+        )}
       </div>
     );
   }

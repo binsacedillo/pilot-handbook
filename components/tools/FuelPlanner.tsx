@@ -66,36 +66,52 @@ export default function FuelPlanner({ isCompact = false, onResultChange }: FuelP
 
   if (isCompact) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <div className="grid gap-4">
-            <div className="flex items-center gap-4">
-              <Label className="w-32 text-xs font-bold uppercase">Distance (NM)</Label>
-              <Input type="number" className="h-10 rounded-lg flex-1" value={params.distance} onChange={(e) => handleParamChange("distance", e.target.value)} />
-            </div>
-            <div className="flex items-center gap-4">
-              <Label className="w-32 text-xs font-bold uppercase">Groundspeed (Kts)</Label>
-              <Input type="number" className="h-10 rounded-lg flex-1" value={params.groundspeed} onChange={(e) => handleParamChange("groundspeed", e.target.value)} />
-            </div>
-            <div className="flex items-center gap-4">
-              <Label className="w-32 text-xs font-bold uppercase">Fuel Flow (GPH)</Label>
-              <Input type="number" className="h-10 rounded-lg flex-1" value={params.burnRate} onChange={(e) => handleParamChange("burnRate", e.target.value)} />
+      <div className="space-y-6 sm:space-y-8 font-sans">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 sm:gap-8">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
+              <div className="space-y-1.5 sm:space-y-2 text-left">
+                <Label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-zinc-500">Trip Distance (NM)</Label>
+                <Input type="number" className="h-11 sm:h-12 rounded-xl bg-zinc-900 border-white/5 text-base" value={params.distance} onChange={(e) => handleParamChange("distance", e.target.value)} />
+              </div>
+              <div className="space-y-1.5 sm:space-y-2 text-left">
+                <Label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-zinc-500">Groundspeed (Kts)</Label>
+                <Input type="number" className="h-11 sm:h-12 rounded-xl bg-zinc-900 border-white/5 text-base" value={params.groundspeed} onChange={(e) => handleParamChange("groundspeed", e.target.value)} />
+              </div>
+              <div className="space-y-1.5 sm:space-y-2 text-left">
+                <Label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-zinc-500">Fuel Flow (GPH)</Label>
+                <Input type="number" className="h-11 sm:h-12 rounded-xl bg-zinc-900 border-white/5 text-base" value={params.burnRate} onChange={(e) => handleParamChange("burnRate", e.target.value)} />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="space-y-4">
-          <div className="p-4 bg-slate-900 rounded-2xl border border-white/5 flex justify-between items-center text-center">
-             <div className="flex-1 border-r border-white/5">
-                <p className="text-[10px] text-zinc-500 uppercase font-black">Total Fuel</p>
-                <p className="text-2xl font-black text-white">{results.totalRequired} GAL</p>
-             </div>
-             <div className="flex-1">
-                <p className="text-[10px] text-zinc-500 uppercase font-black">Endurance</p>
-                <p className="text-2xl font-black text-white">{results.enduranceFormatted}</p>
-             </div>
-          </div>
-          <div className={`p-4 rounded-xl border-l-4 ${results.decision?.status === 'GO' ? 'bg-emerald-500/10 border-emerald-500' : 'bg-amber-500/10 border-amber-500'}`}>
-            <p className="text-xs font-bold">{results.decision?.status === 'GO' ? 'Fuel Reserve OK' : 'INSUFFICIENT RESERVES'}</p>
+
+          <div className="space-y-4">
+            {/* Result HUD: Hierarchy Lock */}
+            <div className="p-5 sm:p-7 bg-zinc-900 rounded-3xl border border-white/5 grid grid-cols-2 gap-4 shadow-xl">
+               <div className="space-y-1">
+                  <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest">Total Required</p>
+                  <div className="flex items-baseline gap-1">
+                    <p className="text-2xl sm:text-4xl font-black italic tracking-tighter text-white">{results.totalRequired}</p>
+                    <p className="text-[10px] font-bold text-zinc-600 uppercase">GAL</p>
+                  </div>
+               </div>
+               <div className="space-y-1 border-l border-white/5 pl-4">
+                  <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest">Endurance</p>
+                  <p className="text-2xl sm:text-4xl font-black italic tracking-tighter text-white">{results.enduranceFormatted}</p>
+               </div>
+            </div>
+
+            <div className={`p-4 rounded-2xl border-l-4 transition-all duration-300 ${
+              results.decision?.status === 'GO' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-200' : 'bg-amber-500/10 border-amber-500 text-amber-200'
+            }`}>
+               <div className="flex items-center gap-2 mb-1">
+                  {results.decision?.status === 'GO' ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
+                  <p className="text-[10px] font-black uppercase tracking-widest">Safety Buffer: {params.reserveMinutes}m</p>
+               </div>
+               <p className="text-[11px] leading-tight opacity-80 italic">
+                 {results.decision?.status === 'GO' ? 'Regulatory reserves met.' : 'Insufficient reserves for selected flight operations.'}
+               </p>
+            </div>
           </div>
         </div>
       </div>
@@ -307,7 +323,7 @@ export default function FuelPlanner({ isCompact = false, onResultChange }: FuelP
                     'bg-red-50 border-red-500 text-red-900 dark:bg-red-950/20 dark:text-red-200'}
                 `}>
                   <div className="flex justify-between items-center w-full uppercase tracking-tighter font-bold text-[10px] opacity-70">
-                    <span>Mission Resilience</span>
+                    <span>System Endurance</span>
                     <span>{results.decision.status === 'GO' ? 'Clear' : 'Constraint'}</span>
                   </div>
                   <div className="flex items-baseline gap-1">
