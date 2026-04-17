@@ -212,8 +212,8 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                      <QuickToolCard 
                        href="/tools" 
-                       title="Mission Control" 
-                       desc="Launch Preflight" 
+                       title="Flight Operations" 
+                       desc="Preflight Planning" 
                        icon={<ShieldCheck className="w-4 h-4 text-blue-500" />} 
                        color="text-blue-500" 
                      />
