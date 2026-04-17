@@ -11,7 +11,10 @@
       nightLandings: 0,
       remarks: 'No landings (scenic tour)',
     };
-    const result = await caller.flight.create(input);
+    const result = await caller.flight.create({
+      operation: 'CREATE_FLIGHT',
+      data: input
+    });
     expect(result.id).toBeDefined();
     expect(result.dayLandings).toBe(0);
     expect(result.nightLandings).toBe(0);
@@ -21,28 +24,34 @@
     // Reset DB for this test
     flightDb.length = 0;
     await caller.flight.create({
-      aircraftId: 'aircraft-1',
-      departureCode: 'JFK',
-      arrivalCode: 'LAX',
-      date: new Date('2026-01-01'),
-      duration: 2.0,
-      picTime: 2.0,
-      dualTime: 0,
-      dayLandings: 1,
-      nightLandings: 0,
-      remarks: 'Leg 1',
+      operation: 'CREATE_FLIGHT',
+      data: {
+        aircraftId: 'aircraft-1',
+        departureCode: 'JFK',
+        arrivalCode: 'LAX',
+        date: new Date('2026-01-01'),
+        duration: 2.0,
+        picTime: 2.0,
+        dualTime: 0,
+        dayLandings: 1,
+        nightLandings: 0,
+        remarks: 'Leg 1',
+      }
     });
     await caller.flight.create({
-      aircraftId: 'aircraft-1',
-      departureCode: 'JFK',
-      arrivalCode: 'LAX',
-      date: new Date('2026-01-02'),
-      duration: 2.0,
-      picTime: 2.0,
-      dualTime: 0,
-      dayLandings: 1,
-      nightLandings: 0,
-      remarks: 'Leg 2',
+      operation: 'CREATE_FLIGHT',
+      data: {
+        aircraftId: 'aircraft-1',
+        departureCode: 'JFK',
+        arrivalCode: 'LAX',
+        date: new Date('2026-01-02'),
+        duration: 2.0,
+        picTime: 2.0,
+        dualTime: 0,
+        dayLandings: 1,
+        nightLandings: 0,
+        remarks: 'Leg 2',
+      }
     });
     const total = flightDb.reduce((sum, f) => sum + (typeof f.duration === 'number' ? f.duration : 0), 0);
     expect(total).toBe(4.0);
@@ -63,7 +72,10 @@
       nightLandings: 0,
       remarks: 'International ferry',
     };
-    const result = await caller.flight.create(input);
+    const result = await caller.flight.create({
+      operation: 'CREATE_FLIGHT',
+      data: input
+    });
     expect(result.duration).toBe(14.5);
     // Simulate analytics aggregation
     const total = flightDb.reduce((sum, f) => sum + (typeof f.duration === 'number' ? f.duration : 0), 0);
@@ -83,7 +95,10 @@
       nightLandings: 0,
       remarks: 'Invalid PIC time',
     };
-    await expect(caller.flight.create(input)).rejects.toThrow();
+    await expect(caller.flight.create({
+      operation: 'CREATE_FLIGHT',
+      data: input
+    })).rejects.toThrow();
   });
 describe('Validation', () => {
   it('should fail to create if duration is negative', async () => {
@@ -99,7 +114,10 @@ describe('Validation', () => {
       nightLandings: 0,
       remarks: 'Negative duration',
     };
-    await expect(caller.flight.create(input)).rejects.toThrow();
+    await expect(caller.flight.create({
+      operation: 'CREATE_FLIGHT',
+      data: input
+    })).rejects.toThrow();
   });
 
   it('should fail to create if landings is a decimal', async () => {
@@ -115,7 +133,10 @@ describe('Validation', () => {
       nightLandings: 0,
       remarks: 'Decimal landings',
     };
-    await expect(caller.flight.create(input)).rejects.toThrow();
+    await expect(caller.flight.create({
+      operation: 'CREATE_FLIGHT',
+      data: input
+    })).rejects.toThrow();
   });
 
   it('should fail to create if date is in the future', async () => {
@@ -134,7 +155,10 @@ describe('Validation', () => {
       remarks: 'Future date',
     };
     // If your schema does not yet validate future dates, this test will fail until you add it
-    await expect(caller.flight.create(input)).rejects.toThrow();
+    await expect(caller.flight.create({
+      operation: 'CREATE_FLIGHT',
+      data: input
+    })).rejects.toThrow();
   });
 });
 
@@ -249,7 +273,10 @@ describe('Flight Router', () => {
       nightLandings: 0,
       remarks: 'Test flight',
     };
-    const result = await caller.flight.create(input);
+    const result = await caller.flight.create({
+      operation: 'CREATE_FLIGHT',
+      data: input
+    });
     expect(result.id).toBeDefined();
   });
 
@@ -265,7 +292,10 @@ describe('Flight Router', () => {
       dayLandings: 1,
       nightLandings: 0,
     };
-    const result = await caller.flight.create(input);
+    const result = await caller.flight.create({
+      operation: 'CREATE_FLIGHT',
+      data: input
+    });
     expect(result.duration).toBe(0.8);
     expect(result.picTime).toBe(result.duration);
   });
@@ -283,7 +313,10 @@ describe('Flight Router', () => {
       nightLandings: 0,
       remarks: 'Test flight',
     };
-    const created = await caller.flight.create(input);
+    const created = await caller.flight.create({
+      operation: 'CREATE_FLIGHT',
+      data: input
+    });
     const result = await caller.flight.get({ id: created.id });
     expect(result).not.toBeNull();
   });
@@ -301,8 +334,14 @@ describe('Flight Router', () => {
       nightLandings: 0,
       remarks: 'Test flight',
     };
-    const created = await caller.flight.create(input);
-    await caller.flight.delete({ id: created.id });
+    const created = await caller.flight.create({
+      operation: 'CREATE_FLIGHT',
+      data: input
+    });
+    await caller.flight.delete({
+      operation: 'DELETE_FLIGHT',
+      flightId: created.id
+    });
     const afterDelete = await caller.flight.get({ id: created.id });
     expect(afterDelete).toBeNull();
   });

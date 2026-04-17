@@ -7,7 +7,10 @@ describe('Validation', () => {
       imageUrl: '',
       status: 'operational',
     };
-    await expect(caller.aircraft.create(input)).rejects.toThrow();
+    await expect(caller.aircraft.create({
+      operation: 'CREATE_AIRCRAFT',
+      data: input
+    })).rejects.toThrow();
   });
 
   it('should fail to create if make is missing', async () => {
@@ -18,8 +21,10 @@ describe('Validation', () => {
       imageUrl: '',
       status: 'operational',
     };
-    // @ts-expect-error: make is missing
-    await expect(caller.aircraft.create(input)).rejects.toThrow();
+    await expect(caller.aircraft.create({
+      operation: 'CREATE_AIRCRAFT',
+      data: input as any
+    })).rejects.toThrow();
   });
 });
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -124,7 +129,10 @@ describe('Aircraft Router', () => {
 
   it('should create an aircraft', async () => {
     const input = { ...baseAircraft };
-    const result = await caller.aircraft.create(input);
+    const result = await caller.aircraft.create({
+      operation: 'CREATE_AIRCRAFT',
+      data: input
+    });
     expect(result.id).toBeDefined();
     expect(result.model).toBe('172');
     expect(result.make).toBe('Cessna');
@@ -132,7 +140,10 @@ describe('Aircraft Router', () => {
 
   it('should get an aircraft by id', async () => {
     const input = { ...baseAircraft };
-    const created = await caller.aircraft.create(input);
+    const created = await caller.aircraft.create({
+      operation: 'CREATE_AIRCRAFT',
+      data: input
+    });
     const result = await caller.aircraft.getById({ id: created.id });
     expect(result).not.toBeNull();
     expect(result!.id).toBe(created.id);
@@ -140,14 +151,21 @@ describe('Aircraft Router', () => {
 
   it('should update an aircraft', async () => {
     const input = { ...baseAircraft };
-    const created = await caller.aircraft.create(input);
+    const created = await caller.aircraft.create({
+      operation: 'CREATE_AIRCRAFT',
+      data: input
+    });
     const updated = await caller.aircraft.update({
-      id: created.id,
-      make: 'Cessna',
-      model: '182',
-      registration: 'N54321',
-      imageUrl: '',
-      status: 'operational',
+      operation: 'UPDATE_AIRCRAFT',
+      aircraftId: created.id,
+      changes: {
+        make: 'Cessna',
+        model: '182',
+        registration: 'N54321',
+        imageUrl: '',
+        status: 'operational',
+      },
+      clientVersion: 1,
     });
     expect(updated.model).toBe('182');
     expect(updated.registration).toBe('N54321');
@@ -167,7 +185,10 @@ describe('Aircraft Router', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    const created = await caller.aircraft.create(input);
+    const created = await caller.aircraft.create({
+      operation: 'CREATE_AIRCRAFT',
+      data: input
+    });
 
     // 2. Mock 'findUnique' to return the aircraft for the delete pre-check
     ctx.db.aircraft.findUnique.mockResolvedValue({
@@ -181,7 +202,10 @@ describe('Aircraft Router', () => {
     // 3. Mock 'update' (which is likely what 'delete' calls for soft-delete)
     // We tell it to return the aircraft with isArchived: true
     ctx.db.aircraft.update.mockResolvedValue({ ...created, isArchived: true });
-    await caller.aircraft.delete({ id: created.id });
+    await caller.aircraft.delete({
+      operation: 'DELETE_AIRCRAFT',
+      aircraftId: created.id
+    });
 
     // 4. Verify that the database was actually called with BOTH id and userId
     expect(ctx.db.aircraft.update).toHaveBeenCalledWith(
@@ -211,7 +235,10 @@ describe('Aircraft Router', () => {
       isArchived: false,
     });
 
-    const created = await ownerCaller.aircraft.create(input);
+    const created = await ownerCaller.aircraft.create({
+      operation: 'CREATE_AIRCRAFT',
+      data: input
+    });
 
     // 3. Setup Attacker Context
     const otherUser = {

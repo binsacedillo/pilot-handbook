@@ -37,16 +37,19 @@ describe('Security Tests', () => {
 
       await expect(
         caller.flight.create({
-          date: new Date(),
-          departureCode: 'KJFK',
-          arrivalCode: 'KBOS',
-          duration: 1.5,
-          picTime: 1.5,
-          dualTime: 0,
-          dayLandings: 1,
-          nightLandings: 0,
-          remarks: longRemarks,
-          aircraftId: 'aircraft-1',
+          operation: 'CREATE_FLIGHT',
+          data: {
+            date: new Date(),
+            departureCode: 'KJFK',
+            arrivalCode: 'KBOS',
+            duration: 1.5,
+            picTime: 1.5,
+            dualTime: 0,
+            dayLandings: 1,
+            nightLandings: 0,
+            remarks: longRemarks,
+            aircraftId: 'aircraft-1',
+          }
         })
       ).rejects.toThrow(/Remarks limited to 500 characters/);
     });
@@ -91,16 +94,19 @@ describe('Security Tests', () => {
       pastDate.setDate(pastDate.getDate() - 1); // Yesterday
 
       const result = await caller.flight.create({
-        date: pastDate,
-        departureCode: 'KJFK',
-        arrivalCode: 'KBOS',
-        duration: 1.5,
-        picTime: 1.5,
-        dualTime: 0,
-        dayLandings: 1,
-        nightLandings: 0,
-        remarks: validRemarks,
-        aircraftId: 'aircraft-1',
+        operation: 'CREATE_FLIGHT',
+        data: {
+          date: pastDate,
+          departureCode: 'KJFK',
+          arrivalCode: 'KBOS',
+          duration: 1.5,
+          picTime: 1.5,
+          dualTime: 0,
+          dayLandings: 1,
+          nightLandings: 0,
+          remarks: validRemarks,
+          aircraftId: 'aircraft-1',
+        }
       });
 
       expect(result.remarks).toBe(validRemarks);
@@ -111,9 +117,12 @@ describe('Security Tests', () => {
 
       await expect(
         caller.aircraft.create({
-          make: longMake,
-          model: 'Model',
-          registration: 'N12345',
+          operation: 'CREATE_AIRCRAFT',
+          data: {
+            make: longMake,
+            model: 'Model',
+            registration: 'N12345',
+          }
         })
       ).rejects.toThrow(/Make too long/);
     });
@@ -123,9 +132,12 @@ describe('Security Tests', () => {
 
       await expect(
         caller.aircraft.create({
-          make: 'Cessna',
-          model: longModel,
-          registration: 'N12345',
+          operation: 'CREATE_AIRCRAFT',
+          data: {
+            make: 'Cessna',
+            model: longModel,
+            registration: 'N12345',
+          }
         })
       ).rejects.toThrow(/Model too long/);
     });
@@ -166,15 +178,18 @@ describe('Security Tests', () => {
       // Should reject malformed airport code
       await expect(
         caller.flight.create({
-          date: new Date(),
-          departureCode: maliciousCode,
-          arrivalCode: 'KBOS',
-          duration: 1.5,
-          picTime: 1.5,
-          dualTime: 0,
-          dayLandings: 1,
-          nightLandings: 0,
-          aircraftId: 'aircraft-1',
+          operation: 'CREATE_FLIGHT',
+          data: {
+            date: new Date(),
+            departureCode: maliciousCode,
+            arrivalCode: 'KBOS',
+            duration: 1.5,
+            picTime: 1.5,
+            dualTime: 0,
+            dayLandings: 1,
+            nightLandings: 0,
+            aircraftId: 'aircraft-1',
+          }
         })
       ).rejects.toThrow();
     });
@@ -201,15 +216,18 @@ describe('Security Tests', () => {
 
       await expect(
         caller.flight.create({
-          date: pastDate,
-          departureCode: 'KJFK',
-          arrivalCode: 'KBOS',
-          duration: -1.5,
-          picTime: 0,
-          dualTime: 0,
-          dayLandings: 1,
-          nightLandings: 0,
-          aircraftId: 'aircraft-1',
+          operation: 'CREATE_FLIGHT',
+          data: {
+            date: pastDate,
+            departureCode: 'KJFK',
+            arrivalCode: 'KBOS',
+            duration: -1.5,
+            picTime: 0,
+            dualTime: 0,
+            dayLandings: 1,
+            nightLandings: 0,
+            aircraftId: 'aircraft-1',
+          }
         })
       ).rejects.toThrow();
     });
@@ -234,15 +252,18 @@ describe('Security Tests', () => {
 
       await expect(
         caller.flight.create({
-          date: pastDate,
-          departureCode: 'KJFK',
-          arrivalCode: 'KBOS',
-          duration: 1.0,
-          picTime: 2.0,
-          dualTime: 0,
-          dayLandings: 1,
-          nightLandings: 0,
-          aircraftId: 'aircraft-1',
+          operation: 'CREATE_FLIGHT',
+          data: {
+            date: pastDate,
+            departureCode: 'KJFK',
+            arrivalCode: 'KBOS',
+            duration: 1.0,
+            picTime: 2.0,
+            dualTime: 0,
+            dayLandings: 1,
+            nightLandings: 0,
+            aircraftId: 'aircraft-1',
+          }
         })
       ).rejects.toThrow(/cannot exceed total flight duration/);
     });
@@ -267,15 +288,18 @@ describe('Security Tests', () => {
 
       await expect(
         caller.flight.create({
-          date: futureDate,
-          departureCode: 'KJFK',
-          arrivalCode: 'KBOS',
-          duration: 1.5,
-          picTime: 1.5,
-          dualTime: 0,
-          dayLandings: 1,
-          nightLandings: 0,
-          aircraftId: 'aircraft-1',
+          operation: 'CREATE_FLIGHT',
+          data: {
+            date: futureDate,
+            departureCode: 'KJFK',
+            arrivalCode: 'KBOS',
+            duration: 1.5,
+            picTime: 1.5,
+            dualTime: 0,
+            dayLandings: 1,
+            nightLandings: 0,
+            aircraftId: 'aircraft-1',
+          }
         })
       ).rejects.toThrow(/cannot be in the future/);
     });
@@ -305,8 +329,12 @@ describe('Security Tests', () => {
 
       await expect(
         caller.flight.update({
-          id: 'flight-1',
-          duration: 2.0,
+          operation: 'UPDATE_FLIGHT',
+          flightId: 'flight-1',
+          changes: {
+            duration: 2.0,
+          },
+          clientVersion: 1,
         })
       ).rejects.toThrow(/not found or unauthorized/);
     });
@@ -329,7 +357,10 @@ describe('Security Tests', () => {
       });
 
       await expect(
-        caller.aircraft.delete({ id: 'aircraft-1' })
+        caller.aircraft.delete({
+          operation: 'DELETE_AIRCRAFT',
+          aircraftId: 'aircraft-1'
+        })
       ).rejects.toThrow(/not found or unauthorized/);
     });
   });
