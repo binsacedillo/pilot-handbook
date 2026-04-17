@@ -10,13 +10,21 @@ import {
   calculatePressureAltitude, 
   calculateDensityAltitude 
 } from "@/lib/aviation-math";
-import { Thermometer, MapPin, AlertTriangle, RefreshCw } from "lucide-react";
+import { evaluateFlightSafety } from "@/lib/decision/engine";
+import { Badge } from "@/components/ui/badge";
+import { Thermometer, MapPin, AlertTriangle, RefreshCw, ShieldCheck, ShieldAlert, ShieldX } from "lucide-react";
 
-export default function DensityAltitudeCalculator() {
+interface DensityAltitudeCalculatorProps {
+  isCompact?: boolean;
+  onResultChange?: (results: any) => void;
+}
+
+export default function DensityAltitudeCalculator({ isCompact = false, onResultChange }: DensityAltitudeCalculatorProps) {
   const [elevation, setElevation] = useState<string>("0");
   const [altimeter, setAltimeter] = useState<string>("29.92");
   const [temperature, setTemperature] = useState<string>("15");
   const [icao, setIcao] = useState<string>("");
+  
   const { data: metar, isLoading, refetch } = trpc.weather.getMetar.useQuery(
     { icao: icao.toUpperCase() },
     { enabled: false }
@@ -30,7 +38,6 @@ export default function DensityAltitudeCalculator() {
 
   useEffect(() => {
     if (metar) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (metar.altimeter) setAltimeter(metar.altimeter.toString());
       if (metar.temperature !== null) setTemperature(metar.temperature.toString());
     }
@@ -44,23 +51,84 @@ export default function DensityAltitudeCalculator() {
     if (!isNaN(elev) && !isNaN(alt) && !isNaN(temp)) {
       const pa = calculatePressureAltitude(elev, alt);
       const da = calculateDensityAltitude(pa, temp);
-      return { pressureAltitude: pa, densityAltitude: da };
+      const decision = evaluateFlightSafety('density-altitude', { 
+        elevation: elev,
+        altimeter: alt,
+        temperature: temp,
+        densityAltitude: da 
+      });
+      return { 
+        pressureAltitude: pa, 
+        densityAltitude: da,
+        decision 
+      };
     }
     return null;
   }, [elevation, altimeter, temperature]);
 
+  useEffect(() => {
+    if (onResultChange && results) {
+      onResultChange(results);
+    }
+  }, [results, onResultChange]);
+
+  if (isCompact) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-white">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-zinc-400">Elevation (ft)</Label>
+                <Input value={elevation} onChange={(e) => setElevation(e.target.value)} className="bg-zinc-900 border-white/5" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-zinc-400">Altimeter (inHg)</Label>
+                <Input value={altimeter} onChange={(e) => setAltimeter(e.target.value)} className="bg-zinc-900 border-white/5" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-zinc-400">Temp (°C)</Label>
+                <Input value={temperature} onChange={(e) => setTemperature(e.target.value)} className="bg-zinc-900 border-white/5" />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-center items-center p-6 bg-zinc-900 rounded-3xl border border-white/5 relative">
+            {results && (
+              <div className="text-center space-y-4 w-full">
+                <div className="flex items-center justify-center gap-2">
+                  <Thermometer className={`w-8 h-8 ${results.densityAltitude > results.pressureAltitude ? "text-red-500" : "text-blue-500"}`} />
+                  <p className="text-5xl font-black italic tracking-tighter">
+                    {results.densityAltitude.toLocaleString()} <span className="text-xl text-zinc-500 ml-1">ft</span>
+                  </p>
+                </div>
+                
+                <div className="text-right border-t border-white/5 pt-4">
+                  <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Aero Deviation</p>
+                  <p className={`text-xl font-black italic tracking-tighter ${results.densityAltitude > results.pressureAltitude ? "text-red-500 animate-pulse" : "text-emerald-500"}`}>
+                    {results.densityAltitude > results.pressureAltitude ? "+" : ""}{(results.densityAltitude - results.pressureAltitude).toLocaleString()} ft
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <Card className="border-blue-200 dark:border-blue-900 shadow-lg">
-        <CardHeader className="bg-blue-50/50 dark:bg-blue-900/10">
+      <Card className="border-2 shadow-xl">
+        <CardHeader className="bg-zinc-50 dark:bg-zinc-900/50">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-800 rounded-lg text-blue-600 dark:text-blue-300">
+            <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500 border border-blue-500/20">
               <RefreshCw className="w-6 h-6" />
             </div>
             <div>
-              <CardTitle>Density Altitude Calculator</CardTitle>
-              <CardDescription>
-                Determine aerodynamic altitude based on current weather conditions.
+              <CardTitle className="italic uppercase tracking-tighter">Performance Analysis</CardTitle>
+              <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                Density Altitude & Environmental Conditions
               </CardDescription>
             </div>
           </div>
@@ -69,94 +137,93 @@ export default function DensityAltitudeCalculator() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
-                  <MapPin className="w-4 h-4" /> Quick Fetch (Optional)
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase text-zinc-400">
+                  <MapPin className="w-4 h-4" /> System Integration / METAR
                 </div>
                 <div className="flex gap-2">
                   <Input 
-                    placeholder="Enter ICAO (e.g. KJFK)" 
+                    placeholder="ICAO" 
                     value={icao}
                     onChange={(e) => setIcao(e.target.value.toUpperCase())}
                     maxLength={4}
-                    className="uppercase"
+                    className="uppercase bg-zinc-50 dark:bg-zinc-900 border-none shadow-inner h-11"
                   />
                   <Button 
                     variant="outline" 
                     onClick={handleFetchMetar} 
                     disabled={isLoading || icao.length !== 4}
+                    className="h-11 rounded-xl"
                   >
-                    {isLoading ? "Fetching..." : "Fetch Weather"}
+                    {isLoading ? "Fetching..." : "Auto-Fill"}
                   </Button>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t">
                 <div className="space-y-2">
-                  <Label htmlFor="elev">Airport Elevation (ft)</Label>
-                  <Input 
-                    id="elev"
-                    type="number"
-                    value={elevation}
-                    onChange={(e) => setElevation(e.target.value)}
-                  />
+                  <Label className="text-xs font-black uppercase">Elevation (ft)</Label>
+                  <Input type="number" value={elevation} onChange={(e) => setElevation(e.target.value)} className="rounded-xl h-11" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="alt">Altimeter (inHg)</Label>
-                  <Input 
-                    id="alt"
-                    type="number"
-                    step="0.01"
-                    value={altimeter}
-                    onChange={(e) => setAltimeter(e.target.value)}
-                  />
+                  <Label className="text-xs font-black uppercase">Altimeter (inHg)</Label>
+                  <Input type="number" step="0.01" value={altimeter} onChange={(e) => setAltimeter(e.target.value)} className="rounded-xl h-11" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="temp">Temperature (°C)</Label>
-                  <Input 
-                    id="temp"
-                    type="number"
-                    value={temperature}
-                    onChange={(e) => setTemperature(e.target.value)}
-                  />
+                  <Label className="text-xs font-black uppercase">Temperature (°C)</Label>
+                  <Input type="number" value={temperature} onChange={(e) => setTemperature(e.target.value)} className="rounded-xl h-11" />
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col justify-center items-center p-6 bg-slate-50 dark:bg-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 relative">
+            <div className="flex flex-col justify-center items-center p-8 bg-zinc-50 dark:bg-zinc-900 rounded-3xl border border-white/5 relative">
               {results && (
                 <div className="text-center space-y-4 w-full">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Density Altitude</p>
-                    <div className="flex items-center justify-center gap-2">
-                      <Thermometer className={`w-8 h-8 ${results.densityAltitude > results.pressureAltitude ? "text-red-500" : "text-blue-500"}`} />
-                      <p className="text-5xl font-bold font-mono tracking-tighter">
-                        {results.densityAltitude.toLocaleString()} <span className="text-xl text-muted-foreground ml-1">ft</span>
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Computed Density Altitude</p>
+                      {results.decision && (
+                        <Badge className={`font-black uppercase tracking-widest bg-blue-500`}>
+                           {results.decision.status}
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center justify-center gap-2 py-4">
+                      <Thermometer className={`w-10 h-10 ${results.densityAltitude > results.pressureAltitude ? "text-red-500" : "text-blue-500"}`} />
+                      <p className="text-6xl font-black italic tracking-tighter">
+                        {results.densityAltitude.toLocaleString()} 
+                        <span className="text-2xl text-zinc-500 ml-2 not-italic">FT</span>
                       </p>
                     </div>
                   </div>
                   
-                  <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800 flex justify-between w-full px-4">
-                    <div className="text-left">
-                      <p className="text-xs text-muted-foreground uppercase font-semibold">Pressure Alt</p>
-                      <p className="text-lg font-mono font-bold">{results.pressureAltitude.toLocaleString()} ft</p>
+                  <div className="pt-6 mt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-between w-full px-4 text-center">
+                    <div className="flex-1">
+                      <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Pressure Alt</p>
+                      <p className="text-xl font-black italic">{results.pressureAltitude.toLocaleString()} ft</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground uppercase font-semibold">Deviation</p>
-                      <p className={`text-lg font-mono font-bold ${results.densityAltitude > results.pressureAltitude ? "text-red-600" : "text-blue-600"}`}>
+                    <div className="flex-1 border-l border-zinc-200 dark:border-zinc-800">
+                      <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Deviation</p>
+                      <p className={`text-xl font-black italic ${results.densityAltitude > results.pressureAltitude ? "text-red-600 animate-pulse" : "text-blue-600"}`}>
                         {results.densityAltitude > results.pressureAltitude ? "+" : ""}{(results.densityAltitude - results.pressureAltitude).toLocaleString()} ft
                       </p>
                     </div>
                   </div>
+
+                  {results.decision && results.decision.status !== 'GO' && (
+                    <div className={`
+                      w-full p-4 rounded-xl border-l-4 text-left flex gap-3 items-start transition-all duration-300 mt-6
+                      ${results.decision.status === 'CAUTION' ? 'bg-amber-500/10 border-amber-500 text-amber-200' : 'bg-red-500/10 border-red-500 text-red-200'}
+                    `}>
+                      <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <p className="font-black text-xs uppercase tracking-widest">Safety Recommendation</p>
+                        <p className="text-xs leading-tight opacity-80 italic">{results.decision.recommendation}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-
-              <div className="mt-8 p-3 bg-amber-50 dark:bg-amber-950/30 rounded border border-amber-200 dark:border-amber-900/50 flex gap-3 text-xs text-amber-800 dark:text-amber-400">
-                <AlertTriangle className="w-5 h-5 shrink-0" />
-                <p>
-                  <strong>Disclaimer:</strong> This calculation is for supplemental planning only. 
-                  Always use your official POH/AFM for final performance data.
-                </p>
-              </div>
             </div>
           </div>
         </CardContent>
