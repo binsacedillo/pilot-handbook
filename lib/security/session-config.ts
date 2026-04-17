@@ -4,8 +4,8 @@
  */
 
 export const SESSION_CONFIG = {
-  // 20 minutes of inactivity before automatic logout
-  IDLE_TIMEOUT_MS: 20 * 60 * 1000,
+  // 60 minutes of inactivity before automatic logout
+  IDLE_TIMEOUT_MS: 60 * 60 * 1000,
   
   // 3 minutes before idle timeout, show the warning dialog
   WARNING_THRESHOLD_MS: 3 * 60 * 1000,
