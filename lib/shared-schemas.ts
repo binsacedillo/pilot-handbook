@@ -77,3 +77,61 @@ export const updateFlightSchema = flightBaseSchema.partial().extend({
 }).superRefine((data, ctx) => {
   flightDurationGuard(data, ctx);
 });
+
+// ============================================================================
+// COMMAND SCHEMAS (Authority Move: Client -> Server)
+// ============================================================================
+
+// Specialized Command Sub-schemas (for TRPC inference)
+export const createFlightCommandSchema = z.object({
+  operation: z.literal('CREATE_FLIGHT'),
+  data: createFlightSchema,
+  clientVersion: z.number().optional(),
+});
+
+export const updateFlightCommandSchema = z.object({
+  operation: z.literal('UPDATE_FLIGHT'),
+  flightId: z.string(),
+  changes: flightBaseSchema.partial().superRefine(flightDurationGuard),
+  clientVersion: z.number(),
+});
+
+export const deleteFlightCommandSchema = z.object({
+  operation: z.literal('DELETE_FLIGHT'),
+  flightId: z.string(),
+  clientVersion: z.number().optional(),
+});
+
+export const flightCommandSchema = z.discriminatedUnion('operation', [
+  updateFlightCommandSchema,
+  createFlightCommandSchema,
+  deleteFlightCommandSchema,
+]);
+
+export const createAircraftCommandSchema = z.object({
+  operation: z.literal('CREATE_AIRCRAFT'),
+  data: createAircraftSchema,
+  clientVersion: z.number().optional(),
+});
+
+export const updateAircraftCommandSchema = z.object({
+  operation: z.literal('UPDATE_AIRCRAFT'),
+  aircraftId: z.string(),
+  changes: createAircraftSchema.partial(),
+  clientVersion: z.number(),
+});
+
+export const deleteAircraftCommandSchema = z.object({
+  operation: z.literal('DELETE_AIRCRAFT'),
+  aircraftId: z.string(),
+  clientVersion: z.number().optional(),
+});
+
+export const aircraftCommandSchema = z.discriminatedUnion('operation', [
+  updateAircraftCommandSchema,
+  createAircraftCommandSchema,
+  deleteAircraftCommandSchema,
+]);
+
+export type FlightCommand = z.infer<typeof flightCommandSchema>;
+export type AircraftCommand = z.infer<typeof aircraftCommandSchema>;
