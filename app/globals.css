@@ -82,9 +82,21 @@ html[data-theme-initial] body {
     }
   }
 
+  @keyframes scanline {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(100%); }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.2); }
+    50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+  }
+
   --animate-shimmer: shimmer 2s infinite linear;
   --animate-entry: entry 0.5s ease-out forwards;
   --animate-bounce-subtle: bounce-subtle 3s ease-in-out infinite;
+  --animate-scanline: scanline 4s linear infinite;
+  --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
 }
 
 @layer utilities {
@@ -141,6 +153,26 @@ html[data-theme-initial] body {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  .hud-scanline {
+    overflow: hidden;
+    position: relative;
+  }
+  .hud-scanline::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(59, 130, 246, 0.03) 50%,
+      transparent 100%
+    );
+    height: 100px;
+    width: 100%;
+    animation: scanline 8s linear infinite;
+    pointer-events: none;
   }
 }
 

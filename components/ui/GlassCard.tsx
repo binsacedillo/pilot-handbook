@@ -46,3 +46,11 @@ export function GlassCardContent({ children, className }: { children: React.Reac
     </div>
   );
 }
+
+export function GlassCardFooter({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn("px-6 py-4 border-t border-(--glass-border) bg-white/[0.02] dark:bg-black/[0.1]", className)}>
+      {children}
+    </div>
+  );
+}
