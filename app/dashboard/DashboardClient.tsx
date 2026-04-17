@@ -18,7 +18,9 @@ import {
   Info, 
   ExternalLink,
   Activity,
-  History
+  History,
+  ShieldCheck,
+  Plane
 } from "lucide-react";
 import ExperienceProgression from "@/components/dashboard/ExperienceProgression";
 import { cn } from "@/lib/utils";
@@ -208,9 +210,27 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
 
                 <section className="animate-in fade-in slide-in-from-left-4 duration-700 delay-300">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                     <QuickToolCard href="/tools/performance" title="Performance" desc="DA/PA Calc" color="text-blue-500" />
-                     <QuickToolCard href="/tools/weight-balance" title="Weight & Balance" desc="CG Envelope" color="text-amber-500" />
-                     <QuickToolCard href="/tools/fuel" title="Fuel Planner" desc="Reserves" color="text-green-500" />
+                     <QuickToolCard 
+                       href="/tools" 
+                       title="Mission Control" 
+                       desc="Launch Preflight" 
+                       icon={<ShieldCheck className="w-4 h-4 text-blue-500" />} 
+                       color="text-blue-500" 
+                     />
+                     <QuickToolCard 
+                       href="/flights" 
+                       title="Safety Records" 
+                       desc="Audit Logs" 
+                       icon={<History className="w-4 h-4 text-amber-500" />} 
+                       color="text-amber-500" 
+                     />
+                     <QuickToolCard 
+                       href="/aircraft" 
+                       title="Fleet Hangar" 
+                       desc="Aircraft Status" 
+                       icon={<Plane className="w-4 h-4 text-green-500" />} 
+                       color="text-green-500" 
+                     />
                   </div>
                 </section>
               </div>
@@ -319,12 +339,15 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
   );
 }
 
-function QuickToolCard({ href, title, desc, color }: { href: string; title: string, desc: string, color: string }) {
+function QuickToolCard({ href, title, desc, color, icon }: { href: string; title: string, desc: string, color: string, icon: React.ReactNode }) {
   return (
-    <Link href={href}>
-      <div className="group p-4 rounded-2xl border border-(--glass-border) bg-zinc-900/10 dark:bg-zinc-900/10 light:bg-slate-50/50 hover:border-zinc-500 transition-all duration-300">
-        <h3 className={cn("text-xs font-bold uppercase tracking-widest mb-1", color)}>{title}</h3>
-        <p className="text-[10px] text-zinc-500 dark:text-zinc-500 light:text-slate-500 font-medium group-hover:text-foreground transition-colors">{desc}</p>
+    <Link href={href} className="flex-1">
+      <div className="group h-full p-4 rounded-2xl border border-(--glass-border) bg-zinc-900/10 dark:bg-zinc-900/10 light:bg-slate-50/50 hover:bg-zinc-900/50 hover:border-blue-500/30 transition-all duration-300">
+        <div className="flex items-center gap-2 mb-2">
+           {icon}
+           <h3 className={cn("text-[10px] font-black uppercase tracking-[0.2em]", color)}>{title}</h3>
+        </div>
+        <p className="text-[10px] text-zinc-500 dark:text-zinc-500 light:text-slate-500 font-black uppercase tracking-widest group-hover:text-foreground transition-colors">{desc}</p>
       </div>
     </Link>
   );
