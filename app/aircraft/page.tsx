@@ -121,7 +121,10 @@ export default function AircraftPage() {
     if (!archiveDialogState.aircraftId) return;
     const aircraftId = archiveDialogState.aircraftId;
     try {
-      await deleteMutation.mutateAsync({ id: aircraftId });
+      await deleteMutation.mutateAsync({
+        operation: "DELETE_AIRCRAFT",
+        aircraftId: aircraftId,
+      });
     } catch {
       // Error handled in onError
     }

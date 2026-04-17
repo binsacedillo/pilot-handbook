@@ -1,8 +1,10 @@
 import { TRPCError } from '@trpc/server';
+import { Aircraft } from '@prisma/client';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
-import { idSchema, createAircraftSchema, updateAircraftSchema } from '@/lib/shared-schemas';
+import { idSchema, createAircraftSchema, updateAircraftSchema, createAircraftCommandSchema, updateAircraftCommandSchema, deleteAircraftCommandSchema } from '@/lib/shared-schemas';
 import { createAuditLog } from '@/lib/audit-logger';
+import { CommandService } from '../services/command-service';
 
 export const aircraftRouter = createTRPCRouter({
   // Restore (unarchive) an aircraft
@@ -80,6 +82,7 @@ export const aircraftRouter = createTRPCRouter({
           imageUrl: true,
           isArchived: true,
           flightHours: true,
+          version: true,
         },
         orderBy: { createdAt: 'desc' },
       });
@@ -103,119 +106,37 @@ export const aircraftRouter = createTRPCRouter({
       return aircraft;
     }),
 
-  // Create a new aircraft
+  // Create a new aircraft (Refactored to Command Pattern)
   create: protectedProcedure
-    .input(createAircraftSchema)
+    .input(createAircraftCommandSchema)
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
-        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
       }
 
-      const aircraft = await ctx.db.aircraft.create({
-        data: {
-          ...input,
-          userId: ctx.user.id,
-        },
-      });
-
-      // Audit log: Aircraft creation
-      await createAuditLog({
-        userId: ctx.user.id,
-        action: 'CREATE',
-        entityType: 'Aircraft',
-        entityId: aircraft.id,
-        newValues: {
-          make: aircraft.make,
-          model: aircraft.model,
-          registration: aircraft.registration,
-          status: aircraft.status,
-        },
-        changes: `Created aircraft: ${aircraft.make} ${aircraft.model} (${aircraft.registration})`,
-      });
-
-      return aircraft;
+      return CommandService.createAircraft(ctx.db, ctx.user.id, input) as Promise<Aircraft>;
     }),
 
-  // Update an aircraft
+  // Update an aircraft (Refactored to Command Pattern)
   update: protectedProcedure
-    .input(updateAircraftSchema)
+    .input(updateAircraftCommandSchema)
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
       }
 
-      const { id, ...data } = input;
-
-      // Use update instead of updateMany for better error handling
-      const aircraft = await ctx.db.aircraft.update({
-        where: {
-          id,
-          userId: ctx.user.id, // Security Check!
-        },
-        data,
-      });
-
-      return aircraft;
+      return CommandService.updateAircraft(ctx.db, ctx.user.id, input) as Promise<Aircraft>;
     }),
 
-  // Archive (soft delete) an aircraft
+  // Archive (soft delete) an aircraft (Refactored to Command Pattern)
   delete: protectedProcedure
-    .input(idSchema)
+    .input(deleteAircraftCommandSchema)
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
-        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
       }
 
-      // Fetch aircraft before archiving for audit trail
-      const aircraftToDelete = await ctx.db.aircraft.findUnique({
-        where: { id: input.id },
-        select: {
-          id: true,
-          make: true,
-          model: true,
-          registration: true,
-          status: true,
-          userId: true,
-        },
-      });
-
-      if (!aircraftToDelete || aircraftToDelete.userId !== ctx.user.id) {
-        throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Aircraft not found or unauthorized',
-        });
-      }
-
-      // Soft delete: set isArchived to true
-      const aircraft = await ctx.db.aircraft.update({
-        where: {
-          id: input.id,
-          userId: ctx.user.id, // Security Check!
-        },
-        data: {
-          isArchived: true,
-        },
-      });
-
-      // Audit log: Aircraft archive/deletion
-      await createAuditLog({
-        userId: ctx.user.id,
-        action: 'DELETE',
-        entityType: 'Aircraft',
-        entityId: input.id,
-        oldValues: {
-          make: aircraftToDelete.make,
-          model: aircraftToDelete.model,
-          registration: aircraftToDelete.registration,
-          isArchived: false,
-        },
-        newValues: {
-          isArchived: true,
-        },
-        changes: `Archived aircraft: ${aircraftToDelete.make} ${aircraftToDelete.model} (${aircraftToDelete.registration})`,
-      });
-
-      return aircraft;
+      return CommandService.deleteAircraft(ctx.db, ctx.user.id, input) as Promise<Aircraft>;
     }),
 
   // Permanent delete with safety check
