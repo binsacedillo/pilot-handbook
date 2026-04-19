@@ -1,6 +1,6 @@
 /**
- * Dashboard & Legality Decision Engine
- * Pure functions for consolidated Go/No-Go logic.
+ * Dashboard & Readiness Decision Engine
+ * Pure functions for consolidated pilot currency logic.
  */
 
 import { differenceInDays, isAfter, subDays, differenceInHours } from "date-fns";
@@ -26,7 +26,7 @@ export interface DashboardLegalityStatus {
 }
 
 /**
- * Aggregates all legality checks into a single Go/No-Go decision.
+ * Aggregates all legality checks into a single readiness decision.
  */
 export function calculateOverallLegality(params: {
   flights: Array<{ date: Date; dayLandings: number; nightLandings: number }>;
@@ -57,7 +57,7 @@ export function calculateOverallLegality(params: {
     : -1;
 
   if (!isMedicalCurrent) {
-    alerts.push("System Alert: Medical Certificate is expired or missing.");
+    alerts.push("Medical Alert: Medical Certificate is expired or missing.");
   } else if (medicalDaysRemaining < 30) {
     alerts.push(`Medical Advisory: Certificate expires in ${medicalDaysRemaining} days.`);
   }

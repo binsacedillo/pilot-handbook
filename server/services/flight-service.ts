@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
  */
 export const FlightService = {
   /**
-   * Aggregates flight experience and calculates pilot legality (Go/No-Go).
+   * Aggregates flight experience and calculates pilot readiness status.
    */
   async getStats(db: PrismaClient, userId: string) {
     // 1. Fetch Pilot Profile & Flights (Type-silent bypass for stale client defs)
