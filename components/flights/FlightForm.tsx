@@ -151,7 +151,7 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       {isSuccess && (
         <div className="absolute inset-0 z-50 flex items-start justify-center p-4 bg-background/20 backdrop-blur-[2px] animate-in fade-in duration-500 rounded-xl">
           <StatusAnnunciator 
-            type="success" 
+            type="normal" 
             title="Success" 
             message={successMessage}
             className="shadow-2xl shadow-emerald-500/20 max-w-lg mt-10"
@@ -289,7 +289,7 @@ export default function FlightForm({ initialData }: FlightFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="remarks" className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Remarks / Operational Notes</Label>
+        <Label htmlFor="remarks" className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Remarks / Flight Notes</Label>
         <Input
           id="remarks"
           placeholder="System notes..."
@@ -324,8 +324,8 @@ export default function FlightForm({ initialData }: FlightFormProps) {
           {isPending 
             ? "Saving..." 
             : isEditMode 
-              ? "Update Flight Log" 
-              : "Save Flight Log"
+              ? "Update Flight Record" 
+              : "Record Flight"
           }
         </Button>
       </div>

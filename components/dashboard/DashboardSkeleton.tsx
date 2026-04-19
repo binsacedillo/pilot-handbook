@@ -3,7 +3,7 @@ import RecentFlightsSkeleton from "./RecentFlightsSkeleton";
 
 export default function DashboardSkeleton() {
   return (
-    <div className="container mx-auto px-2 md:px-4 py-8 animate-pulse">
+    <div className="flex flex-col gap-3 mb-6 animate-pulse">
       <div className="flex flex-col gap-3 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="h-8 w-40 bg-accent rounded" />

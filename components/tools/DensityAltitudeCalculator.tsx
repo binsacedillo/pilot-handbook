@@ -12,7 +12,7 @@ import {
 } from "@/lib/aviation-math";
 import { evaluateFlightSafety } from "@/lib/decision/engine";
 import { Badge } from "@/components/ui/badge";
-import { Thermometer, MapPin, AlertTriangle, RefreshCw, ShieldCheck, ShieldAlert, ShieldX } from "lucide-react";
+import { Thermometer, MapPin, AlertTriangle, RefreshCw, ShieldCheck, ShieldAlert, ShieldX, Info } from "lucide-react";
 
 interface DensityAltitudeCalculatorProps {
   isCompact?: boolean;
@@ -97,7 +97,7 @@ export default function DensityAltitudeCalculator({ isCompact = false, onResultC
             {results && (
               <div className="text-center space-y-4 w-full">
                 <div className="space-y-1">
-                  <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest">Computed Density Altitude</p>
+                  <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest">Calculated Density Altitude</p>
                   <div className="flex items-center justify-center gap-2">
                     <Thermometer className={`w-8 h-8 sm:w-10 sm:h-10 ${results.densityAltitude > results.pressureAltitude ? "text-red-500 animate-pulse" : "text-blue-500"}`} />
                     <p className="text-4xl sm:text-5xl font-black italic tracking-tighter">
@@ -113,8 +113,8 @@ export default function DensityAltitudeCalculator({ isCompact = false, onResultC
                       {results.pressureAltitude.toLocaleString()}<span className="text-[10px] ml-1">ft</span>
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest leading-none mb-1">Aero Deviation</p>
+                   <div className="text-right">
+                    <p className="text-[10px] text-zinc-600 uppercase font-black tracking-widest leading-none mb-1">Calculated Deviation</p>
                     <p className={`text-lg sm:text-xl font-black italic tracking-tight ${results.densityAltitude > results.pressureAltitude ? "text-red-500" : "text-emerald-500"}`}>
                       {results.densityAltitude > results.pressureAltitude ? "+" : ""}{(results.densityAltitude - results.pressureAltitude).toLocaleString()} ft
                     </p>
@@ -125,14 +125,14 @@ export default function DensityAltitudeCalculator({ isCompact = false, onResultC
           </div>
         </div>
 
-        {results?.decision && results.decision.status !== 'GO' && (
+        {results?.decision && results.decision.status !== 'NORMAL' && (
           <div className={`p-4 rounded-2xl border-l-4 transition-all duration-300 ${
             results.decision.status === 'CAUTION' ? 'bg-amber-500/10 border-amber-500 text-amber-200' : 'bg-red-500/10 border-red-500 text-red-200'
           }`}>
              <div className="flex items-start gap-3">
                 <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-widest">Aero Performance Risk: {results.decision.status}</p>
+                   <p className="text-[10px] font-black uppercase tracking-widest">Performance Status: {results.decision.status}</p>
                   <p className="text-[11px] leading-tight opacity-80 italic">{results.decision.recommendation}</p>
                 </div>
              </div>
@@ -151,9 +151,9 @@ export default function DensityAltitudeCalculator({ isCompact = false, onResultC
               <RefreshCw className="w-6 h-6" />
             </div>
             <div>
-              <CardTitle className="italic uppercase tracking-tighter">Performance Analysis</CardTitle>
+              <CardTitle className="italic uppercase tracking-tighter text-xl">Performance Check</CardTitle>
               <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                Density Altitude & Environmental Conditions
+                Atmospheric conditions and Climb Safety
               </CardDescription>
             </div>
           </div>
@@ -205,7 +205,7 @@ export default function DensityAltitudeCalculator({ isCompact = false, onResultC
                 <div className="text-center space-y-4 w-full">
                   <div className="space-y-1">
                     <div className="flex items-center justify-center gap-2 mb-1">
-                      <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Computed Density Altitude</p>
+                      <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Calculated Density Altitude</p>
                       {results.decision && (
                         <Badge className={`font-black uppercase tracking-widest bg-blue-500`}>
                            {results.decision.status}
@@ -235,15 +235,28 @@ export default function DensityAltitudeCalculator({ isCompact = false, onResultC
                     </div>
                   </div>
 
-                  {results.decision && results.decision.status !== 'GO' && (
-                    <div className={`
-                      w-full p-4 rounded-xl border-l-4 text-left flex gap-3 items-start transition-all duration-300 mt-6
-                      ${results.decision.status === 'CAUTION' ? 'bg-amber-500/10 border-amber-500 text-amber-200' : 'bg-red-500/10 border-red-500 text-red-200'}
-                    `}>
-                      <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
-                      <div className="space-y-1">
-                        <p className="font-black text-xs uppercase tracking-widest">Safety Recommendation</p>
-                        <p className="text-xs leading-tight opacity-80 italic">{results.decision.recommendation}</p>
+                   {results.decision && (
+                    <div className="space-y-4 w-full mt-6">
+                      <div className={`
+                        w-full p-4 rounded-xl border-l-4 text-left flex flex-col gap-2 transition-all duration-300
+                        ${results.decision.status === 'NORMAL' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-200' : 
+                          results.decision.status === 'CAUTION' ? 'bg-amber-500/10 border-amber-500 text-amber-200' : 
+                          'bg-red-500/10 border-red-500 text-red-200'}
+                      `}>
+                         <div className="flex items-center gap-2">
+                            <ShieldAlert className="w-4 h-4 shrink-0" />
+                            <p className="text-[10px] font-black uppercase tracking-widest leading-none">Status: {results.decision.status}</p>
+                         </div>
+                         <p className="text-xs font-bold leading-tight">{results.decision.implication}</p>
+                         <p className="text-[11px] leading-tight opacity-70 italic">{results.decision.recommendation}</p>
+                      </div>
+
+                      <div className="p-4 bg-blue-500/5 rounded-xl border border-blue-500/10 flex gap-3 text-xs text-blue-400 italic text-left">
+                         <Info className="w-4 h-4 shrink-0 mt-0.5 text-blue-500" />
+                         <div className="space-y-1">
+                           <p className="font-black uppercase tracking-widest text-[10px] not-italic text-blue-500">Mentorship Tip</p>
+                           <p>{results.decision.mentorship}</p>
+                         </div>
                       </div>
                     </div>
                   )}

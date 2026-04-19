@@ -130,13 +130,13 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
           </div>
           
           <div className={`p-4 rounded-2xl border-l-4 transition-all duration-300 ${
-            results.decision?.status === 'GO' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-200' : 
+            results.decision?.status === 'NORMAL' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-200' : 
             results.decision?.status === 'CAUTION' ? 'bg-amber-500/10 border-amber-500 text-amber-200' : 
             'bg-red-500/10 border-red-500 text-red-200'
           }`}>
             <div className="flex items-center gap-2 mb-1">
-               {results.decision?.status === 'GO' ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
-               <p className="text-[10px] font-black uppercase tracking-widest">Flight Safety Risk: {results.decision?.status || 'GO'}</p>
+               {results.decision?.status === 'NORMAL' ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
+               <p className="text-[10px] font-black uppercase tracking-widest">Safety Status: {results.decision?.status || 'NORMAL'}</p>
             </div>
             <p className="text-[11px] leading-tight opacity-70 italic">{results.decision?.recommendation || 'Flight parameters within normal limits.'}</p>
           </div>
@@ -158,7 +158,7 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
           <CardHeader className="pb-4">
             <CardTitle className="text-xl flex items-center gap-2 italic uppercase tracking-tighter">
               <Scale className="w-5 h-5 text-blue-500" />
-              Loading Stations
+              Aircraft Loading Check
             </CardTitle>
             <CardDescription className="text-[10px] uppercase font-bold tracking-widest text-zinc-500">
               Structural Weight Distribution (LBS)
@@ -213,10 +213,10 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
           <div className={`h-2 w-full transition-colors duration-500 ${results.isOverweight || results.isOutOfCG ? "bg-red-500" : "bg-emerald-500"}`} />
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl italic uppercase tracking-tighter">Aero Safety Analysis</CardTitle>
+              <CardTitle className="text-xl italic uppercase tracking-tighter">Safety & Guidance</CardTitle>
               {results.decision && (
                 <Badge className={`font-black uppercase tracking-widest ${
-                  results.decision.status === 'GO' ? 'bg-emerald-500' : 'bg-red-500'
+                  results.decision.status === 'NORMAL' ? 'bg-emerald-500' : 'bg-red-500'
                 }`}>
                   {results.decision.status}
                 </Badge>
@@ -259,10 +259,28 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
                   </div>
                </div>
                
-               {results.decision?.recommendation && (
-                 <div className="flex items-start gap-3 p-4 bg-zinc-900/50 rounded-xl border border-white/5 text-[11px] italic text-zinc-400 leading-tight">
-                    <ShieldAlert className="w-4 h-4 shrink-0 text-zinc-500" />
-                    <p>{results.decision.recommendation}</p>
+               {results.decision && (
+                 <div className="space-y-4">
+                   <div className={`p-4 rounded-xl border-l-4 flex flex-col gap-2 transition-all duration-300 ${
+                     results.decision.status === 'NORMAL' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-200' : 
+                     results.decision.status === 'CAUTION' ? 'bg-amber-500/10 border-amber-500 text-amber-200' : 
+                     'bg-red-500/10 border-red-500 text-red-200'
+                   }`}>
+                      <div className="flex items-center gap-2">
+                         <ShieldAlert className="w-4 h-4 shrink-0" />
+                         <p className="text-[10px] font-black uppercase tracking-widest leading-none">Status: {results.decision.status}</p>
+                      </div>
+                      <p className="text-xs font-bold leading-tight">{results.decision.implication}</p>
+                      <p className="text-[11px] leading-tight opacity-70 italic">{results.decision.recommendation}</p>
+                   </div>
+                   
+                   <div className="p-4 bg-blue-500/5 rounded-xl border border-blue-500/10 flex gap-3 text-xs text-blue-400 italic">
+                      <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <p className="font-black uppercase tracking-widest text-[10px] not-italic text-blue-500">Mentorship Tip</p>
+                        <p>{results.decision.mentorship}</p>
+                      </div>
+                   </div>
                  </div>
                )}
             </div>

@@ -35,11 +35,11 @@ import FuelPlanner from "./FuelPlanner";
 type WorkflowStep = "AIRCRAFT" | "WB" | "PERFORMANCE" | "FUEL" | "SUMMARY";
 
 const STEPS = [
-  { id: "AIRCRAFT" as const, title: "Select Aircraft", icon: Plane },
-  { id: "WB" as const, title: "Weight & Balance", icon: Scale },
-  { id: "PERFORMANCE" as const, title: "Performance/DA", icon: Thermometer },
-  { id: "FUEL" as const, title: "Fuel Planning", icon: Zap },
-  { id: "SUMMARY" as const, title: "Final Review", icon: ShieldCheck }
+  { id: "AIRCRAFT" as const, title: "Select Aircraft", icon: Plane, guidance: "Choose your aircraft to load its performance profile." },
+  { id: "WB" as const, title: "Loading Check", icon: Scale, guidance: "Verify weight and balance to ensure stable flight control." },
+  { id: "PERFORMANCE" as const, title: "Performance Check", icon: Thermometer, guidance: "Analyze atmospheric impact on your climb and takeoff." },
+  { id: "FUEL" as const, title: "Fuel Planning", icon: Zap, guidance: "Plan fuel reserves to account for delays and diversions." },
+  { id: "SUMMARY" as const, title: "Final Review", icon: ShieldCheck, guidance: "Review consolidated readiness before marking as verified." }
 ];
 
 export default function PreflightWorkflow() {
@@ -106,9 +106,9 @@ export default function PreflightWorkflow() {
 
   const currentStatus = useMemo(() => {
     const statuses = Object.values(results).map(r => r?.decision?.status);
-    if (statuses.includes('NO_GO')) return 'NO_GO';
+    if (statuses.includes('WARNING')) return 'WARNING';
     if (statuses.includes('CAUTION')) return 'CAUTION';
-    return 'GO';
+    return 'NORMAL';
   }, [results]);
 
   return (
@@ -220,30 +220,45 @@ export default function PreflightWorkflow() {
         )}
 
         {currentStep === "WB" && (
-          <div className="bg-zinc-950/40 backdrop-blur-xl border border-white/5 rounded-3xl p-4 sm:p-6 shadow-2xl">
-            <WeightBalanceCalculator isCompact onResultChange={handleWBChange} />
+          <div className="space-y-4">
+            <div className="px-4 py-2 border-l-2 border-blue-500 bg-blue-500/5 text-[11px] text-blue-400 italic">
+              Assistant Guidance: Loading affects stability. Ensure your Center of Gravity (CG) is within limits for safe takeoff and landing.
+            </div>
+            <div className="bg-zinc-950/40 backdrop-blur-xl border border-white/5 rounded-3xl p-4 sm:p-6 shadow-2xl">
+              <WeightBalanceCalculator isCompact onResultChange={handleWBChange} />
+            </div>
           </div>
         )}
 
         {currentStep === "PERFORMANCE" && (
-          <div className="bg-zinc-950/40 backdrop-blur-xl border border-white/5 rounded-3xl p-4 sm:p-6 shadow-2xl">
-            <DensityAltitudeCalculator isCompact onResultChange={handleDAChange} />
+          <div className="space-y-4">
+            <div className="px-4 py-2 border-l-2 border-blue-500 bg-blue-500/5 text-[11px] text-blue-400 italic">
+              Assistant Guidance: High density altitude reduces climb performance. Verify your aircraft can safely clear obstacles today.
+            </div>
+            <div className="bg-zinc-950/40 backdrop-blur-xl border border-white/5 rounded-3xl p-4 sm:p-6 shadow-2xl">
+              <DensityAltitudeCalculator isCompact onResultChange={handleDAChange} />
+            </div>
           </div>
         )}
 
         {currentStep === "FUEL" && (
-          <div className="bg-zinc-950/40 backdrop-blur-xl border border-white/5 rounded-3xl p-4 sm:p-6 shadow-2xl">
-            <FuelPlanner isCompact onResultChange={handleFuelChange} />
+          <div className="space-y-4">
+            <div className="px-4 py-2 border-l-2 border-blue-500 bg-blue-500/5 text-[11px] text-blue-400 italic">
+              Assistant Guidance: Plan for the unexpected. Legal minimums are a baseline; safe pilots always keep a healthy buffer.
+            </div>
+            <div className="bg-zinc-950/40 backdrop-blur-xl border border-white/5 rounded-3xl p-4 sm:p-6 shadow-2xl">
+              <FuelPlanner isCompact onResultChange={handleFuelChange} />
+            </div>
           </div>
         )}
 
         {currentStep === "SUMMARY" && (
           <div className="space-y-6 text-left">
             <Card className="border-2 border-zinc-800 bg-zinc-950/40 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
-               <div className={`h-2 w-full ${currentStatus === 'GO' ? 'bg-emerald-500' : currentStatus === 'CAUTION' ? 'bg-amber-500' : 'bg-red-500'}`} />
+               <div className={`h-2 w-full ${currentStatus === 'NORMAL' ? 'bg-emerald-500' : currentStatus === 'CAUTION' ? 'bg-amber-500' : 'bg-red-500'}`} />
                <CardHeader className="text-center p-4 sm:p-6">
-                  <div className={`mx-auto w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-4 ${currentStatus === 'GO' ? 'bg-emerald-500/10' : 'bg-amber-500/10'}`}>
-                    {currentStatus === 'GO' ? <ShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-500" /> : <ShieldAlert className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />}
+                  <div className={`mx-auto w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-4 ${currentStatus === 'NORMAL' ? 'bg-emerald-500/10' : 'bg-amber-500/10'}`}>
+                    {currentStatus === 'NORMAL' ? <ShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-500" /> : <ShieldAlert className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />}
                   </div>
                   <CardTitle className="text-xl sm:text-3xl font-black uppercase italic tracking-tighter">
                     Flight Readiness: {currentStatus}
@@ -273,13 +288,13 @@ export default function PreflightWorkflow() {
               disabled={commitSnapshot.isPending}
             >
               <Save className="w-5 h-5 sm:w-6 sm:h-6 mr-3" />
-              {commitSnapshot.isPending ? "Syncing..." : "Finalize & Log Flight Operations"}
+              {commitSnapshot.isPending ? "Syncing..." : "Record Readiness Data"}
             </Button>
           </div>
         )}
       </div>
 
-      {/* Navigation Controls - Hardened Touch Targets */}
+      {/* Navigation Controls - Optimized Touch Targets */}
       <div className="flex justify-between items-center pt-6 sm:pt-8 gap-4">
         <Button 
           variant="outline" 
@@ -309,7 +324,7 @@ function StatusMiniCard({ title, status, value }: { title: string, status?: stri
     <div className="p-4 bg-zinc-900 rounded-2xl border border-white/5">
       <div className="flex justify-between items-center mb-1">
         <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{title}</p>
-        <div className={`w-2 h-2 rounded-full ${status === 'GO' ? 'bg-emerald-500' : status === 'CAUTION' ? 'bg-amber-500' : 'bg-zinc-700'}`} />
+        <div className={`w-2 h-2 rounded-full ${status === 'NORMAL' ? 'bg-emerald-500' : status === 'CAUTION' ? 'bg-amber-500' : 'bg-zinc-700'}`} />
       </div>
       <p className="text-xl font-black italic text-white uppercase tracking-tighter">{value}</p>
     </div>

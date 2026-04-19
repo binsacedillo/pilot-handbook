@@ -21,13 +21,13 @@ export default function ToolsDashboard() {
           <div className="space-y-1 sm:space-y-2 animate-in fade-in slide-in-from-left-4 duration-700">
             <div className="flex items-center gap-3 text-blue-500/60">
                <Activity className="w-5 h-5" />
-               <span className="text-[10px] font-black uppercase tracking-[0.4em]">Operations Dispatch / System HUD</span>
+               <span className="text-[10px] font-black uppercase tracking-[0.4em]">Flight Planning / Decision Support</span>
             </div>
             <h1 className="text-3xl sm:text-6xl font-black tracking-tighter text-foreground uppercase italic leading-none">
               FLIGHT PREPARATION<span className="text-blue-500">.</span>
             </h1>
             <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.3em] text-zinc-500">
-              Active Operational Analysis • {userName}
+              Active Flight Preparation • {userName}
             </p>
           </div>
 
@@ -35,9 +35,9 @@ export default function ToolsDashboard() {
             <div className="flex flex-col items-end gap-2">
                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-900 border border-white/5 shadow-xl">
                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                 <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Telemetry Active</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">System Ready</span>
                </div>
-                <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest italic tracking-tighter">Instrument-Grade HUD Online</span>
+                <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest italic tracking-tighter">Pro-Grade Cockpit Tooling</span>
             </div>
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function ToolsDashboard() {
                {/* High-visibility alert strip */}
                <div className="w-full sm:w-16 bg-amber-600/10 flex flex-row sm:flex-col items-center justify-center p-3 sm:p-0 gap-3 border-b sm:border-b-0 sm:border-r border-amber-600/20">
                   <ShieldCheck className="w-6 h-6 text-amber-600" />
-                  <span className="sm:-rotate-90 text-[10px] font-black text-amber-600 whitespace-nowrap tracking-[0.2em] uppercase">Security</span>
+                  <span className="sm:-rotate-90 text-[10px] font-black text-amber-600 whitespace-nowrap tracking-[0.2em] uppercase">Safety</span>
                </div>
                
                <div className="flex-1 p-5 sm:p-8 space-y-3 relative overflow-hidden">
@@ -65,7 +65,7 @@ export default function ToolsDashboard() {
                   <div className="relative z-10 space-y-2 sm:space-y-3">
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-amber-600" />
-                      <h3 className="text-xs font-black uppercase tracking-[0.4em] text-amber-600">Aviation Safety Protocol 01</h3>
+                      <h3 className="text-xs font-black uppercase tracking-[0.4em] text-amber-600">Safety Notice</h3>
                     </div>
                     
                     <p className="text-[10px] sm:text-[11px] font-bold text-zinc-400 max-w-4xl leading-relaxed uppercase italic tracking-wider">

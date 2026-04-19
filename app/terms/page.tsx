@@ -31,7 +31,7 @@ export default function TermsPage() {
               <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Project Status</h2>
               <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-lg">
                 <p className="text-zinc-400 font-mono text-xs">
-                  Pilot Handbook is currently under development. The following terms are provided for transparency and may be updated prior to public launch.
+                  The Pilot Handbook is a Guided Training Companion currently under active development. The following terms are provided for transparency and to establish the baseline for student and general aviation use.
                 </p>
               </div>
             </section>
@@ -52,8 +52,8 @@ export default function TermsPage() {
               <p>All content, trademarks, and intellectual property on Pilot Handbook remain the property of their respective owners. You may not copy, modify, or distribute any part of the platform without permission.</p>
             </section>
             <section>
-              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">5. Disclaimer &amp; Limitation of Liability</h2>
-              <p>Pilot Handbook is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We make no warranties regarding the accuracy, reliability, or availability of the platform. To the fullest extent permitted by law, we disclaim all liability for any damages arising from your use of the platform.</p>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">5. Safety Disclaimer &amp; Liability</h2>
+              <p>Pilot Handbook is provided for informational and decision-support purposes only. It is NOT a replacement for the Approved Flight Manual (AFM) or Pilot&apos;s Operating Handbook (POH). The Pilot in Command (PIC) retains final authority and responsibility for the safe operation of the aircraft. Always verify calculations manually against official data.</p>
             </section>
             <section>
               <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">6. Changes to Terms</h2>

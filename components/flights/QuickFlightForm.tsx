@@ -60,7 +60,7 @@ export default function QuickFlightForm() {
         <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-2">
           <CheckCircle2 className="w-8 h-8" />
         </div>
-        <h3 className="text-lg font-black uppercase tracking-tighter text-foreground">Flight Logged Successfully</h3>
+        <h3 className="text-lg font-black uppercase tracking-tighter text-foreground">Flight Recorded Successfully</h3>
         <p className="text-xs text-zinc-500 max-w-[240px]">Full details can be managed from the logbook table at any time.</p>
         <Button 
           variant="outline" 
@@ -68,7 +68,7 @@ export default function QuickFlightForm() {
           onClick={() => setForm({ ...form, departureCode: "", arrivalCode: "", duration: "" })}
           className="mt-4 border-zinc-800 text-[10px] font-black uppercase tracking-widest"
         >
-          Log Another
+          Record Another
         </Button>
       </div>
     );
@@ -156,7 +156,7 @@ export default function QuickFlightForm() {
         className="w-full h-11 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 gap-2"
       >
         <Zap className={cn("w-3.5 h-3.5 fill-current", isPending && "animate-pulse")} />
-        {isPending ? "Transmitting..." : "Quick Save"}
+        {isPending ? "Saving..." : "Save Flight"}
       </Button>
       
       <p className="text-[9px] text-zinc-600 text-center font-medium uppercase tracking-tighter">

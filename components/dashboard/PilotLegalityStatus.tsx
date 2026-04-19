@@ -89,7 +89,7 @@ export default function PilotLegalityStatus({ pilotName, initialStats }: PilotLe
               <User className="w-4 h-4 text-zinc-500 dark:text-zinc-500 light:text-slate-600" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[9px] uppercase font-black text-zinc-500 dark:text-zinc-500 light:text-slate-500 tracking-[0.2em] leading-none mb-1">Command Pilot</span>
+              <span className="text-[9px] uppercase font-black text-zinc-500 dark:text-zinc-500 light:text-slate-500 tracking-[0.2em] leading-none mb-1">Pilot in Command</span>
               <span className="text-sm font-black text-foreground tracking-tight">
                 {pilotName}
               </span>
@@ -111,12 +111,12 @@ export default function PilotLegalityStatus({ pilotName, initialStats }: PilotLe
               <DialogTrigger asChild>
                 <button className="flex items-center gap-2 px-3 py-2 rounded-lg border border-(--glass-border) bg-zinc-900/60 text-zinc-500 hover:text-blue-500 hover:border-blue-500/50 transition-all text-[9px] font-black uppercase tracking-widest shadow-inner">
                   <Settings2 className="w-3 h-3" />
-                  Configure System
+                  Update Profile
                 </button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl bg-(--glass-bg) border-(--glass-border) p-0 overflow-hidden shadow-2xl backdrop-blur-3xl">
                 <DialogHeader className="sr-only">
-                  <DialogTitle>Configure Pilot Profile</DialogTitle>
+                  <DialogTitle>Update Pilot Profile</DialogTitle>
                   <DialogDescription>Update your aviation credentials.</DialogDescription>
                 </DialogHeader>
                 <div className="absolute right-4 top-4 z-50">
@@ -138,11 +138,8 @@ export default function PilotLegalityStatus({ pilotName, initialStats }: PilotLe
               ? "bg-emerald-500/5 border-emerald-500/20 shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)]" 
               : "bg-red-500/5 border-red-500/20 shadow-[0_0_40px_-10px_rgba(239,68,68,0.2)]"
           )}>
-            <div className={cn(
-              "text-[10px] font-black uppercase tracking-[0.4em] mb-3",
-              isGo ? "text-emerald-500/80" : "text-red-500/80"
-            )}>
-              Pre-Flight Legality
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] mb-3">
+              Preflight Status
             </div>
             <div className={cn(
               "text-5xl font-black italic tracking-tighter",
@@ -155,7 +152,7 @@ export default function PilotLegalityStatus({ pilotName, initialStats }: PilotLe
                "mt-2 text-[9px] font-bold uppercase tracking-widest",
                isGo ? "text-emerald-600/60" : "text-red-600/60"
             )}>
-               {isGo ? "Nominal Operations" : "Check Interlocks"}
+               {isGo ? "Currency & Medical Valid" : "Review Requirements"}
             </div>
           </div>
 

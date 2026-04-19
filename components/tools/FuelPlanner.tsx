@@ -25,7 +25,7 @@ import {
 import { calculateFuel, FUEL_CONSTANTS } from "@/lib/calculations/fuel-planner";
 import { evaluateFlightSafety } from "@/lib/decision/engine";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, ShieldAlert, ShieldX } from "lucide-react";
+import { ShieldCheck, ShieldAlert, ShieldX, Info } from "lucide-react";
 
 interface FuelPlannerProps {
   isCompact?: boolean;
@@ -102,14 +102,14 @@ export default function FuelPlanner({ isCompact = false, onResultChange }: FuelP
             </div>
 
             <div className={`p-4 rounded-2xl border-l-4 transition-all duration-300 ${
-              results.decision?.status === 'GO' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-200' : 'bg-amber-500/10 border-amber-500 text-amber-200'
+              results.decision?.status === 'NORMAL' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-200' : 'bg-amber-500/10 border-amber-500 text-amber-200'
             }`}>
                <div className="flex items-center gap-2 mb-1">
-                  {results.decision?.status === 'GO' ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
-                  <p className="text-[10px] font-black uppercase tracking-widest">Safety Buffer: {params.reserveMinutes}m</p>
+                  {results.decision?.status === 'NORMAL' ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
+                  <p className="text-[10px] font-black uppercase tracking-widest">Endurance Buffer: {params.reserveMinutes}m</p>
                </div>
                <p className="text-[11px] leading-tight opacity-80 italic">
-                 {results.decision?.status === 'GO' ? 'Regulatory reserves met.' : 'Insufficient reserves for selected flight operations.'}
+                 {results.decision?.status === 'NORMAL' ? 'Regulatory reserves met.' : 'Insufficient reserves for selected flight operations.'}
                </p>
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function FuelPlanner({ isCompact = false, onResultChange }: FuelP
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="w-5 h-5 text-green-500" />
-              Flight Parameters
+              Fuel Planning Parameters
             </CardTitle>
             <CardDescription>
               Enter your trip details for fuel estimation.
@@ -239,28 +239,28 @@ export default function FuelPlanner({ isCompact = false, onResultChange }: FuelP
       <div className="space-y-6">
         <Card className="border-2 overflow-hidden shadow-lg">
            <div className={`h-2 w-full transition-colors duration-500 ${
-             results.decision?.status === 'GO' ? "bg-emerald-500" : 
+             results.decision?.status === 'NORMAL' ? "bg-emerald-500" : 
              results.decision?.status === 'CAUTION' ? "bg-amber-500" : "bg-red-500"
            }`} />
            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Fuel Requirements</CardTitle>
+                <CardTitle className="text-lg">Safety & Guidance</CardTitle>
                 {results.decision && (
                   <Badge 
                     variant={
-                      results.decision.status === 'GO' ? 'success' : 
+                      results.decision.status === 'NORMAL' ? 'success' : 
                       results.decision.status === 'CAUTION' ? 'secondary' : 
                       results.decision.status === 'INVALID' ? 'default' : 'default'
                     }
                     className={`
                       px-2 py-0.5 text-[10px] font-bold uppercase tracking-tighter flex items-center gap-1
-                      ${results.decision.status === 'GO' ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : ''}
+                      ${results.decision.status === 'NORMAL' ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : ''}
                       ${results.decision.status === 'CAUTION' ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}
-                      ${results.decision.status === 'NO_GO' ? 'bg-red-500 hover:bg-red-600 text-white' : ''}
+                      ${results.decision.status === 'WARNING' ? 'bg-red-500 hover:bg-red-600 text-white' : ''}
                       ${results.decision.status === 'INVALID' ? 'bg-red-700 hover:bg-red-800 text-white' : ''}
                     `}
                   >
-                    {results.decision.status === 'GO' ? <ShieldCheck className="w-3 h-3" /> : 
+                    {results.decision.status === 'NORMAL' ? <ShieldCheck className="w-3 h-3" /> : 
                      results.decision.status === 'CAUTION' ? <ShieldAlert className="w-3 h-3" /> : <ShieldX className="w-3 h-3" />}
                     {results.decision.status === 'INVALID' ? 'Param Error' : results.decision.status.replace('_', ' ')}
                   </Badge>
@@ -275,7 +275,7 @@ export default function FuelPlanner({ isCompact = false, onResultChange }: FuelP
            <CardContent className="space-y-8">
               <div className="text-center p-6 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
                  <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold mb-1">Total Fuel Required</p>
-                  <h2 className={`text-5xl font-black flex items-center justify-center gap-2 ${results.decision?.status === 'NO_GO' ? 'text-red-500 animate-pulse' : 'text-slate-900 dark:text-slate-100'}`}>
+                   <h2 className={`text-5xl font-black flex items-center justify-center gap-2 ${results.decision?.status === 'WARNING' ? 'text-red-500 animate-pulse' : 'text-slate-900 dark:text-slate-100'}`}>
                     {results.totalRequired}
                     <span className="text-lg font-bold text-muted-foreground">GAL</span>
                   </h2>
@@ -318,16 +318,16 @@ export default function FuelPlanner({ isCompact = false, onResultChange }: FuelP
               {results.decision && results.decision.status !== 'INVALID' && (
                 <div className={`
                   p-4 rounded-xl border-l-4 flex flex-col gap-1 transition-all duration-300
-                  ${results.decision.status === 'GO' ? 'bg-emerald-50 border-emerald-500 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200' : 
+                  ${results.decision.status === 'NORMAL' ? 'bg-emerald-50 border-emerald-500 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200' : 
                     results.decision.status === 'CAUTION' ? 'bg-amber-50 border-amber-500 text-amber-900 dark:bg-amber-950/20 dark:text-amber-200' : 
                     'bg-red-50 border-red-500 text-red-900 dark:bg-red-950/20 dark:text-red-200'}
                 `}>
                   <div className="flex justify-between items-center w-full uppercase tracking-tighter font-bold text-[10px] opacity-70">
-                    <span>System Endurance</span>
-                    <span>{results.decision.status === 'GO' ? 'Clear' : 'Constraint'}</span>
+                    <span>Performance Status</span>
+                    <span>{results.decision.status === 'NORMAL' ? 'Clear' : 'Constraint'}</span>
                   </div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-black">{results.decision.status === 'NO_GO' ? '0' : params.reserveMinutes}</span>
+                    <span className="text-2xl font-black">{results.decision.status === 'WARNING' ? '0' : params.reserveMinutes}</span>
                     <span className="text-xs font-bold">MIN Reserve Buffer</span>
                   </div>
                   {results.decision.recommendation && (

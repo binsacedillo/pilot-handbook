@@ -4,7 +4,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, Info, AlertTriangle, Loader2, XCircle } from "lucide-react";
 
-type StatusType = "success" | "warning" | "error" | "info" | "processing";
+type StatusType = "warning" | "caution" | "normal" | "advisory" | "processing";
 
 interface StatusAnnunciatorProps {
   type: StatusType;
@@ -15,28 +15,28 @@ interface StatusAnnunciatorProps {
 
 export default function StatusAnnunciator({ type, title, message, className }: StatusAnnunciatorProps) {
   const styles = {
-    success: {
-      bg: "bg-emerald-500/10",
-      border: "border-emerald-500/30",
-      text: "text-emerald-500",
-      icon: <CheckCircle2 className="w-4 h-4" />,
-      glow: "shadow-[0_0_15px_rgba(16,185,129,0.2)]"
-    },
     warning: {
-      bg: "bg-amber-500/10",
-      border: "border-amber-500/30",
-      text: "text-amber-500",
-      icon: <AlertTriangle className="w-4 h-4" />,
-      glow: "shadow-[0_0_15px_rgba(245,158,11,0.2)]"
-    },
-    error: {
       bg: "bg-red-500/10",
       border: "border-red-500/30",
       text: "text-red-500",
       icon: <AlertTriangle className="w-4 h-4" />,
       glow: "shadow-[0_0_15px_rgba(239,68,68,0.2)]"
     },
-    info: {
+    caution: {
+      bg: "bg-amber-500/10",
+      border: "border-amber-500/30",
+      text: "text-amber-500",
+      icon: <AlertTriangle className="w-4 h-4" />,
+      glow: "shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+    },
+    normal: {
+      bg: "bg-emerald-500/10",
+      border: "border-emerald-500/30",
+      text: "text-emerald-500",
+      icon: <CheckCircle2 className="w-4 h-4" />,
+      glow: "shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+    },
+    advisory: {
       bg: "bg-blue-500/10",
       border: "border-blue-500/30",
       text: "text-blue-500",
