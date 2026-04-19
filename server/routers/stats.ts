@@ -14,8 +14,11 @@ export const statsRouter = createTRPCRouter({
       });
 
     // Join with aircraft to get aircraft names
+    // Filter out null aircraft IDs (Fix for IN (NULL) Prisma queries)
     const enrichedStats = await Promise.all(
-      stats.map(async (stat) => {
+      stats
+        .filter(stat => stat.aircraftId !== null)
+        .map(async (stat) => {
         const aircraft = await ctx.db.aircraft.findUnique({
           where: { id: stat.aircraftId },
           select: { model: true },
