@@ -166,7 +166,7 @@ export default function FlightsPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div className="space-y-1">
             <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground uppercase italic">
-              FLIGHT LOGS<span className="text-blue-500">.</span>
+              Flight Logbook<span className="text-blue-500">.</span>
             </h1>
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
               {filteredRows.length} Flights Logged • {userName}
@@ -186,7 +186,7 @@ export default function FlightsPage() {
                 onClick={() => setShowOpsMenu(!showOpsMenu)}
               >
                 <Settings className="w-3.5 h-3.5" />
-                Operations
+                Logbook Tools
                 <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", showOpsMenu && "rotate-180")} />
               </Button>
               
@@ -252,7 +252,7 @@ export default function FlightsPage() {
               onClick={() => setShowForm(true)} 
               className="h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95 gap-2"
             >
-              <Plus className="w-4 h-4" /> Log New Flight
+              <Plus className="w-4 h-4" /> Record Flight
             </Button>
           </div>
         </div>
@@ -266,7 +266,7 @@ export default function FlightsPage() {
               <div className="px-6 py-4 border-b border-(--glass-border) flex justify-between items-center bg-blue-500/5">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                  <h2 className="text-xs font-black uppercase tracking-widest text-blue-500">Create New Flight</h2>
+                  <h2 className="text-xs font-black uppercase tracking-widest text-blue-500">Add Flight Record</h2>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex bg-zinc-900/40 p-1 rounded-lg border border-zinc-800">
@@ -325,7 +325,7 @@ export default function FlightsPage() {
               title="No Flights Logged"
               description="Your logbook represents your legal experience. Start logging to track your transition from student to professional pilot."
               action={{
-                label: "Initialize First Log",
+                label: "Record Your First Flight",
                 onClick: () => setShowForm(true),
               }}
             />

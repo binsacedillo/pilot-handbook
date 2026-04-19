@@ -259,7 +259,7 @@ export default function AircraftPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {displayedAircraft.map((a) => (
+            {displayedAircraft.map((a, index) => (
               <GlassCard key={a.id} className={cn(
                 "overflow-hidden transition-all hover:border-blue-500/50 group",
                 a.isArchived && "opacity-60 grayscale hover:grayscale-0 transition-all duration-500"
@@ -277,6 +277,7 @@ export default function AircraftPage() {
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover transition-transform group-hover:scale-105 duration-700"
+                      priority={index < 4}
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full bg-gradient-to-br from-zinc-900/10 to-transparent">

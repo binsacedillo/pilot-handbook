@@ -20,33 +20,33 @@ export default function AboutPage() {
               id="about-title"
               className="text-3xl md:text-5xl font-black tracking-tighter text-foreground uppercase mb-4 italic"
             >
-              System <span className="text-blue-500">About</span>
+              About <span className="text-blue-500">Pilot Handbook</span>
             </h1>
             <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none">
-              [ LAST CALIBRATION: APRIL 17, 2026 ]
+              [ REVISION: APRIL 19, 2026 ]
             </p>
           </header>
           <div className="space-y-10 text-sm leading-relaxed text-zinc-300">
             <section>
-              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3 leading-none pb-0.5">Operational Vision</h2>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3 leading-none pb-0.5">Our Mission</h2>
               <p>
-                Pilot Handbook is your professional digital companion for flight logging, operational analytics, and safety record management. Our goal is to empower pilots with modern, secure, and intuitive tools that prioritize data accuracy and regulatory compliance.
+                The Pilot Handbook is a guided flight training companion designed to help student pilots understand, calculate, and verify critical preflight decisions. We believe that technology should do more than just crunch numbers—it should help you understand *why* those numbers matter to your safety and performance.
               </p>
             </section>
             <section>
-              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Core Operating Values</h2>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Core Philosophy</h2>
               <ul className="list-none space-y-2 ml-1 text-zinc-400">
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> Privacy and data protection by design</li>
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> Reliability and accuracy in record keeping</li>
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> Modern, user-friendly experience</li>
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> Continuous improvement and transparency</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> **Clarity over Complexity**: Plain-language explanations of complex performance data.</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> **Habit Reinforcement**: Guided workflows that match professional industry standards.</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> **Student-First UX**: Designed for the cockpit environment on iPad and mobile.</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> **Mentorship through Data**: Turning calculations into learning moments.</li>
               </ul>
             </section>
             <section>
-              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Status</h2>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Project Status</h2>
               <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-lg">
                 <p className="text-zinc-400 font-mono text-xs">
-                  This project is currently under development. Features and content may change as we work toward a public release. For more information, contact our team or explore the rest of the site.
+                  The Pilot Handbook is currently undergoing active refinement to better serve the student pilot community. We are constantly adding new "Learning Modules" and guidance layers to ensure every preflight check is a step toward mastery.
                 </p>
               </div>
             </section>

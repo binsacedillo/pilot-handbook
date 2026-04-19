@@ -26,7 +26,7 @@ export default function PrivacyPage() {
                 Privacy <span className="text-blue-500">Policy</span>
               </h1>
               <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
-                [ LAST UPDATED: JANUARY 11, 2026 ]
+                [ REVISION: APRIL 19, 2026 ]
               </p>
             </div>
             
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Introduction</h2>
               <p>
-                Pilot Handbook (“we”, “us”, “our”) is a Personal Information Controller (PIC) registered and compliant with the National Privacy Commission (NPC) of the Philippines. We are committed to protecting your privacy and ensuring the security of your personal data in accordance with Republic Act No. 10173 (Data Privacy Act of 2012) and global best practices, including the General Data Protection Regulation (GDPR).
+                The Pilot Handbook (“we”, “us”, “our”) is a Personal Information Controller (PIC) registered and compliant with the National Privacy Commission (NPC) of the Philippines. As a guided flight training companion, we are committed to protecting your privacy and ensuring the security of your training data in accordance with Republic Act No. 10173 (Data Privacy Act of 2012) and global best practices.
               </p>
             </section>
             
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
               <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Data Collected</h2>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-zinc-900/30 border border-zinc-800/50 p-5 rounded-xl">
-                  <h3 className="font-bold text-[11px] text-white uppercase tracking-widest mb-3">Personal & Pilot Data</h3>
+                  <h3 className="font-bold text-[11px] text-white uppercase tracking-widest mb-3">Pilot Personnel Records</h3>
                   <ul className="list-none space-y-2 text-zinc-400 text-xs">
                     <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">&gt;</span> Flight logs (dates, routes, durations)</li>
                     <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">&gt;</span> Aircraft details (make, model, registration)</li>
@@ -76,10 +76,10 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Purpose of Data Processing</h2>
               <ul className="list-none space-y-2 ml-1 text-zinc-400">
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> To provide and improve the Pilot Handbook SaaS platform</li>
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> To ensure secure authentication and account management</li>
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> To maintain accurate pilot records and analytics</li>
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> To comply with legal and regulatory requirements</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> To maintain the Pilot Handbook guided training companion</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> To provide safety implications and learning feedback based on your data</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> To maintain accurate pilot records and flight mastery analytics</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> To comply with legal and regulatory aviation standards</li>
               </ul>
             </section>
 
