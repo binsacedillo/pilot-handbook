@@ -2,8 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import AppHeader from "@/components/common/AppHeader";
-import AppFooter from "@/components/common/AppFooter";
 import PilotLegalityStatus from "@/components/dashboard/PilotLegalityStatus";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import { GlassCard, GlassCardHeader, GlassCardContent } from "@/components/ui/GlassCard";
@@ -65,11 +63,15 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
   const { data: stats } = trpc.flight.getStats.useQuery(undefined, {
     initialData: initialData.stats ?? undefined,
     enabled,
+    staleTime: 1000 * 60,
+    refetchOnMount: false,
   });
   
   const { data: flights } = trpc.flight.getRecent.useQuery({ limit: 6 }, {
     initialData: initialData.flights,
     enabled,
+    staleTime: 1000 * 60,
+    refetchOnMount: false,
   });
 
   const stableNow = useMemo(() => {
@@ -82,6 +84,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
       initialData: initialData.upcoming ?? undefined,
       enabled,
       staleTime: 1000 * 60,
+      refetchOnMount: false,
     }
   );
 
@@ -102,15 +105,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
   const pilotName = user?.fullName || user?.firstName || "Pilot";
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden font-sans">
-      {/* Decorative Cockpit Glows */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-blue-500/5 dark:bg-blue-600/5 blur-[120px] -z-10 pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-indigo-500/5 dark:bg-indigo-600/5 blur-[150px] -z-10 pointer-events-none" />
-
-      <AppHeader />
-      
-      <main className="container mx-auto px-4 py-8 relative z-10">
-        <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-10">
           
           {hasMounted && isOffline && (
             <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/5 text-amber-500 px-4 py-3 text-sm backdrop-blur-md animate-pulse">
@@ -121,8 +116,8 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
           {/* Welcome Area (Operational Header) */}
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
             <div className="space-y-2 animate-in fade-in slide-in-from-left-4 duration-700">
-              <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">
-                DASHBOARD<span className="text-blue-500">.</span>
+              <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground uppercase italic">
+                PILOT DASHBOARD<span className="text-blue-500">.</span>
               </h1>
               <p className="text-xs md:text-sm font-bold uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 light:text-slate-500">
                 Connectivity: <span className="text-emerald-500">ONLINE</span> • 
@@ -132,10 +127,10 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
 
             <div className="flex gap-3 animate-in fade-in slide-in-from-right-4 duration-700">
               <Button asChild variant="outline" className="h-12 px-6 rounded-xl border-(--glass-border) text-[11px] font-black uppercase tracking-widest hover:border-blue-500/50 transition-all bg-background/50 backdrop-blur-md">
-                <Link href="/flights">Logbook</Link>
+                <Link href="/flights">View Logbook</Link>
               </Button>
               <Button asChild className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95">
-                <Link href="/flights?new=true">Log Flight</Link>
+                <Link href="/flights?new=true">Record Flight</Link>
               </Button>
             </div>
           </header>
@@ -212,15 +207,15 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                      <QuickToolCard 
                        href="/tools" 
-                       title="Flight Operations" 
-                       desc="Preflight Planning" 
+                       title="Flight Planning" 
+                       desc="Preflight Readiness" 
                        icon={<ShieldCheck className="w-4 h-4 text-blue-500" />} 
                        color="text-blue-500" 
                      />
                      <QuickToolCard 
                        href="/flights" 
-                       title="Safety Records" 
-                       desc="Audit Logs" 
+                       title="Audit Records" 
+                       desc="Logbook Integrity" 
                        icon={<History className="w-4 h-4 text-amber-500" />} 
                        color="text-amber-500" 
                      />
@@ -263,7 +258,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
                             </div>
                             <div className="text-[10px] font-black text-emerald-500 uppercase tracking-tighter mb-2 flex items-center gap-1">
                               <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                              Upcoming Flight Status
+                              Flight Preparation Status
                             </div>
                             <div className="text-lg font-black text-foreground mb-1 leading-tight">
                               {upcomingFlight.departureCode} → {upcomingFlight.arrivalCode}
@@ -275,7 +270,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
                             <div className="flex gap-2">
                               <Button asChild size="sm" className="flex-1 h-8 text-[10px] font-black uppercase tracking-widest bg-emerald-600 hover:bg-emerald-700 text-white border-none transition-all">
                                 <Link href={`/flights/${upcomingFlight.id}/edit`}>
-                                  Flight Preparation
+                                  Preflight Prep
                                 </Link>
                               </Button>
                               <div className="w-8 h-8 rounded-lg border border-emerald-500/30 flex items-center justify-center text-emerald-500">
@@ -290,7 +285,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
                             </div>
                             <Button asChild variant="outline" size="sm" className="w-full h-9 text-[10px] font-black uppercase tracking-widest border-(--glass-border) text-zinc-500 dark:text-zinc-500 hover:text-blue-500 hover:border-blue-500/30 transition-all bg-background/50">
                               <Link href="/flights?new=true">
-                                Schedule Flight
+                                Plan Flight
                               </Link>
                             </Button>
                           </div>
@@ -316,7 +311,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
                         
                         <div className="px-6 pb-6 space-y-2">
                            <ProfileMetric label="Medical" value={stats?.profile?.medicalClass ? `${stats.profile.medicalClass} Class` : "N/A"} />
-                           <ProfileMetric label="Ikaros ID" value={stats?.profile?.id.substring(0, 8).toUpperCase() || "N/A"} />
+                           <ProfileMetric label="License ID" value={stats?.profile?.id.substring(0, 8).toUpperCase() || "N/A"} />
                            <div className="pt-4">
                              <Button asChild variant="outline" className="w-full justify-between h-11 text-[10px] font-black uppercase tracking-[0.2em] border-(--glass-border) text-zinc-500 dark:text-zinc-400 light:text-slate-500 hover:text-blue-500 hover:border-blue-500/30 transition-all bg-background/50">
                                <Link href="/settings/profile">
@@ -331,10 +326,6 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
               </div>
             </div>
           </div>
-        </div>
-      </main>
-      
-      <AppFooter />
     </div>
   );
 }
