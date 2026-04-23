@@ -5,7 +5,6 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/webhooks(.*)",
-  "/api/trpc(.*)",
   "/api/health",
   "/manifest.json",
   "/favicon.ico",
@@ -19,18 +18,25 @@ const isPublicRoute = createRouteMatcher([
   "/help(.*)",
 ]);
 
+const isTRPC = createRouteMatcher(["/api/trpc(.*)"]);
+
 export default clerkMiddleware(async (auth, req) => {
-  // Only protect routes that are NOT public
+  // 1. Explicitly bypass middleware for tRPC to let procedures handle auth
+  if (isTRPC(req)) return;
+
+  // 2. Only protect routes that are NOT public
   if (!isPublicRoute(req)) {
     await auth.protect();
   }
 });
 
+
 export const config = {
   matcher: [
     // Next.js standard matcher for Clerk
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/((?!_next|.*\\..*).*)",
     "/",
     "/(api|trpc)(.*)",
   ],
 };
+
