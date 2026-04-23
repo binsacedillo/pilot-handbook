@@ -2,22 +2,21 @@
 
 import { SignIn, useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { Plane, CheckCircle, ArrowLeft, Loader2 } from "lucide-react";
+import { Plane, ArrowLeft } from "lucide-react";
 import { useTheme } from "next-themes";
 import { dark } from "@clerk/themes";
 import AuthFooter from "@/components/auth/AuthFooter";
+import PublicTechnicalLoading from "@/components/shared/PublicTechnicalLoading";
+
 
 export default function SignInPage() {
   const { theme } = useTheme();
   const { isLoaded } = useUser();
 
   if (!isLoaded) {
-    return (
-      <div className="flex justify-center items-center min-vh-100 bg-zinc-950 font-sans">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-      </div>
-    );
+    return <PublicTechnicalLoading />;
   }
+
 
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col font-sans relative overflow-hidden">
