@@ -37,7 +37,7 @@ export default function ToolsDashboard() {
                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">System Ready</span>
                </div>
-                <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest italic tracking-tighter">Pro-Grade Cockpit Tooling</span>
+                <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest italic">Pro-Grade Cockpit Tooling</span>
             </div>
           </div>
         </div>

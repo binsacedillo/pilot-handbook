@@ -41,7 +41,7 @@ export default function AppHeader() {
   return (
     <nav className="border-b border-zinc-800 bg-zinc-950/80 sticky top-0 z-50 backdrop-blur-3xl shadow-xl w-full">
       {/* Decorative top pulse line */}
-      <div className="absolute top-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+      <div className="absolute top-0 w-full h-px bg-linear-to-r from-transparent via-blue-500/50 to-transparent" />
       
       <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4 relative">
         <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-3 hover:opacity-80 transition-opacity shrink-0 group">
@@ -188,7 +188,7 @@ export default function AppHeader() {
         </div>
         
         {/* Decorative bottom fade */}
-        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+        <div className="h-px w-full bg-linear-to-r from-transparent via-blue-500/20 to-transparent" />
       </div>
     </nav>
   );

@@ -267,7 +267,7 @@ export default function AircraftPage() {
                 <div className="relative h-48 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900/50">
                   {/* Card HUD Scanline */}
                   <div className="absolute inset-0 pointer-events-none overflow-hidden z-20 opacity-20">
-                    <div className="w-full h-[1px] bg-blue-500/30 blur-[1px] animate-hud-scanline" />
+                    <div className="w-full h-px bg-blue-500/30 blur-[1px] animate-hud-scanline" />
                   </div>
 
                   {a.imageUrl ? (
@@ -280,7 +280,7 @@ export default function AircraftPage() {
                       priority={index < 4}
                     />
                   ) : (
-                    <div className="flex items-center justify-center h-full bg-gradient-to-br from-zinc-900/10 to-transparent">
+                    <div className="flex items-center justify-center h-full bg-linear-to-br from-zinc-900/10 to-transparent">
                       <Plane className="w-12 h-12 text-zinc-300 dark:text-zinc-800/50" />
                     </div>
                   )}

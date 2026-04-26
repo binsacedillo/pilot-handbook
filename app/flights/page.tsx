@@ -219,7 +219,7 @@ export default function FlightsPage() {
                   <Upload className="w-3.5 h-3.5" /> Import CSV
                 </button>
                 
-                <div className="h-[1px] bg-(--glass-border) my-1" />
+                <div className="h-px bg-(--glass-border) my-1" />
                 
                 <button 
                   className="w-full px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-blue-500 hover:bg-blue-500/10 transition-colors flex items-center gap-3"

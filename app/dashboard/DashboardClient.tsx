@@ -298,7 +298,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
                   <GlassCard bezel={true} className="bg-(--glass-bg) dark:bg-zinc-950/60 light:bg-slate-50 overflow-hidden">
                      <GlassCardContent className="p-0">
                         <div className="p-6 pb-4 flex items-center gap-5">
-                           <div className="w-14 h-14 rounded-full bg-linear-to-br from-blue-600 to-blue-400 p-[1px] shadow-lg shadow-blue-500/10">
+                           <div className="w-14 h-14 rounded-full bg-linear-to-br from-blue-600 to-blue-400 p-px shadow-lg shadow-blue-500/10">
                               <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
                                  <span className="text-xl font-black text-blue-500">{user?.firstName?.[0]}{user?.lastName?.[0]}</span>
                               </div>

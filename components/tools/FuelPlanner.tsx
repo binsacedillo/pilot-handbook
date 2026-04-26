@@ -182,7 +182,7 @@ export default function FuelPlanner({ isCompact = false, onResultChange }: FuelP
             <Separator />
 
             <div className="space-y-3">
-              <Label className="text-sm font-semibold block flex items-center gap-2">
+              <Label className="text-sm font-semibold flex items-center gap-2">
                 <Clock className="w-4 h-4 text-muted-foreground" />
                 Reserve Requirements
               </Label>

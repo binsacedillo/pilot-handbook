@@ -50,7 +50,7 @@ export default function PublicTechnicalLoading({ className }: PublicTechnicalLoa
   return (
     <div 
       className={cn(
-        "fixed inset-0 z-[100] flex flex-col items-center justify-center bg-zinc-950 overflow-hidden font-sans",
+        "fixed inset-0 z-100 flex flex-col items-center justify-center bg-zinc-950 overflow-hidden font-sans",
         className
       )}
       role="alert"
