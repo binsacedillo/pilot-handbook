@@ -6,10 +6,11 @@ import ClerkProviderClient from "@/components/providers/ClerkProviderClient";
 import { TRPCProvider } from "@/trpc/Provider";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeWrapper } from "@/components/providers/ThemeWrapper";
-import DevWarningBanner from "@/components/dev/DevWarningBanner";
+import ReleaseAdvisory from "@/components/layout/ReleaseAdvisory";
 import { FeedbackButton } from "@/components/feedback/feedback-index";
 import { SessionExpirationHandler } from "@/components/SessionExpirationHandler";
 import { IdleTimeoutManager } from "@/components/Security/IdleTimeoutManager";
+import SmoothScroll from "@/components/providers/SmoothScroll";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -94,11 +95,13 @@ export default function RootLayout({
                 <SessionExpirationHandler />
                 <IdleTimeoutManager />
                 <ThemeWrapper>
-                  <div className="flex flex-col min-h-screen">
-                    <DevWarningBanner />
-                    {children}
-                    <FeedbackButton />
-                  </div>
+                  <SmoothScroll>
+                    <div className="flex flex-col min-h-screen">
+                      <ReleaseAdvisory />
+                      {children}
+                      <FeedbackButton />
+                    </div>
+                  </SmoothScroll>
                 </ThemeWrapper>
               </ClerkProviderClient>
             </TRPCProvider>
