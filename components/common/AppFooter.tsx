@@ -38,7 +38,7 @@ export default function AppFooter() {
 
           {/* Copyright */}
           <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
-            © {currentYear} SYSTEM INIT
+            © {currentYear} PILOT HANDBOOK
           </div>
         </div>
       </div>
