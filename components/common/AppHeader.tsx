@@ -3,7 +3,7 @@
 import { UserButton, useUser, SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Plane, LayoutDashboard, Menu, X } from "lucide-react";
+import { Plane, LayoutDashboard, Menu, X, BarChart3 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
@@ -22,6 +22,7 @@ export default function AppHeader() {
     { label: "Flights", href: "/flights" },
     { label: "Aircraft", href: "/aircraft" },
     { label: "Tools", href: "/tools" },
+    { label: "Analytics", href: "/analytics" },
   ];
 
   // Close menu when pathname changes
