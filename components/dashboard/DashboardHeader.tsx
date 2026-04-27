@@ -28,11 +28,6 @@ export default function DashboardHeader({ pilotName }: DashboardHeaderProps) {
         <Button asChild className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95">
           <Link href="/flights?new=true">Record Flight</Link>
         </Button>
-        <Button asChild variant="ghost" className="h-12 w-12 p-0 rounded-xl border border-(--glass-border) text-zinc-500 hover:text-blue-500 hover:border-blue-500/50 transition-all bg-background/50 backdrop-blur-md hidden sm:flex">
-          <Link href="/analytics" title="View Detailed Analytics">
-            <BarChart3 className="w-5 h-5" />
-          </Link>
-        </Button>
       </div>
     </header>
   );
