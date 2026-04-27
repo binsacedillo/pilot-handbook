@@ -22,7 +22,7 @@ export interface FlightRecord {
 }
 
 /**
- * Calculates FAA Part 61.57(a) & (b) Recent Flight Experience
+ * Calculates CAAP Recent Flight Experience (90-day rule)
  */
 export function calculateCurrency(flights: FlightRecord[]): CurrencyStatus {
     const now = new Date();
@@ -47,7 +47,7 @@ export function calculateCurrency(flights: FlightRecord[]): CurrencyStatus {
     let nextDeadline = ninetyDaysAgo;
 
     if (landingDates.length >= 3) {
-        // Correct FAA logic is complicated, but for a prototype, 90 days from the 3rd-to-last landing works well
+        // Correct CAAP logic is complicated, but for a prototype, 90 days from the 3rd-to-last landing works well
         const thirdRecentLanding = landingDates[2]?.date;
         if (thirdRecentLanding) {
             nextDeadline = new Date(thirdRecentLanding.getTime() + 90 * 24 * 60 * 60 * 1000);
@@ -59,13 +59,13 @@ export function calculateCurrency(flights: FlightRecord[]): CurrencyStatus {
     const requirementsMissing = [];
 
     if (isCurrentForPassengers) {
-        requirementsMet.push("FAA 61.57(a): 3 landings in 90 days (Day)");
+        requirementsMet.push("CAAP Compliance: 3 landings in 90 days (Day)");
     } else {
         requirementsMissing.push(`Need ${3 - totalLandings} more landings for passenger carrying.`);
     }
 
     if (isNightCurrent) {
-        requirementsMet.push("FAA 61.57(b): 3 landings in 90 days (Night)");
+        requirementsMet.push("CAAP Compliance: 3 landings in 90 days (Night)");
     } else {
         requirementsMissing.push(`Need ${3 - nightLandings} more night landings for night passenger carrying.`);
     }

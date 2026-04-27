@@ -36,7 +36,7 @@ export function calculateOverallLegality(params: {
   const now = new Date();
   const alerts: string[] = [];
 
-  // 1. Landing Currency (FAA 61.57 - 90 days)
+  // 1. Landing Currency (CAAP Regulations - 90 days)
   const ninetyDaysAgo = subDays(now, 90);
   const recentFlights = params.flights.filter(f => new Date(f.date) >= ninetyDaysAgo);
   const totalLandings = recentFlights.reduce((sum, f) => {
@@ -80,7 +80,7 @@ export function calculateOverallLegality(params: {
     landingCurrency: {
       isCurrent: isLandingCurrent,
       count: totalLandings,
-      daysRemaining: 90, // Bound by FAA reg
+      daysRemaining: 90, // Bound by CAAP reg
     },
     medical: {
       isCurrent: isMedicalCurrent,

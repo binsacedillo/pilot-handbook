@@ -103,7 +103,7 @@ export function ComplianceMonitor({ compliance, isLoading }: ComplianceMonitorPr
 
                 <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                     <p className="text-[10px] text-muted-foreground leading-tight">
-                        Calculated based on FAA Part 61.57(a). Last updated: {new Date().toLocaleTimeString()}
+                        Calculated based on CAAP Regulations. Last updated: {new Date().toLocaleTimeString()}
                     </p>
                 </div>
             </CardContent>

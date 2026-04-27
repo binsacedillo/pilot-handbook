@@ -115,7 +115,7 @@ function evaluateFuel(data: { totalRequired: number; reserveMinutes: number }): 
       reason: 'Illegal Fuel Reserves',
       recommendation: 'Below VFR day legal minimums. Add fuel or plan an intermediate stop.',
       implication: 'You do not have enough fuel to safely handle delays or diversions.',
-      mentorship: 'The FAA requires a 30-minute reserve for day VFR for a reason—don\'t cut it close.'
+      mentorship: 'CAAP requires a 30-minute reserve for day VFR for a reason—don\'t cut it close.'
     };
   }
   

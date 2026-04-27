@@ -30,7 +30,7 @@ The Pilot Handbook is more than just a calculator; it is a step-by-step mentor f
 ### 🚧 Future Features
 - **Learning Feedback Loop**: Insight into past calculations to highlight improvements and common mistakes.
 - **Instructor Portal**: Shared flight snapshots for preflight signatures and verification.
-- **Glossary & Resource Integration**: "Learn More" links connecting calculations directly to FAA handbook concepts.
+- **Glossary & Resource Integration**: "Learn More" links connecting calculations directly to CAAP handbook concepts.
 
 ---
 

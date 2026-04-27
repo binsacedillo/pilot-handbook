@@ -230,7 +230,7 @@ export default function FuelPlanner({ isCompact = false, onResultChange }: FuelP
         <div className="bg-amber-50 dark:bg-amber-900/10 p-5 rounded-3xl border border-amber-100 dark:border-amber-900/20 flex gap-4">
           <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-500 shrink-0" />
           <p className="text-xs leading-relaxed text-amber-800 dark:text-amber-400">
-            <strong>VFR Regulations:</strong> FAA 91.151 requires day VFR flights to have at least 30 minutes of reserve fuel at normal cruising speed. Night VFR requires 45 minutes.
+            <strong>VFR Regulations:</strong> CAAP Regulations require day VFR flights to have at least 30 minutes of reserve fuel at normal cruising speed. Night VFR requires 45 minutes.
           </p>
         </div>
       </div>

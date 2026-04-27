@@ -28,7 +28,7 @@ export const fuelPlanSchema = z.object({
   distance: z.number().min(0, "Distance cannot be negative"),
   groundspeed: z.number().min(1, "Groundspeed must be at least 1 kt"),
   burnRate: z.number().min(1, "Burn rate must be at least 1 GPH"),
-  reserveMinutes: z.number().min(30, "FAA Violation: Reserve must be at least 30 mins"),
+  reserveMinutes: z.number().min(30, "CAAP Violation: Reserve must be at least 30 mins"),
 });
 
 export type DensityAltitudeInput = z.infer<typeof densityAltitudeSchema>;
