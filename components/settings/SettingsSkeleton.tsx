@@ -1,78 +1,87 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import React from "react";
+import { GlassCard, GlassCardHeader, GlassCardContent } from "@/components/ui/GlassCard";
+import { Skeleton } from "@/components/ui/skeleton";
 
+/**
+ * Premium Settings Skeleton
+ * Precision-engineered to match SettingsForm.tsx with GlassCard aesthetics.
+ */
 export default function SettingsSkeleton() {
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto py-4 sm:py-8 px-4 max-w-4xl">
-        {/* Header Skeleton */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-          <Skeleton className="h-8 w-32" />
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <Skeleton className="h-10 w-full sm:w-24" />
-            <Skeleton className="h-10 w-full sm:w-24" />
-          </div>
-        </div>
+    <div className="space-y-8 pb-10 animate-in fade-in duration-500">
+      {/* 1. Header / Summary Section Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[...Array(3)].map((_, i) => (
+          <GlassCard key={i} className="border-l-4 border-l-zinc-800/40" bezel={false}>
+            <GlassCardContent className="py-4 space-y-2">
+              <Skeleton className="h-2.5 w-20 opacity-20" />
+              <Skeleton className="h-6 w-32" />
+            </GlassCardContent>
+          </GlassCard>
+        ))}
+      </div>
 
-        <div className="space-y-8">
-          {/* App Preferences Card Skeleton */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <Skeleton className="h-6 w-40" />
-              </CardTitle>
-              <CardDescription>
-                <Skeleton className="h-4 w-56 mt-2" />
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Theme Input Skeleton removed */}
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-10 w-full" />
-              </div>
+      <div className="grid grid-cols-1 gap-6">
+        {/* 2. Interface Section Skeleton */}
+        <GlassCard bezel={true}>
+          <GlassCardHeader className="flex flex-row items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-lg opacity-20" />
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-2.5 w-24 opacity-20" />
+            </div>
+          </GlassCardHeader>
+          <GlassCardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 py-6">
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-20 opacity-30" />
+              <Skeleton className="h-11 w-full rounded-md opacity-10" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-24 opacity-30" />
+              <Skeleton className="h-11 w-full rounded-md opacity-10" />
+            </div>
+          </GlassCardContent>
+        </GlassCard>
 
-              {/* Unit System Input Skeleton */}
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-10 w-full" />
-              </div>
+        {/* 3. Operations Section Skeleton */}
+        <GlassCard bezel={true}>
+          <GlassCardHeader className="flex flex-row items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-lg opacity-20" />
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-2.5 w-32 opacity-20" />
+            </div>
+          </GlassCardHeader>
+          <GlassCardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 py-6">
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-24 opacity-30" />
+              <Skeleton className="h-11 w-full rounded-md opacity-10" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-32 opacity-30" />
+              <Skeleton className="h-11 w-full rounded-md opacity-10" />
+            </div>
+          </GlassCardContent>
+        </GlassCard>
 
-              {/* Currency Input Skeleton */}
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-
-              {/* Default Aircraft Input Skeleton */}
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-
-              {/* Save Button Skeleton */}
-              <Skeleton className="h-10 w-24 mt-8" />
-            </CardContent>
-          </Card>
-
-          {/* Identity & Account Card Skeleton */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <Skeleton className="h-6 w-48" />
-              </CardTitle>
-              <CardDescription>
-                <Skeleton className="h-4 w-64 mt-2" />
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* Clerk UserProfile Skeleton */}
-              <Skeleton className="h-96 w-full rounded-lg" />
-            </CardContent>
-          </Card>
-        </div>
+        {/* 4. Economics Section Skeleton */}
+        <GlassCard bezel={true}>
+          <GlassCardHeader className="flex flex-row items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-lg opacity-20" />
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-36" />
+              <Skeleton className="h-2.5 w-28 opacity-20" />
+            </div>
+          </GlassCardHeader>
+          <GlassCardContent className="py-6">
+            <div className="space-y-2 max-w-sm">
+              <Skeleton className="h-3 w-32 opacity-30" />
+              <Skeleton className="h-11 w-full rounded-md opacity-10" />
+            </div>
+          </GlassCardContent>
+        </GlassCard>
       </div>
     </div>
   );
