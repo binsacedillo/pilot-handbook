@@ -4,11 +4,18 @@ import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Plane } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function CTASection() {
 	return (
 		<section className="container mx-auto px-4 py-20">
-			<div className="max-w-5xl mx-auto relative group">
+			<motion.div 
+				className="max-w-5xl mx-auto relative group"
+				initial={{ opacity: 0, scale: 0.95 }}
+				whileInView={{ opacity: 1, scale: 1 }}
+				viewport={{ once: true }}
+				transition={{ duration: 0.8 }}
+			>
 				{/* Glow effect */}
 				<div className="absolute -inset-1 bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl blur-2xl opacity-20 dark:opacity-40 group-hover:opacity-40 dark:group-hover:opacity-60 transition-opacity duration-500" />
 
@@ -18,9 +25,20 @@ export default function CTASection() {
 					<div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-3xl -ml-48 -mb-48" />
 
 					{/* Plane icon decoration */}
-					<div className="absolute top-8 right-8 opacity-5 dark:opacity-10">
+					<motion.div 
+						className="absolute top-8 right-8 opacity-5 dark:opacity-10"
+						animate={{ 
+							y: [0, -10, 0],
+							rotate: [45, 48, 45]
+						}}
+						transition={{ 
+							duration: 6, 
+							repeat: Infinity, 
+							ease: "easeInOut" 
+						}}
+					>
 						<Plane className="w-32 h-32 transform rotate-45 text-slate-900 dark:text-white" />
-					</div>
+					</motion.div>
 
 					<div className="relative z-10 text-center max-w-3xl mx-auto">
 
@@ -33,22 +51,32 @@ export default function CTASection() {
 
 						<SignedOut>
 							<Link href="/sign-up" className="w-full sm:w-auto">
-								<Button
-									size="lg"
-									className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-10 md:px-12 py-5 sm:py-6 md:py-7 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-2xl font-semibold"
+								<motion.div
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
 								>
-									Create Free Account
-								</Button>
+									<Button
+										size="lg"
+										className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-10 md:px-12 py-5 sm:py-6 md:py-7 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl font-semibold"
+									>
+										Get Started Now
+									</Button>
+								</motion.div>
 							</Link>
 						</SignedOut>
 						<SignedIn>
 							<Link href="/dashboard" className="w-full sm:w-auto">
-								<Button
-									size="lg"
-									className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-10 md:px-12 py-5 sm:py-6 md:py-7 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-2xl font-semibold"
+								<motion.div
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
 								>
-									Go to Dashboard
-								</Button>
+									<Button
+										size="lg"
+										className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-10 md:px-12 py-5 sm:py-6 md:py-7 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl font-semibold"
+									>
+										Go to Dashboard
+									</Button>
+								</motion.div>
 							</Link>
 						</SignedIn>
 
@@ -57,7 +85,7 @@ export default function CTASection() {
 						</p>
 					</div>
 				</div>
-			</div>
+			</motion.div>
 		</section>
 	);
 }

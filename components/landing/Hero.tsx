@@ -4,27 +4,28 @@ import { SignedIn, SignedOut } from "@clerk/nextjs";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 
 export default function Hero() {
-	const [scrollY, setScrollY] = useState(0);
-
-	useEffect(() => {
-		const handleScroll = () => {
-			setScrollY(window.scrollY);
-		};
-
-		window.addEventListener("scroll", handleScroll, { passive: true });
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
+	const shouldReduceMotion = useReducedMotion();
+	const { scrollY } = useScroll();
 
 	// Parallax effect: background moves slower than scroll
-	const parallaxOffset = scrollY * 0.5;
+	// We use y values that are subtle to maintain ISO compliance and prevent motion sickness
+	// Background starts slightly offset upwards (-10%) to prevent gaps at the top
+	const y1 = useTransform(scrollY, [0, 500], [0, 100]);
+	const y2 = useTransform(scrollY, [0, 500], [0, -50]);
+
+	const backgroundY = shouldReduceMotion ? 0 : y1;
+	const contentY = shouldReduceMotion ? 0 : y2;
 
 	return (
-		<section className="relative overflow-hidden bg-linear-to-b from-slate-900 to-blue-900 min-h-175 md:min-h-212.5 pb-20">
-			{/* Parallax Background Image - Next.js Image for LCP/CLS */}
-			<div className="absolute inset-0 w-full h-full" style={{ transform: `translateY(${parallaxOffset}px)`, willChange: 'transform' }}>
+		<section className="relative overflow-hidden bg-zinc-950 min-h-175 md:min-h-212.5 pb-20">
+			{/* Parallax Background Image - Oversized to prevent gaps during motion */}
+			<motion.div 
+				className="absolute -top-[10%] left-0 w-full h-[120%]" 
+				style={{ y: backgroundY }}
+			>
 				<Image
 					src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop"
 					alt="Airplane flying in the sky"
@@ -33,19 +34,30 @@ export default function Hero() {
 					className="object-cover"
 					sizes="100vw"
 				/>
-			</div>
+			</motion.div>
 
-			{/* Gradient Overlay */}
+			{/* Gradient Overlays for premium feel and depth */}
+			{/* Top edge fade to transition from navigation */}
+			<div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-zinc-950 to-transparent z-10" />
+			
 			<div className="absolute inset-0 bg-linear-to-b from-slate-900/70 via-blue-900/50 to-slate-900/70" />
 
-			{/* Accessibility: Black overlay for improved contrast ratio (WCAG AA 4.5:1) */}
-			<div className="absolute inset-0 bg-black/30" />
+			{/* Accessibility: Dark overlay for contrast ratio */}
+			<div className="absolute inset-0 bg-black/40" />
 
 			{/* Content */}
-			<div className="relative container mx-auto px-4 py-12 md:py-20">
+			<motion.div 
+				className="relative container mx-auto px-4 py-12 md:py-20"
+				style={{ y: contentY }}
+			>
 				<div className="max-w-6xl mx-auto">
 					{/* Text Content */}
-					<div className="text-center mb-10">
+					<motion.div 
+						className="text-center mb-10"
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.8, ease: "easeOut" }}
+					>
 						<div className="inline-block mb-4 px-3 py-1 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 text-blue-200 rounded-full text-sm font-medium">
 							CAAP-ready logbook for PH pilots
 						</div>
@@ -66,7 +78,7 @@ export default function Hero() {
 										size="lg"
 										className="w-full sm:w-auto px-6 sm:px-8 text-sm sm:text-base bg-blue-600 hover:bg-blue-700 text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
 									>
-										Start Free Trial
+										Get Started
 									</Button>
 								</Link>
 								<Link href="/sign-in" className="w-full sm:w-auto">
@@ -90,12 +102,14 @@ export default function Hero() {
 								</Link>
 							</SignedIn>
 						</div>
-						<p className="text-sm text-blue-200 mt-6 mb-8 drop-shadow">
-							No credit card required • Free forever plan available in PH
-						</p>
 
 						{/* Feature Badges */}
-						<div className="flex flex-wrap justify-center gap-4 animate-fade-in-up">
+						<motion.div 
+							className="flex flex-wrap justify-center gap-4 mt-12"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							transition={{ delay: 0.5, duration: 1 }}
+						>
 							<div className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 backdrop-blur-md border border-blue-400/20 rounded-full hover:bg-blue-500/20 transition-colors cursor-default">
 								<span className="text-xl">🛡️</span>
 								<span className="text-blue-100 font-medium text-sm">CAAP Standard</span>
@@ -108,11 +122,11 @@ export default function Hero() {
 								<span className="text-xl">📱</span>
 								<span className="text-purple-100 font-medium text-sm">Mobile First</span>
 							</div>
-						</div>
+						</motion.div>
 
-					</div>
+					</motion.div>
 				</div>
-			</div>
+			</motion.div>
 
 			{/* Smooth Fade Transition to Content (Fixes 'bad division' look) */}
 			<div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white dark:from-background to-transparent z-10 pointer-events-none" />
