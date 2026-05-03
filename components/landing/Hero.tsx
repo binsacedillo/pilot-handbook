@@ -38,7 +38,7 @@ export default function Hero() {
 
 			{/* Gradient Overlays for premium feel and depth */}
 			{/* Top edge fade to transition from navigation */}
-			<div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-zinc-950 to-transparent z-10" />
+			<div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-zinc-950 to-transparent z-10" />
 			
 			<div className="absolute inset-0 bg-linear-to-b from-slate-900/70 via-blue-900/50 to-slate-900/70" />
 
@@ -129,7 +129,7 @@ export default function Hero() {
 			</motion.div>
 
 			{/* Smooth Fade Transition to Content (Fixes 'bad division' look) */}
-			<div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white dark:from-background to-transparent z-10 pointer-events-none" />
+			<div className="absolute bottom-0 left-0 w-full h-24 bg-linear-to-t from-white dark:from-background to-transparent z-10 pointer-events-none" />
 		</section>
 	);
 }

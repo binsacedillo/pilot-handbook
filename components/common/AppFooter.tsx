@@ -6,7 +6,7 @@ export default function AppFooter() {
 
   return (
     <footer className="mt-auto border-t border-zinc-800 bg-zinc-950/80 backdrop-blur-xl relative z-10 w-full">
-      <div className="absolute top-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+      <div className="absolute top-0 w-full h-px bg-linear-to-r from-transparent via-blue-500/20 to-transparent" />
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           {/* Brand */}

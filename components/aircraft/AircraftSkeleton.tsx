@@ -17,7 +17,7 @@ export function AircraftSkeleton() {
               Fleet Diagnostic Active...
            </span>
         </div>
-        <Skeleton className="h-[1px] flex-1 bg-blue-500/10" />
+        <Skeleton className="h-px flex-1 bg-blue-500/10" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

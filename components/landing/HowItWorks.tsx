@@ -10,7 +10,7 @@ export default function HowItWorks() {
 	return (
 		<section className="relative bg-white dark:bg-background py-24 border-t border-border/50 overflow-hidden">
 			{/* Technical Grid Pattern */}
-			<div className="absolute inset-0 z-0 h-full w-full bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+			<div className="absolute inset-0 z-0 h-full w-full bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
 
 			<div className="relative z-10 container mx-auto px-4">
 				<div className="max-w-5xl mx-auto">
