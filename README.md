@@ -48,6 +48,8 @@ For technical details, architecture, and setup instructions, refer to our intern
 - **[Guided Module Patterns](docs/GUIDED_MODULES.md)**: How to build new mentored calculation modules.
 - **[Decision Engine Guide](docs/DECISION_ENGINE.md)**: Mapping aviation math to pilot mentorship logic.
 - **[Deployment Guide](docs/DEPLOYMENT.md)**: Instructions for Neon + Vercel deployment.
+- **[Maintenance Playbook](docs/MAINTENANCE.md)**: Operational procedures and emergency runbook.
+
 
 ---
 
