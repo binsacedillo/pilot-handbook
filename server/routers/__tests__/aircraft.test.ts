@@ -41,6 +41,7 @@ import { createTestCaller, createMockContext } from './test-utils';
     status: string;
     isArchived: boolean;
     userId?: string;
+    version: number;
   };
 
 let aircraftDb: Aircraft[];
@@ -87,6 +88,7 @@ beforeEach(() => {
       imageUrl: String(args.data.imageUrl ?? ''),
       status: String(args.data.status ?? 'operational'),
       userId: args.data.userId,
+      version: 1,
     };
     aircraftDb.push(newAircraft);
     return newAircraft;
@@ -212,9 +214,12 @@ describe('Aircraft Router', () => {
       expect.objectContaining({
         where: { 
           id: created.id,
-          userId: ctx.user.id // Add this line to match your router's security check
+          userId: ctx.user.id
         },
-        data: { isArchived: true }
+        data: { 
+          isArchived: true,
+          version: { increment: 1 }
+        }
       })
     );
   });

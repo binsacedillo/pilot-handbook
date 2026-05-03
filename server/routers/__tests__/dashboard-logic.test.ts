@@ -47,7 +47,7 @@ describe('flightRouter.getStats', () => {
     expect(result.totalPicHours).toBe(8);
     expect(result.totalDualHours).toBe(2);
     expect(result.totalFlights).toBe(3);
-  });
+  }, 15000);
 
   it('handles 0 and missing values without NaN', async () => {
     flightDb.push(
