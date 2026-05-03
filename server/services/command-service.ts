@@ -118,7 +118,7 @@ export const CommandService = {
     });
 
     if (!aircraft || aircraft.userId !== userId) {
-      throw new TRPCError({ code: "UNAUTHORIZED", message: "Unauthorized" });
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Aircraft not found or unauthorized" });
     }
 
     if (aircraft.version !== clientVersion) {
@@ -129,7 +129,7 @@ export const CommandService = {
     }
 
     const updatedAircraft = await db.aircraft.update({
-      where: { id: aircraftId },
+      where: { id: aircraftId, userId },
       data: {
         ...changes,
         version: { increment: 1 },
@@ -176,11 +176,11 @@ export const CommandService = {
     });
 
     if (!aircraft || aircraft.userId !== userId) {
-        throw new TRPCError({ code: "UNAUTHORIZED", message: "Unauthorized" });
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Aircraft not found or unauthorized" });
     }
 
     const deleted = await db.aircraft.update({
-      where: { id: command.aircraftId },
+      where: { id: command.aircraftId, userId },
       data: { isArchived: true, version: { increment: 1 } },
     });
 

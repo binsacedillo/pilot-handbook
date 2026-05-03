@@ -17,7 +17,7 @@ export const createMockContext = (overrides: Overrides = {}) => {
   // Allow test to inject a userDb array for user lookups
   const userDb: MinimalUser[] = overrides.userDb ?? [];
   return {
-    session: { userId: clerkId }, // session.userId is the Clerk ID
+    session: { userId: (clerkId as string | null) }, // session.userId is the Clerk ID
     user: { id: userId, clerkId, email: 'test@example.com', role: overrides.role ?? 'USER' },
     db: {
       flight: {
@@ -80,6 +80,14 @@ export const createMockContext = (overrides: Overrides = {}) => {
         upsert: vi.fn(),
         create: vi.fn(),
         update: vi.fn(),
+      },
+      safetySnapshot: {
+        create: vi.fn(),
+        findMany: vi.fn(),
+        findUnique: vi.fn(),
+        delete: vi.fn(),
+        update: vi.fn(),
+        count: vi.fn(),
       },
       // Add more models/methods as needed for your procedures
     },
