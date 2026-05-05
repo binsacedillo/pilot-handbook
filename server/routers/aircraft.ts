@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { Aircraft } from '@prisma/client';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
-import { idSchema, createAircraftSchema, updateAircraftSchema, createAircraftCommandSchema, updateAircraftCommandSchema, deleteAircraftCommandSchema } from '@/lib/shared-schemas';
+import { idSchema, createAircraftCommandSchema, updateAircraftCommandSchema, deleteAircraftCommandSchema } from '@/lib/shared-schemas';
 import { createAuditLog } from '@/lib/audit-logger';
 import { CommandService } from '../services/command-service';
 

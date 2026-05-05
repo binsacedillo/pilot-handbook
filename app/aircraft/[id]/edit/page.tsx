@@ -15,8 +15,8 @@ import { isNetworkError, getNetworkErrorMessage, getServerErrorMessage } from "@
 import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardFooter } from "@/components/ui/GlassCard";
 import { ImageUpload } from "@/components/common/ImageUpload";
 import { AircraftCardPreview } from "@/components/aircraft/AircraftCardPreview";
-import { Plane, Hash, Image as ImageIcon, Activity, Info, Save, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Plane, Hash, ImageIcon, Activity, Info, Save, X } from "lucide-react";
+// Removed unused cn import
 
 import { AircraftEditorSkeleton } from "@/components/aircraft/AircraftEditorSkeleton";
 
@@ -69,7 +69,7 @@ export default function EditAircraftPage() {
 
 	function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
-		if (!id) return;
+		if (!id || !aircraft) return;
 		updateAircraft.mutate({
 			operation: "UPDATE_AIRCRAFT",
 			aircraftId: id,
@@ -80,7 +80,7 @@ export default function EditAircraftPage() {
 				imageUrl: form.imageUrl || undefined,
 				status: form.status,
 			},
-			clientVersion: (aircraft as any).version ?? 1,
+			clientVersion: aircraft.version ?? 1,
 		});
 	}
 

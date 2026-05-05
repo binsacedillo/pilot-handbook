@@ -9,12 +9,12 @@ export const FlightService = {
    * Aggregates flight experience and calculates pilot readiness status.
    */
   async getStats(db: PrismaClient, userId: string) {
-    // 1. Fetch Pilot Profile & Flights (Type-silent bypass for stale client defs)
-    const profile = await (db as any).pilotProfile.findUnique({
+    // 1. Fetch Pilot Profile & Flights
+    const profile = await db.pilotProfile.findUnique({
       where: { userId }
     });
 
-    const flights: any[] = await (db as any).flight.findMany({
+    const flights = await db.flight.findMany({
       where: { userId },
       orderBy: { date: 'desc' }
     });
@@ -22,12 +22,12 @@ export const FlightService = {
     // 2. Aggregate Experience Totals with explicit type annotations (Fix for TS7006)
     const totalFlights = flights.length;
     
-    const totalHours = flights.reduce((sum: number, f: any) => sum + (f.duration ?? 0), 0);
-    const totalPicHours = flights.reduce((sum: number, f: any) => sum + (f.picTime ?? 0), 0);
-    const totalDualHours = flights.reduce((sum: number, f: any) => sum + (f.dualTime ?? 0), 0);
+    const totalHours = flights.reduce((sum: number, f) => sum + (f.duration ?? 0), 0);
+    const totalPicHours = flights.reduce((sum: number, f) => sum + (f.picTime ?? 0), 0);
+    const totalDualHours = flights.reduce((sum: number, f) => sum + (f.dualTime ?? 0), 0);
     
     const totalLandings = flights.reduce(
-      (sum: number, f: any) => sum + ((f.dayLandings ?? 0) + (f.nightLandings ?? 0)), 
+      (sum: number, f) => sum + ((f.dayLandings ?? 0) + (f.nightLandings ?? 0)), 
       0
     );
 
@@ -35,7 +35,7 @@ export const FlightService = {
     const { calculateCurrency } = await import('@/lib/compliance-engine');
     const { calculateOverallLegality } = await import('@/lib/dashboard/currency-utils');
     
-    const compliance = calculateCurrency(flights.map((f: any) => ({
+    const compliance = calculateCurrency(flights.map((f) => ({
       date: f.date,
       dayLandings: f.dayLandings,
       nightLandings: f.nightLandings,
@@ -44,7 +44,7 @@ export const FlightService = {
 
     // 4. Calculate Dashboard Legality (Go/No-Go Lamps)
     const legality = calculateOverallLegality({
-      flights: flights.map((f: any) => ({
+      flights: flights.map((f) => ({
         date: f.date,
         dayLandings: f.dayLandings,
         nightLandings: f.nightLandings
@@ -69,7 +69,7 @@ export const FlightService = {
    * Identifies the single next upcoming flight for a pilot.
    */
   async getUpcomingFlight(db: PrismaClient, userId: string, now: string) {
-    const upcoming = await (db as any).flight.findFirst({
+    const upcoming = await db.flight.findFirst({
       where: {
         userId,
         date: { gte: new Date(now) },

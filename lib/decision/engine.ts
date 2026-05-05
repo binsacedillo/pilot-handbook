@@ -1,4 +1,4 @@
-import { validatePerformanceInput } from "./validation";
+import { validatePerformanceInput, DensityAltitudeInput, WeightBalanceInput, FuelPlanInput } from "./validation";
 
 export type SafetyStatus = 'NORMAL' | 'CAUTION' | 'WARNING' | 'INVALID';
 
@@ -14,7 +14,10 @@ export interface FlightSafetyDecision {
  * Evaluates flight safety based on performance calculation results.
  * This wraps existing outputs to provide "Success Beyond CRUD" logic.
  */
-export function evaluateFlightSafety(type: 'density-altitude' | 'weight-balance' | 'fuel', data: any): FlightSafetyDecision {
+export function evaluateFlightSafety(
+  type: 'density-altitude' | 'weight-balance' | 'fuel', 
+  data: DensityAltitudeInput | WeightBalanceInput | FuelPlanInput
+): FlightSafetyDecision {
   // 1. Validate Input First (Phase 2 Guardrails)
   const validationError = validatePerformanceInput(type, data);
   if (validationError) {

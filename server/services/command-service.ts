@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { FlightCommand, AircraftCommand, updateFlightCommandSchema, createFlightCommandSchema, deleteFlightCommandSchema, updateAircraftCommandSchema, createAircraftCommandSchema, deleteAircraftCommandSchema } from "@/lib/shared-schemas";
 import { z } from "zod";
@@ -8,7 +8,7 @@ export const CommandService = {
   /**
    * Executes a Flight Command with server-side authority and concurrency control.
    */
-  async updateFlight(db: any, userId: string, command: z.infer<typeof updateFlightCommandSchema>) {
+  async updateFlight(db: PrismaClient, userId: string, command: z.infer<typeof updateFlightCommandSchema>) {
     const { flightId, changes, clientVersion } = command;
 
     const flight = await db.flight.findUnique({
@@ -42,15 +42,15 @@ export const CommandService = {
       action: "UPDATE",
       entityType: "Flight",
       entityId: flightId,
-      oldValues: flight as any,
-      newValues: updatedFlight as any,
+      oldValues: flight as unknown as Prisma.InputJsonValue,
+      newValues: updatedFlight as unknown as Prisma.InputJsonValue,
       changes: `Updated flight (Command): ${Object.keys(changes).join(", ")}`,
     });
 
     return updatedFlight;
   },
 
-  async createFlight(db: any, userId: string, command: z.infer<typeof createFlightCommandSchema>) {
+  async createFlight(db: PrismaClient, userId: string, command: z.infer<typeof createFlightCommandSchema>) {
     const flight = await db.flight.create({
       data: {
         ...command.data,
@@ -64,14 +64,14 @@ export const CommandService = {
       action: "CREATE",
       entityType: "Flight",
       entityId: flight.id,
-      newValues: flight as any,
+      newValues: flight as unknown as Prisma.InputJsonValue,
       changes: `Created flight (Command): ${flight.departureCode} -> ${flight.arrivalCode}`,
     });
 
     return flight;
   },
 
-  async deleteFlight(db: any, userId: string, command: z.infer<typeof deleteFlightCommandSchema>) {
+  async deleteFlight(db: PrismaClient, userId: string, command: z.infer<typeof deleteFlightCommandSchema>) {
     const flight = await db.flight.findUnique({
       where: { id: command.flightId },
     });
@@ -87,7 +87,7 @@ export const CommandService = {
       action: "DELETE",
       entityType: "Flight",
       entityId: command.flightId,
-      oldValues: flight as any,
+      oldValues: flight as unknown as Prisma.InputJsonValue,
       changes: `Deleted flight (Command): ${flight.departureCode} -> ${flight.arrivalCode}`,
     });
 
@@ -97,7 +97,7 @@ export const CommandService = {
   /**
    * @deprecated Use specialized methods instead (createFlight, updateFlight, deleteFlight)
    */
-  async executeFlightCommand(db: any, userId: string, command: FlightCommand) {
+  async executeFlightCommand(db: PrismaClient, userId: string, command: FlightCommand) {
     switch (command.operation) {
       case "UPDATE_FLIGHT": return this.updateFlight(db, userId, command);
       case "CREATE_FLIGHT": return this.createFlight(db, userId, command);
@@ -110,7 +110,7 @@ export const CommandService = {
   /**
    * Executes an Aircraft Command.
    */
-  async updateAircraft(db: any, userId: string, command: z.infer<typeof updateAircraftCommandSchema>) {
+  async updateAircraft(db: PrismaClient, userId: string, command: z.infer<typeof updateAircraftCommandSchema>) {
     const { aircraftId, changes, clientVersion } = command;
 
     const aircraft = await db.aircraft.findUnique({
@@ -141,15 +141,15 @@ export const CommandService = {
       action: "UPDATE",
       entityType: "Aircraft",
       entityId: aircraftId,
-      oldValues: aircraft as any,
-      newValues: updatedAircraft as any,
+      oldValues: aircraft as unknown as Prisma.InputJsonValue,
+      newValues: updatedAircraft as unknown as Prisma.InputJsonValue,
       changes: `Updated aircraft (Command): ${Object.keys(changes).join(", ")}`,
     });
 
     return updatedAircraft;
   },
 
-  async createAircraft(db: any, userId: string, command: z.infer<typeof createAircraftCommandSchema>) {
+  async createAircraft(db: PrismaClient, userId: string, command: z.infer<typeof createAircraftCommandSchema>) {
     const aircraft = await db.aircraft.create({
       data: {
         ...command.data,
@@ -163,14 +163,14 @@ export const CommandService = {
       action: "CREATE",
       entityType: "Aircraft",
       entityId: aircraft.id,
-      newValues: aircraft as any,
+      newValues: aircraft as unknown as Prisma.InputJsonValue,
       changes: `Created aircraft (Command): ${aircraft.registration}`,
     });
 
     return aircraft;
   },
 
-  async deleteAircraft(db: any, userId: string, command: z.infer<typeof deleteAircraftCommandSchema>) {
+  async deleteAircraft(db: PrismaClient, userId: string, command: z.infer<typeof deleteAircraftCommandSchema>) {
     const aircraft = await db.aircraft.findUnique({
       where: { id: command.aircraftId },
     });
@@ -189,7 +189,7 @@ export const CommandService = {
         action: "DELETE",
         entityType: "Aircraft",
         entityId: command.aircraftId,
-        oldValues: aircraft as any,
+        oldValues: aircraft as unknown as Prisma.InputJsonValue,
         changes: `Archived aircraft (Command): ${aircraft.registration}`,
     });
 
@@ -199,7 +199,7 @@ export const CommandService = {
   /**
    * @deprecated Use specialized methods instead (createAircraft, updateAircraft, deleteAircraft)
    */
-  async executeAircraftCommand(db: any, userId: string, command: AircraftCommand) {
+  async executeAircraftCommand(db: PrismaClient, userId: string, command: AircraftCommand) {
     switch (command.operation) {
       case "UPDATE_AIRCRAFT": return this.updateAircraft(db, userId, command);
       case "CREATE_AIRCRAFT": return this.createAircraft(db, userId, command);

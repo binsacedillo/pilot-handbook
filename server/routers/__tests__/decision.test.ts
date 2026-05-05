@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { createMockContext, createTestCaller } from './test-utils';
-import { TRPCError } from '@trpc/server';
+// Removed unused TRPCError import
 
 describe('Decision Router', () => {
   let ctx: ReturnType<typeof createMockContext>;

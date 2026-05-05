@@ -23,6 +23,7 @@ describe('Validation', () => {
     };
     await expect(caller.aircraft.create({
       operation: 'CREATE_AIRCRAFT',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: input as any
     })).rejects.toThrow();
   });

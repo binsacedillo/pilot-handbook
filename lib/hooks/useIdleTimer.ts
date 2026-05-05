@@ -43,7 +43,7 @@ export function useIdleTimer({ onIdle, onHardLimit, onWarning }: UseIdleTimerPro
     if (sync && channelRef.current) {
       try {
         channelRef.current.postMessage({ type: 'RESET_EXT', timestamp: now });
-      } catch (e) {
+      } catch {
         // Ignore errors from closed channels during unmount
       }
     }

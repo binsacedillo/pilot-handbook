@@ -2,8 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { Flight } from '@prisma/client';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
-import { idSchema, createFlightSchema, updateFlightSchema } from '@/lib/shared-schemas';
-import { createAuditLog } from '@/lib/audit-logger';
+// Removed unused schemas and audit log import
 import { FlightService } from '../services/flight-service';
 import { CommandService } from '../services/command-service';
 import { 
@@ -260,7 +259,7 @@ export const flightRouter = createTRPCRouter({
       };
     }
 
-    return FlightService.getStats(ctx.db as any, ctx.user.id);
+    return FlightService.getStats(ctx.db, ctx.user.id);
   }),
 
   // Get the single next upcoming flight (Delegated to Service)
@@ -268,6 +267,6 @@ export const flightRouter = createTRPCRouter({
     .input(z.object({ now: z.string() }))
     .query(async ({ ctx, input }) => {
       if (!ctx.user) return null;
-      return FlightService.getUpcomingFlight(ctx.db as any, ctx.user.id, input.now);
+      return FlightService.getUpcomingFlight(ctx.db, ctx.user.id, input.now);
     }),
 });

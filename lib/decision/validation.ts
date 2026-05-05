@@ -15,6 +15,7 @@ export const densityAltitudeSchema = z.object({
   temperature: z.number()
     .min(-50, "Temperature too low (min -50°C)")
     .max(60, "Temperature too high (max 60°C)"),
+  densityAltitude: z.number().optional(),
 });
 
 export const weightBalanceSchema = z.object({
@@ -22,6 +23,7 @@ export const weightBalanceSchema = z.object({
     .max(2550, "MTOW Exceeded: Total weight exceeds 2,550 lbs limit"),
   isOverweight: z.boolean(),
   isOutOfCG: z.boolean(),
+  maxWeight: z.number().optional(),
 });
 
 export const fuelPlanSchema = z.object({
@@ -39,7 +41,10 @@ export type FuelPlanInput = z.infer<typeof fuelPlanSchema>;
  * Validates performance data against Zod schemas.
  * Returns the error message if invalid, or null if valid.
  */
-export function validatePerformanceInput(type: 'density-altitude' | 'weight-balance' | 'fuel', data: any): string | null {
+export function validatePerformanceInput(
+  type: 'density-altitude' | 'weight-balance' | 'fuel', 
+  data: unknown
+): string | null {
   let schema;
   switch (type) {
     case 'density-altitude':

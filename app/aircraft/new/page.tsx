@@ -25,10 +25,10 @@ export default function NewAircraftPage() {
   const utils = trpc.useUtils();
   const { showToast } = useToast();
   const createAircraft = trpc.aircraft.create.useMutation({
-    onSuccess: async () => {
-      await utils.aircraft.getAll.invalidate();
-      showToast("Aircraft created successfully!", "success");
-      router.push("/aircraft");
+    onSuccess: async (result) => {
+      const aircraft = (result as unknown as { id: string });
+      showToast(`${form.registration} added to fleet`, "success");
+      router.push(`/aircraft/${aircraft.id}`);
     },
     onError: (err, variables) => {
       const errorMessage = isNetworkError(err)
