@@ -32,11 +32,11 @@ export function evaluateFlightSafety(
 
   switch (type) {
     case 'density-altitude':
-      return evaluateDensityAltitude(data);
+      return evaluateDensityAltitude(data as DensityAltitudeInput);
     case 'weight-balance':
-      return evaluateWeightBalance(data);
+      return evaluateWeightBalance(data as WeightBalanceInput);
     case 'fuel':
-      return evaluateFuel(data);
+      return evaluateFuel(data as FuelPlanInput);
     default:
       return {
         status: 'NORMAL',
@@ -48,8 +48,8 @@ export function evaluateFlightSafety(
   }
 }
 
-function evaluateDensityAltitude(data: { densityAltitude: number }): FlightSafetyDecision {
-  const { densityAltitude } = data;
+function evaluateDensityAltitude(data: DensityAltitudeInput): FlightSafetyDecision {
+  const densityAltitude = data.densityAltitude ?? 0;
   
   if (densityAltitude > 8000) {
     return {
@@ -80,7 +80,7 @@ function evaluateDensityAltitude(data: { densityAltitude: number }): FlightSafet
   };
 }
 
-function evaluateWeightBalance(data: { isOverweight: boolean; isOutOfCG: boolean; totalWeight: number; maxWeight?: number }): FlightSafetyDecision {
+function evaluateWeightBalance(data: WeightBalanceInput): FlightSafetyDecision {
   if (data.isOverweight || data.isOutOfCG) {
     return {
       status: 'WARNING',
@@ -111,7 +111,7 @@ function evaluateWeightBalance(data: { isOverweight: boolean; isOutOfCG: boolean
   };
 }
 
-function evaluateFuel(data: { totalRequired: number; reserveMinutes: number }): FlightSafetyDecision {
+function evaluateFuel(data: FuelPlanInput): FlightSafetyDecision {
   if (data.reserveMinutes < 30) {
     return {
       status: 'WARNING',
