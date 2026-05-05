@@ -3,7 +3,6 @@ import type { MetarData } from "@/types/weather";
 
 import React, { useState, type KeyboardEvent } from "react";
 import { 
-  Cloud, 
   Wind, 
   Eye, 
   CloudSun, 
@@ -31,7 +30,6 @@ interface WeatherWidgetProps {
 export function WeatherWidget({ 
   metar, 
   isLoading, 
-  error, 
   onAirportChange, 
   onResetToFavorite, 
   isFavorite = false 

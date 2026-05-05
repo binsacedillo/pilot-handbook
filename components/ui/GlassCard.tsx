@@ -16,7 +16,8 @@ export function GlassCard({ children, className, bezel = true, ...props }: Glass
     <div
       className={cn(
         "relative overflow-hidden rounded-2xl transition-all duration-300 backdrop-blur-xl",
-        "bg-(--glass-bg) border border-(--glass-border) text-foreground shadow-(--glass-bezel)",
+        "bg-(--glass-bg) border border-(--glass-border) text-foreground",
+        bezel && "shadow-(--glass-bezel)",
         className
       )}
       {...props}

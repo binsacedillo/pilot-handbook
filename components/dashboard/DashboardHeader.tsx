@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { BarChart3 } from "lucide-react";
 
 interface DashboardHeaderProps {
   pilotName: string;
