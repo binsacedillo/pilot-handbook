@@ -44,6 +44,7 @@ For technical details, architecture, and setup instructions, refer to our intern
 
 - **[Quick Start & Setup](docs/SETUP.md)**: Get the app running locally in 5 minutes.
 - **[System Architecture](docs/ARCHITECTURE.md)**: Deep dive into the "Explanation UX" layer and technical rationale.
+- **[Technical Diagrams](docs/TECHNICAL_DIAGRAMS.md)**: Visual flows for monetization, data integrity, and user journey.
 - **[Brand & Terminology](docs/TERMINOLOGY.md)**: The source of truth for student-first language standards.
 - **[Guided Module Patterns](docs/GUIDED_MODULES.md)**: How to build new mentored calculation modules.
 - **[Decision Engine Guide](docs/DECISION_ENGINE.md)**: Mapping aviation math to pilot mentorship logic.
