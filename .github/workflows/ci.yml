@@ -1,0 +1,44 @@
+name: "CI Foundation"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify:
+    name: "Code Safety Checks"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Prisma Generate
+        run: npx prisma generate
+
+      - name: Type Check (Fail-Fast)
+        run: npm run typecheck
+
+      - name: Linting
+        run: npm run lint
+
+      - name: Unit Tests
+        run: npm run test
+
+      - name: Build Check
+        run: npm run build
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_placeholder
+          CLERK_SECRET_KEY: sk_test_placeholder
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilot-handbook

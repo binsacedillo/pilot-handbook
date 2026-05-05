@@ -182,7 +182,7 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
                     {station.name}
                   </Label>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
-                    Arm: {station.arm}"
+                    Arm: {station.arm}&quot;
                   </span>
                 </div>
                 <div className="relative">
@@ -202,7 +202,7 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
 
             <div className="pt-4 p-4 bg-blue-500/5 rounded-2xl flex gap-3 text-xs text-blue-600 dark:text-blue-400 italic">
               <Info className="w-4 h-4 shrink-0" />
-              <p>Values based on standard C172S. Always verify with your aircraft's specific weight & balance sheet.</p>
+              <p>Values based on standard C172S. Always verify with your aircraft&apos;s specific weight &amp; balance sheet.</p>
             </div>
           </CardContent>
         </Card>

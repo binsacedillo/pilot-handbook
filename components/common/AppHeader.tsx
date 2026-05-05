@@ -27,8 +27,10 @@ export default function AppHeader() {
 
   // Close menu when pathname changes
   useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [pathname]);
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  }, [pathname, isMobileMenuOpen]);
 
   // Prevent scrolling when mobile menu is open
   useEffect(() => {

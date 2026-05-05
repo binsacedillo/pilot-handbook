@@ -46,7 +46,7 @@ export default function AboutPage() {
               <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Project Status</h2>
               <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-lg">
                 <p className="text-zinc-400 font-mono text-xs">
-                  The Pilot Handbook is currently undergoing active refinement to better serve the student pilot community. We are constantly adding new "Learning Modules" and guidance layers to ensure every preflight check is a step toward mastery.
+                  The Pilot Handbook is currently undergoing active refinement to better serve the student pilot community. We are constantly adding new &quot;Learning Modules&quot; and guidance layers to ensure every preflight check is a step toward mastery.
                 </p>
               </div>
             </section>

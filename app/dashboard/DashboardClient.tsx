@@ -35,7 +35,9 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
 
   // Connectivity & Lifecycle Logic
   useEffect(() => {
-    setHasMounted(true);
+    if (!hasMounted) {
+      setHasMounted(true);
+    }
     if (typeof navigator !== "undefined") {
       setIsOffline(!navigator.onLine);
     }
@@ -68,9 +70,18 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
     refetchOnMount: false,
   });
 
+  const [minuteBucket, setMinuteBucket] = useState(0);
+
+  useEffect(() => {
+    if (hasMounted) {
+      setMinuteBucket(Math.floor(Date.now() / 60000));
+    }
+  }, [hasMounted]);
+
   const stableNow = useMemo(() => {
-    return new Date().toISOString().split(':').slice(0, 2).join(':') + ':00.000Z';
-  }, [hasMounted ? Math.floor(Date.now() / 60000) : 0]);
+    const d = minuteBucket ? new Date(minuteBucket * 60000) : new Date();
+    return d.toISOString().split(':').slice(0, 2).join(':') + ':00.000Z';
+  }, [minuteBucket]);
 
   const { data: upcomingFlight } = trpc.flight.getUpcoming.useQuery(
     { now: stableNow }, 
