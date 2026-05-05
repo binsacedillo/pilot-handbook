@@ -6,17 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/trpc/client";
-import { 
-  calculatePressureAltitude, 
-  calculateDensityAltitude 
-} from "@/lib/aviation-math";
-import { evaluateFlightSafety } from "@/lib/decision/engine";
+import { calculatePressureAltitude, calculateDensityAltitude } from "@/lib/aviation-math";
+import { evaluateFlightSafety, FlightSafetyDecision } from "@/lib/decision/engine";
 import { Badge } from "@/components/ui/badge";
-import { Thermometer, MapPin, AlertTriangle, RefreshCw, ShieldCheck, ShieldAlert, ShieldX, Info } from "lucide-react";
+import { Thermometer, MapPin, RefreshCw, ShieldAlert, Info } from "lucide-react";
+
+export interface DensityAltitudeResults {
+  pressureAltitude: number;
+  densityAltitude: number;
+  decision: FlightSafetyDecision;
+}
 
 interface DensityAltitudeCalculatorProps {
   isCompact?: boolean;
-  onResultChange?: (results: any) => void;
+  onResultChange?: (results: DensityAltitudeResults) => void;
 }
 
 export default function DensityAltitudeCalculator({ isCompact = false, onResultChange }: DensityAltitudeCalculatorProps) {
@@ -30,18 +33,22 @@ export default function DensityAltitudeCalculator({ isCompact = false, onResultC
     { enabled: false }
   );
 
-  const handleFetchMetar = () => {
+  const handleFetchMetar = async () => {
     if (icao.length === 4) {
-      refetch();
+      const result = await refetch();
+      if (result.data) {
+        const newAltimeter = result.data.altimeter?.toString();
+        const newTemperature = result.data.temperature?.toString();
+        
+        if (newAltimeter) setAltimeter(newAltimeter);
+        if (newTemperature !== undefined && newTemperature !== null) {
+          setTemperature(newTemperature);
+        }
+      }
     }
   };
 
-  useEffect(() => {
-    if (metar) {
-      if (metar.altimeter) setAltimeter(metar.altimeter.toString());
-      if (metar.temperature !== null) setTemperature(metar.temperature.toString());
-    }
-  }, [metar]);
+  // Removed useEffect that synced metar to state to avoid cascading renders
 
   const results = useMemo(() => {
     const elev = parseFloat(elevation);
