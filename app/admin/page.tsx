@@ -10,12 +10,9 @@ import { useUser } from '@clerk/nextjs';
 import { 
   Users, 
   Plane, 
-  TrendingUp, 
   CheckCircle, 
-  XCircle, 
   Activity, 
   ShieldAlert,
-  Gamepad2,
   HardDrive
 } from 'lucide-react';
 import UserManagementTable from '@/components/admin/UserManagementTable';
@@ -55,8 +52,6 @@ export default function AdminDashboard() {
   const totalFlights = stats?.totalFlights ?? 0;
   const totalAircraft = stats?.totalAircraft ?? 0;
   const unverifiedUsers = allUsers?.users.filter(u => u.role === 'USER') ?? [];
-  const verifiedPilots = allUsers?.users.filter(u => u.role === 'PILOT') ?? [];
-  const admins = allUsers?.users.filter(u => u.role === 'ADMIN') ?? [];
 
   if (isLoading) {
     return (

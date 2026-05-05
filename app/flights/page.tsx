@@ -4,7 +4,7 @@ import AppHeader from "@/components/common/AppHeader";
 import AppFooter from "@/components/common/AppFooter";
 import { trpc } from "@/trpc/client";
 import type { RouterOutputs } from "@/trpc/shared";
-import Link from "next/link";
+// Removed unused Link import
 import { useState, useEffect, useRef } from "react";
 import FlightForm from "@/components/flights/FlightForm";
 import QuickFlightForm from "@/components/flights/QuickFlightForm";
