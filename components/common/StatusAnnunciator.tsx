@@ -2,7 +2,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, Info, AlertTriangle, Loader2, XCircle } from "lucide-react";
+import { CheckCircle2, Info, AlertTriangle, Loader2 } from "lucide-react";
 
 type StatusType = "warning" | "caution" | "normal" | "advisory" | "processing";
 

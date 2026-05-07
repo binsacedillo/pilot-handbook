@@ -17,8 +17,8 @@ import { isNetworkError, getNetworkErrorMessage, getServerErrorMessage } from "@
 import { ImageUpload } from "@/components/common/ImageUpload";
 import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardFooter } from "@/components/ui/GlassCard";
 import { AircraftCardPreview } from "@/components/aircraft/AircraftCardPreview";
-import { Plane, Hash, Image as ImageIcon, Activity, Info, Save, X, Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Hash, Image as ImageIcon, Activity, Info, Save, X, Plus } from "lucide-react";
+
 
 export default function NewAircraftPage() {
   const router = useRouter();

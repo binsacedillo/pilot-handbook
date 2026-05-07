@@ -28,7 +28,7 @@ export default function DensityAltitudeCalculator({ isCompact = false, onResultC
   const [temperature, setTemperature] = useState<string>("15");
   const [icao, setIcao] = useState<string>("");
   
-  const { data: metar, isLoading, refetch } = trpc.weather.getMetar.useQuery(
+  const { isLoading, refetch } = trpc.weather.getMetar.useQuery(
     { icao: icao.toUpperCase() },
     { enabled: false }
   );
