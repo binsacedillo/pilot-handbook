@@ -63,6 +63,7 @@
 	},
 	"devDependencies": {
 		"@axe-core/cli": "^4.11.0",
+		"@playwright/test": "^1.59.1",
 		"@prisma/client": "^7.6.0",
 		"@shadcn/ui": "^0.0.4",
 		"@tailwindcss/postcss": "^4",
