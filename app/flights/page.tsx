@@ -73,7 +73,10 @@ export default function FlightsPage() {
     aircraftId: searchParams.get("aircraftId") || undefined,
   };
 
-  const { data: flights, isLoading } = trpc.flight.getAll.useQuery(filters);
+  const { data: flights, isLoading } = trpc.flight.getAll.useQuery(filters, {
+    staleTime: 1000 * 60, // Data is fresh for 1 minute
+    refetchOnWindowFocus: false,
+  });
   const deleteMutation = trpc.flight.delete.useMutation();
   const queryClient = useQueryClient();
 

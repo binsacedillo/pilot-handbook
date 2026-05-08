@@ -12,8 +12,14 @@ import { SettingsForm } from '@/components/settings/SettingsForm';
  * This separation ensures clean component mounting with synchronized data.
  */
 export default function SettingsPage() {
-  const { data: preferences, isLoading: preferencesLoading } = trpc.preferences.getPreferences.useQuery();
-  const { data: aircraft, isLoading: aircraftLoading } = trpc.aircraft.getAll.useQuery();
+  const { data: preferences, isLoading: preferencesLoading } = trpc.preferences.getPreferences.useQuery(undefined, {
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
+  const { data: aircraft, isLoading: aircraftLoading } = trpc.aircraft.getAll.useQuery(undefined, {
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
 
   // Wait for both queries to complete before rendering the form
   if (preferencesLoading || aircraftLoading || !preferences || !aircraft) {

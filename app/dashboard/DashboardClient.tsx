@@ -96,10 +96,16 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
   const [customIcao, setCustomIcao] = useState<string | null>(null);
   const { data: favoriteMetar, isLoading: favoriteLoading } = trpc.weather.getFavoriteAirportMetar.useQuery(undefined, {
     enabled: !customIcao && isLoaded,
+    staleTime: 1000 * 60 * 5, // Weather is stable for at least 5 mins
+    refetchOnWindowFocus: false,
   });
   const { data: customMetar, isLoading: customLoading } = trpc.weather.getMetar.useQuery(
     { icao: customIcao! },
-    { enabled: !!customIcao && isLoaded }
+    { 
+      enabled: !!customIcao && isLoaded,
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+    }
   );
 
   const metar = customIcao ? customMetar : favoriteMetar;
