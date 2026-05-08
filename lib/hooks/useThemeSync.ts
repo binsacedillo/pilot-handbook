@@ -10,22 +10,25 @@ import { trpc } from '@/trpc/client';
  * Automatically applies the theme on component mount
  */
 export function useThemeSync() {
-  const { setTheme } = useTheme();
+  const { theme: currentTheme, setTheme } = useTheme();
   const { isLoaded, isSignedIn } = useAuth();
-
+ 
   // Avoid hitting protected tRPC route when signed out
   const { data: prefs, isLoading } = trpc.preferences.getPreferences.useQuery(undefined, {
     enabled: isLoaded && isSignedIn,
+    staleTime: 1000 * 60 * 5, // Preferences are very stable
+    refetchOnWindowFocus: false,
   });
-
+ 
   useEffect(() => {
     if (!isLoading && prefs?.theme) {
-      // Map database theme to next-themes format
-      // LIGHT → light, DARK → dark, SYSTEM → system
       const themeValue = prefs.theme.toLowerCase();
-      setTheme(themeValue);
+      // Only update if the theme actually changed to avoid render loops
+      if (currentTheme !== themeValue) {
+        setTheme(themeValue);
+      }
     }
-  }, [prefs, isLoading, setTheme]);
+  }, [prefs, isLoading, setTheme, currentTheme]);
 
   return { isLoading };
 }
