@@ -12,6 +12,7 @@
 		"test": "vitest",
 		"test:ui": "vitest --ui",
 		"test:coverage": "vitest --coverage",
+		"test:e2e": "playwright test",
 		"make:admin": "node ./scripts/promote-admin.mjs",
 		"typecheck": "tsc --noEmit",
 		"postinstall": "prisma generate"
