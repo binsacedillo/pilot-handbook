@@ -18,7 +18,7 @@ function getRateLimiter(): Ratelimit | null {
     try {
       limiter = new Ratelimit({
         redis: Redis.fromEnv(),
-        limiter: Ratelimit.slidingWindow(10, "60 s"), // 10 requests per 60 seconds default
+        limiter: Ratelimit.slidingWindow(100, "60 s"), // 100 requests per 60 seconds (Production Standard)
         analytics: true,
         prefix: "ratelimit",
       });
