@@ -53,8 +53,8 @@ export const t = initTRPC.context<typeof createTRPCContext>().create({
  * 3. MIDDLEWARE
  */
 const rateLimitMiddleware = t.middleware(async ({ ctx, next, path }) => {
-  // Bypass rate limiting in test environment to avoid breaking the test suite
-  if (process.env.NODE_ENV === 'test') {
+  // Bypass rate limiting in test environment or for localhost to avoid breaking dev/E2E workflows
+  if (process.env.NODE_ENV === 'test' || ctx.ip === '::1' || ctx.ip === '127.0.0.1') {
     return next();
   }
 
