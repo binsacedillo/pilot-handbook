@@ -6,12 +6,19 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: [path.resolve(__dirname, 'vitest.setup.ts')],
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/e2e/**',
+      '**/.next/**',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
         'node_modules/',
         '.next/',
+        'e2e/',
       ],
     },
   },
