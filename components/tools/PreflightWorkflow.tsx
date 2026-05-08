@@ -58,9 +58,19 @@ export default function PreflightWorkflow() {
   }, [currentStep]);
 
   const canGoNext = useMemo(() => {
-    if (currentStep === "AIRCRAFT") return !!selectedAircraftId;
-    return true;
-  }, [currentStep, selectedAircraftId]);
+    switch (currentStep) {
+      case "AIRCRAFT":
+        return !!selectedAircraftId;
+      case "WB":
+        return !!results.wb?.decision;
+      case "PERFORMANCE":
+        return !!results.da?.decision;
+      case "FUEL":
+        return !!results.fuel?.decision;
+      default:
+        return true;
+    }
+  }, [currentStep, selectedAircraftId, results]);
 
   const handleWBChange = useCallback((r: WeightBalanceResults) => {
     setResults(prev => {
@@ -171,6 +181,7 @@ export default function PreflightWorkflow() {
         canGoBack={currentStep !== "AIRCRAFT"} 
         canGoNext={canGoNext} 
         isLastStep={currentStep === "FUEL"} 
+        currentStep={currentStep}
       />
     </div>
   );
