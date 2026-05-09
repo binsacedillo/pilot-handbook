@@ -19,7 +19,7 @@ export default defineConfig({
   timeout: 60 * 1000,
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://127.0.0.1:3001',
+    baseURL: 'http://127.0.0.1:3000',
     actionTimeout: 15 * 1000,
     navigationTimeout: 30 * 1000,
 
@@ -59,8 +59,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npx next dev -p 3001 --hostname 127.0.0.1',
-    url: 'http://127.0.0.1:3001',
+    command: 'npm run start',
+    url: 'http://127.0.0.1:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 180 * 1000,
   },
