@@ -3,12 +3,12 @@ import withPWAInit from "@ducanh2912/next-pwa";
 
 const withPWA = withPWAInit({
   dest: "public",
-  disable: process.env.NODE_ENV === "development" || process.env.CI === "true",
+  disable: process.env.NODE_ENV === "development" || process.env.CI === "true" || process.env.NEXT_PUBLIC_E2E === "true",
   register: true,
 });
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["192.168.254.102", "192.168.254.102:3000", "localhost:3000", "127.0.0.1:3000"],
+  allowedDevOrigins: ["192.168.254.102", "192.168.254.102:3000", "localhost:3000", "127.0.0.1:8080", "localhost:8080"],
   // Enable future-friendly defaults progressively via explicit config.
   images: {
     remotePatterns: [

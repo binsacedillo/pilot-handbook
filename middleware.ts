@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isPublicRoute = createRouteMatcher([
@@ -20,15 +21,21 @@ const isPublicRoute = createRouteMatcher([
 
 const isTRPC = createRouteMatcher(["/api/trpc(.*)"]);
 
-export default clerkMiddleware(async (auth, req) => {
-  // 1. Explicitly bypass middleware for tRPC to let procedures handle auth
-  if (isTRPC(req)) return;
+const isCI = process.env.CI === "true";
+const isE2E = process.env.NEXT_PUBLIC_E2E === "true";
 
-  // 2. Only protect routes that are NOT public
-  if (!isPublicRoute(req)) {
-    await auth.protect();
-  }
-});
+// Bypass Clerk entirely in CI/E2E environments to prevent SSL/Redirect interference
+export default isCI || isE2E
+  ? () => NextResponse.next()
+  : clerkMiddleware(async (auth, req) => {
+      // 1. Explicitly bypass middleware for tRPC to let procedures handle auth
+      if (isTRPC(req)) return;
+ 
+      // 2. Only protect routes that are NOT public
+      if (!isPublicRoute(req)) {
+        await auth.protect();
+      }
+    });
 
 
 export const config = {

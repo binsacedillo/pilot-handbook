@@ -7,7 +7,7 @@
 		"dev:clean": "rmdir /s /q .next .turbopack 2>nul & npm run dev",
 		"dev:full-clean": "rmdir /s /q .next .turbopack node_modules\\.cache 2>nul & npm run dev",
 		"build": "next build",
-		"start": "next start",
+		"start": "next start -H 0.0.0.0 -p 8080",
 		"lint": "eslint . --ext .ts,.tsx",
 		"test": "vitest",
 		"test:ui": "vitest --ui",

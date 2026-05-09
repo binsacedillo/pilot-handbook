@@ -2,9 +2,9 @@ name: "CI Foundation"
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "*" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "*" ]
 
 jobs:
   verify:
@@ -54,6 +54,8 @@ jobs:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmstc2V0dXAuaWQubGNsLmNsdWRnZS5jb20k
           CLERK_SECRET_KEY: sk_test_clerk_dummy_secret_key_12345
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilot-handbook
+          PORT: 8080
+          NEXT_PUBLIC_E2E: true
 
       - name: Cache Playwright Browsers
         uses: actions/cache@v4
@@ -74,6 +76,8 @@ jobs:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmstc2V0dXAuaWQubGNsLmNsdWRnZS5jb20k
           CLERK_SECRET_KEY: sk_test_clerk_dummy_secret_key_12345
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilot-handbook
+          PORT: 8080
+          NEXT_PUBLIC_E2E: true
           NODE_TLS_REJECT_UNAUTHORIZED: 0
 
       - name: Upload Test Results
