@@ -25,17 +25,17 @@ const isCI = process.env.CI === "true";
 const isE2E = process.env.NEXT_PUBLIC_E2E === "true";
 
 // Bypass Clerk entirely in CI/E2E environments to prevent SSL/Redirect interference
-export default isCI || isE2E
-  ? () => NextResponse.next()
-  : clerkMiddleware(async (auth, req) => {
-      // 1. Explicitly bypass middleware for tRPC to let procedures handle auth
-      if (isTRPC(req)) return;
- 
-      // 2. Only protect routes that are NOT public
-      if (!isPublicRoute(req)) {
-        await auth.protect();
-      }
-    });
+export default clerkMiddleware(async (auth, req) => {
+  if (isCI || isE2E) return;
+
+  // 1. Explicitly bypass middleware for tRPC to let procedures handle auth
+  if (isTRPC(req)) return;
+
+  // 2. Only protect routes that are NOT public
+  if (!isPublicRoute(req)) {
+    await auth.protect();
+  }
+});
 
 
 export const config = {

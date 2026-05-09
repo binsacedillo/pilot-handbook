@@ -25,7 +25,8 @@ const Footer = NextDynamic(() => import("@/components/landing/Footer"), {
 });
 
 export default async function Home() {
-  const { userId } = await auth();
+  const isE2E = process.env.NEXT_PUBLIC_E2E === "true";
+  const { userId } = isE2E ? { userId: null } : await auth();
 
   if (userId) {
     redirect("/dashboard");
