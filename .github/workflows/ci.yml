@@ -92,16 +92,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run E2E Tests (Phase 5)
-        run: |
-          echo "🔍 Starting Production-Grade E2E Pipe..."
-          # Start the server in the background using the production build
-          npm run start &
-          
-          # Robust wait: Ensure localhost:8080 is responding via HTTP before starting Playwright
-          timeout 60s bash -c 'until curl -f http://localhost:8080; do sleep 2; echo "waiting for server..."; done'
-          
-          # Run tests with single project for maximum CI speed
-          npm run test:e2e -- --project=chromium
+        run: npm run test:e2e
 
       - name: Upload Test Results
         if: failure()

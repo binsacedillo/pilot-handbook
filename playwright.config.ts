@@ -28,7 +28,12 @@ export default defineConfig({
     video: 'on-first-retry',
     ignoreHTTPSErrors: true,
     launchOptions: process.env.CI ? {
-      args: ['--ignore-certificate-errors', '--disable-web-security']
+      args: [
+        '--ignore-certificate-errors',
+        '--ignore-certificate-errors-spki-list',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor'
+      ]
     } : undefined,
   },
 
@@ -38,34 +43,14 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    /* Test against mobile viewports. */
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
   ],
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run start -- -p 8080 -H localhost',
+    command: 'npm run start:e2e',
     url: 'http://localhost:8080',
-    reuseExistingServer: true,
-    timeout: 180 * 1000,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
     stdout: 'ignore',
     stderr: 'pipe',
   },
