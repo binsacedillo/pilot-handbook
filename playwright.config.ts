@@ -27,6 +27,9 @@ export default defineConfig({
     trace: 'on-first-retry',
     video: 'on-first-retry',
     ignoreHTTPSErrors: true,
+    launchOptions: process.env.CI ? {
+      args: ['--ignore-certificate-errors', '--disable-web-security']
+    } : undefined,
   },
 
   /* Configure projects for major browsers */
