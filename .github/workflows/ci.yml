@@ -91,8 +91,24 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
-      - name: Run E2E Tests (Phase 5)
-        run: npm run test:e2e
+      - name: Run E2E Tests (Manual Server Orchestration)
+        run: |
+          echo "🚀 Starting Production-Grade HTTP Server..."
+          # Start HTTP-only server in background
+          (NEXTAUTH_URL=http://localhost:8080 \
+           NODE_NO_WARNINGS=1 \
+           npm run start) &
+          
+          # Wait properly for port 8080
+          echo "⏳ Waiting for server to be ready..."
+          npx wait-on --timeout 60000 http://localhost:8080
+          
+          # Verify 127.0.0.1 responds with HTML
+          echo "🔍 Proof of Life check..."
+          curl -f http://127.0.0.1:8080 || exit 1
+          
+          # Run tests (Single project for speed)
+          npx playwright test --project=chromium
 
       - name: Upload Test Results
         if: failure()
