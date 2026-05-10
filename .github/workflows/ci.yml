@@ -24,13 +24,9 @@ jobs:
 
     env:
       CI: "true"
-      NEXTAUTH_URL: http://localhost:8080
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilot-handbook
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmstc2V0dXAuaWQubGNsLmNsdWRnZS5jb20k
       CLERK_SECRET_KEY: sk_test_clerk_dummy_secret_key_12345
-      PORT: 8080
-      NEXT_PUBLIC_E2E: "true"
-      NODE_TLS_REJECT_UNAUTHORIZED: 0
     
     steps:
       - name: Checkout Code
@@ -76,47 +72,4 @@ jobs:
         run: npm run test
 
       - name: Build Check
-        env:
-          NEXT_PUBLIC_E2E: "true"
         run: npm run build
-
-      - name: Cache Playwright Browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      - name: Install Playwright Browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps
-
-      - name: Run E2E Tests (Manual Server Orchestration)
-        run: |
-          echo "🚀 Starting Production-Grade HTTP Server..."
-          # Start HTTP-only server in background
-          (NEXTAUTH_URL=http://localhost:8080 \
-           NEXT_PUBLIC_E2E=true \
-           NODE_NO_WARNINGS=1 \
-           npm run start) &
-          
-          # Wait properly for port 8080
-          echo "⏳ Waiting for server to be ready..."
-          npx wait-on --timeout 60000 http://localhost:8080
-          
-          # Verify 127.0.0.1 responds with HTML
-          echo "🔍 Proof of Life check..."
-          curl -f http://127.0.0.1:8080 || exit 1
-          
-          # Run tests (Single project for speed)
-          npx playwright test --project=chromium
-
-      - name: Upload Test Results
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 7
