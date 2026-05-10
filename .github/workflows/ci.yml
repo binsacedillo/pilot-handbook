@@ -98,6 +98,7 @@ jobs:
           echo "🚀 Starting Production-Grade HTTP Server..."
           # Start HTTP-only server in background
           (NEXTAUTH_URL=http://localhost:8080 \
+           NEXT_PUBLIC_E2E=true \
            NODE_NO_WARNINGS=1 \
            npm run start) &
           

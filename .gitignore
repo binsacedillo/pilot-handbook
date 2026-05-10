@@ -48,3 +48,6 @@ next-env.d.ts
 internal-docs/
 /docs/
 check-db.ts
+
+playwright-report/
+test-results/
