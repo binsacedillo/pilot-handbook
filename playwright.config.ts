@@ -27,13 +27,6 @@ export default defineConfig({
     trace: 'on-first-retry',
     video: 'on-first-retry',
     ignoreHTTPSErrors: true,
-    launchOptions: {
-      args: [
-        '--ignore-certificate-errors',
-        '--ignore-certificate-errors-spki-list',
-        '--disable-web-security',
-      ],
-    },
   },
 
   /* Configure projects for major browsers */
@@ -43,5 +36,4 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-
 });
