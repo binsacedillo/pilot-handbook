@@ -16,7 +16,7 @@ test.describe('Landing Page', () => {
     await expect(heading).toBeVisible({ timeout: 10000 });
 
     // 3. Check for the primary CTA button
-    const getStartedBtn = page.getByRole('button', { name: /Get Started/i });
+    const getStartedBtn = page.getByRole('button', { name: /^Get Started$/i }).first();
     await expect(getStartedBtn).toBeVisible();
     await expect(getStartedBtn).toHaveAttribute('class', /bg-blue-600/); // Verify it's the primary button
   });
