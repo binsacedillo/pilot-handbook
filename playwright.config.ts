@@ -19,7 +19,7 @@ export default defineConfig({
   timeout: 60 * 1000,
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://127.0.0.1:8080',
+    baseURL: 'http://localhost:8080',
     actionTimeout: 15 * 1000,
     navigationTimeout: 30 * 1000,
 
@@ -27,14 +27,13 @@ export default defineConfig({
     trace: 'on-first-retry',
     video: 'on-first-retry',
     ignoreHTTPSErrors: true,
-    launchOptions: process.env.CI ? {
+    launchOptions: {
       args: [
         '--ignore-certificate-errors',
         '--ignore-certificate-errors-spki-list',
         '--disable-web-security',
-        '--disable-features=VizDisplayCompositor'
-      ]
-    } : undefined,
+      ],
+    },
   },
 
   /* Configure projects for major browsers */
