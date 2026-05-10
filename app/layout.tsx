@@ -75,6 +75,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isE2E = process.env.NEXT_PUBLIC_E2E === "true";
+
   return (
     <ToastProvider>
       <html lang="en" suppressHydrationWarning>
@@ -92,8 +94,8 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <TRPCProvider>
               <ClerkProviderClient>
-                <SessionExpirationHandler />
-                <IdleTimeoutManager />
+                {!isE2E && <SessionExpirationHandler />}
+                {!isE2E && <IdleTimeoutManager />}
                 <ThemeWrapper>
                   <SmoothScroll>
                     <div className="flex flex-col min-h-screen">
