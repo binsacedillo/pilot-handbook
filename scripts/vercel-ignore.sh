@@ -1,13 +1,15 @@
 #!/bin/bash
 
-echo "VERCEL_GIT_COMMIT_REF: $VERCEL_GIT_COMMIT_REF"
+# Vercel Ignore Build Step
+# 1 = Build, 0 = Ignore
+
+echo "🔍 Vercel Ignore Check"
+echo "Ref: $VERCEL_GIT_COMMIT_REF"
 
 if [[ "$VERCEL_GIT_COMMIT_REF" == "fix/ci-stabilization" ]] ; then
-  # Don't build this branch
-  echo "✅ Ignored build for branch: $VERCEL_GIT_COMMIT_REF"
-  exit 0;
+  echo "✅ Ignored build for stabilization branch."
+  exit 0
 else
-  # Proceed with build for other branches
-  echo "🚀 Proceeding with build for branch: $VERCEL_GIT_COMMIT_REF"
-  exit 1;
+  echo "🚀 Proceeding with build for: $VERCEL_GIT_COMMIT_REF"
+  exit 1
 fi
