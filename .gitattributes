@@ -1,0 +1,2 @@
+# Ensure shell scripts always use LF line endings for compatibility with Linux (Vercel/CI)
+*.sh text eol=lf
