@@ -29,7 +29,7 @@ jobs:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmstc2V0dXAuaWQubGNsLmNsdWRnZS5jb20k
       CLERK_SECRET_KEY: sk_test_clerk_dummy_secret_key_12345
       PORT: 8080
-      NEXT_PUBLIC_E2E: true
+      NEXT_PUBLIC_E2E: "true"
       NODE_TLS_REJECT_UNAUTHORIZED: 0
     
     steps:
@@ -76,6 +76,8 @@ jobs:
         run: npm run test
 
       - name: Build Check
+        env:
+          NEXT_PUBLIC_E2E: "true"
         run: npm run build
 
       - name: Cache Playwright Browsers
