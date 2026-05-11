@@ -35,7 +35,7 @@ export default async function Home() {
   return (
     <>
       <main className="min-h-screen flex flex-col bg-background">
-        {!isE2E && <Navigation />}
+        <Navigation />
         <Hero />
         <Features />
         <HowItWorks />
