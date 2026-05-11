@@ -24,19 +24,19 @@ const isTRPC = createRouteMatcher(["/api/trpc(.*)"]);
 const isE2E = process.env.NEXT_PUBLIC_E2E === "true";
 
 // Bypass Clerk entirely in CI/E2E environments to prevent SSL/Redirect interference
-export default clerkMiddleware(async (auth, req) => {
-  // Bypass Clerk entirely in E2E — prevents SSL handshake errors
-  // from Clerk's production instance rejecting plain HTTP
+export default function middleware(req: any, evt: any) {
   if (isE2E) return NextResponse.next();
+  
+  return clerkMiddleware(async (auth, req) => {
+    // 1. Explicitly bypass middleware for tRPC to let procedures handle auth
+    if (isTRPC(req)) return NextResponse.next();
 
-  // 1. Explicitly bypass middleware for tRPC to let procedures handle auth
-  if (isTRPC(req)) return NextResponse.next();
-
-  // 2. Only protect routes that are NOT public
-  if (!isPublicRoute(req)) {
-    await auth.protect();
-  }
-});
+    // 2. Only protect routes that are NOT public
+    if (!isPublicRoute(req)) {
+      await auth.protect();
+    }
+  })(req, evt);
+}
 
 export const config = {
   matcher: [

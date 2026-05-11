@@ -93,9 +93,7 @@ export default function RootLayout({
 
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <TRPCProvider>
-              <ClerkProviderClient>
-                {!isE2E && <SessionExpirationHandler />}
-                {!isE2E && <IdleTimeoutManager />}
+              {isE2E ? (
                 <ThemeWrapper>
                   <SmoothScroll>
                     <div className="flex flex-col min-h-screen">
@@ -105,7 +103,21 @@ export default function RootLayout({
                     </div>
                   </SmoothScroll>
                 </ThemeWrapper>
-              </ClerkProviderClient>
+              ) : (
+                <ClerkProviderClient>
+                  <SessionExpirationHandler />
+                  <IdleTimeoutManager />
+                  <ThemeWrapper>
+                    <SmoothScroll>
+                      <div className="flex flex-col min-h-screen">
+                        <ReleaseAdvisory />
+                        {children}
+                        <FeedbackButton />
+                      </div>
+                    </SmoothScroll>
+                  </ThemeWrapper>
+                </ClerkProviderClient>
+              )}
             </TRPCProvider>
           </ThemeProvider>
         </body>
