@@ -17,8 +17,8 @@ test.describe('Tools Workflow Validation', () => {
     await expect(afmText).toBeVisible();
 
     // 3. Verify Workflow Stepper Initialization
-    // The first step should be "AIRCRAFT"
-    const aircraftStep = page.getByText(/Aircraft Selection/i).first();
+    // The first step should be "Select Aircraft"
+    const aircraftStep = page.getByText(/Select Aircraft/i).first();
     await expect(aircraftStep).toBeVisible();
 
     // 4. Verify System Ready Status
