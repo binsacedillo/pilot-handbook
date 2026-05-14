@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import dynamicImport from "next/dynamic";
 const AppHeader = dynamicImport(() => import("@/components/common/AppHeader"), { ssr: false });
 import AppFooter from "@/components/common/AppFooter";
+import { ShieldCheck } from "lucide-react";
 
 export default function AboutPage() {
   return (
