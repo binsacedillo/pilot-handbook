@@ -3,8 +3,6 @@
 import { trpc } from "@/trpc/client";
 import { GlassCard, GlassCardHeader, GlassCardContent } from "@/components/ui/GlassCard";
 import { 
-  BarChart, 
-  Bar, 
   XAxis, 
   YAxis, 
   Tooltip, 
@@ -20,16 +18,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ComplianceMonitor } from "@/components/dashboard/ComplianceMonitor";
 import { 
   Activity, 
-  ChevronLeft, 
-  BarChart3, 
   TrendingUp, 
   PieChart as PieIcon,
   Clock,
-  ShieldCheck,
-  Zap
+  ShieldCheck
 } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 
 type MonthData = { month: string; hours: number };

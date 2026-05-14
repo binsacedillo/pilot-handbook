@@ -2,12 +2,9 @@
 
 import { useUser } from "@clerk/nextjs";
 import { 
-  Terminal, 
   ShieldCheck, 
   Activity, 
-  Info 
 } from "lucide-react";
-import { GlassCard } from "@/components/ui/GlassCard";
 import PreflightWorkflow from "@/components/tools/PreflightWorkflow";
 
 export default function ToolsDashboard() {

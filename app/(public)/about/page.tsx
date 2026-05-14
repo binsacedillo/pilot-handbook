@@ -34,7 +34,7 @@ export default function AboutPage() {
                 Confidence is built through understanding.
               </p>
               <p className="mt-4">
-                The Pilot Handbook is designed to be your digital co-pilot during flight training. We go beyond simple calculations by providing clear, assisted guidance that helps you understand the "why" behind every preflight decision. Our mission is to transform complex data into clear safety habits that stay with you long after you earn your wings.
+                The Pilot Handbook is designed to be your digital co-pilot during flight training. We go beyond simple calculations by providing clear, assisted guidance that helps you understand the &quot;why&quot; behind every preflight decision. Our mission is to transform complex data into clear safety habits that stay with you long after you earn your wings.
               </p>
             </section>
             <section>

@@ -3,7 +3,6 @@ import {
   LifeBuoy, 
   Mail, 
   MessageSquare, 
-  ShieldCheck,
   ArrowRight
 } from "lucide-react";
 import AppHeader from "@/components/common/AppHeader";
