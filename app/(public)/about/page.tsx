@@ -23,30 +23,44 @@ export default function AboutPage() {
               About <span className="text-blue-500">Pilot Handbook</span>
             </h1>
             <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none">
-              [ REVISION: APRIL 19, 2026 ]
+              [ REVISION: MAY 14, 2026 ]
             </p>
           </header>
           <div className="space-y-10 text-sm leading-relaxed text-zinc-300">
             <section>
               <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3 leading-none pb-0.5">Our Mission</h2>
-              <p>
-                The Pilot Handbook is a guided flight training companion designed to help student pilots understand, calculate, and verify critical preflight decisions. We believe that technology should do more than just crunch numbers—it should help you understand *why* those numbers matter to your safety and performance.
+              <p className="font-medium text-zinc-300 italic">
+                Confidence is built through understanding.
+              </p>
+              <p className="mt-4">
+                The Pilot Handbook is designed to be your digital co-pilot during flight training. We go beyond simple calculations by providing clear, assisted guidance that helps you understand the "why" behind every preflight decision. Our mission is to transform complex data into clear safety habits that stay with you long after you earn your wings.
               </p>
             </section>
             <section>
-              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Core Philosophy</h2>
-              <ul className="list-none space-y-2 ml-1 text-zinc-400">
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> **Clarity over Complexity**: Plain-language explanations of complex performance data.</li>
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> **Habit Reinforcement**: Guided workflows that match professional industry standards.</li>
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> **Student-First UX**: Designed for the cockpit environment on iPad and mobile.</li>
-                <li className="flex items-center gap-2"><span className="text-blue-500 font-bold">&gt;</span> **Mentorship through Data**: Turning calculations into learning moments.</li>
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3 leading-none pb-0.5">Student-First Philosophy</h2>
+              <ul className="list-none space-y-4 ml-1">
+                {[
+                  { title: "Safe Habits First", desc: "Workflows built to reinforce professional standard operating procedures (SOPs)." },
+                  { title: "Assisted Guidance", desc: "Not just results, but plain-language explanations of what those results mean for your flight." },
+                  { title: "Mastery through Data", desc: "Turning every calculation into a learning moment to build your aeronautical decision-making (ADM)." }
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3 group">
+                    <span className="text-blue-500 font-black mt-0.5 group-hover:translate-x-1 transition-transform">&gt;</span>
+                    <p className="text-zinc-400 font-bold uppercase tracking-tight">
+                      <span className="text-zinc-200">{item.title}</span>: {item.desc}
+                    </p>
+                  </li>
+                ))}
               </ul>
             </section>
             <section>
-              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3">Project Status</h2>
-              <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-lg">
-                <p className="text-zinc-400 font-mono text-xs">
-                  The Pilot Handbook is currently undergoing active refinement to better serve the student pilot community. We are constantly adding new &quot;Learning Modules&quot; and guidance layers to ensure every preflight check is a step toward mastery.
+              <h2 className="text-xs font-black uppercase tracking-widest text-blue-500 mb-4 border-l-2 border-blue-500 pl-3 leading-none pb-0.5">Project Status [V1.4]</h2>
+              <div className="bg-zinc-950/50 border border-blue-500/10 p-6 rounded-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                  <ShieldCheck className="w-12 h-12 text-blue-500" />
+                </div>
+                <p className="text-zinc-500 font-bold text-[11px] uppercase tracking-wider leading-relaxed relative z-10">
+                  The Pilot Handbook is currently enhanced with our <span className="text-blue-400">Assisted Safety Engine</span>. This layer cross-checks your inputs against CAAP-standard compliance parameters to give you an extra level of confidence before you ever leave the ground.
                 </p>
               </div>
             </section>
