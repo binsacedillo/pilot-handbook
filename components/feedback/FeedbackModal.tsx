@@ -32,7 +32,14 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ open, onClose }) => {
                 body: JSON.stringify({ feedback, email }),
             });
             
-            if (!res.ok) throw new Error('Failed to send feedback. Please try again later.');
+            const data = await res.json();
+            
+            if (!res.ok) {
+                const errorDetail = data.error || 'Failed to send feedback';
+                const fieldErrors = data.details?.fieldErrors;
+                const fieldMessage = fieldErrors ? Object.values(fieldErrors).flat().join(', ') : null;
+                throw new Error(fieldMessage || errorDetail);
+            }
             
             setStatus('success');
             setTimeout(() => {

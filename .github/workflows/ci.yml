@@ -78,5 +78,5 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run Phase 1 E2E Validation
+      - name: Run Multi-Phase E2E Validation (Landing, Analytics, Tools)
         run: npx playwright test --project=chromium

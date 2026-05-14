@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { 
   LifeBuoy, 
   Mail, 
@@ -8,8 +10,11 @@ import {
 import AppHeader from "@/components/common/AppHeader";
 import AppFooter from "@/components/common/AppFooter";
 import { GlassCard, GlassCardHeader, GlassCardContent } from "@/components/ui/GlassCard";
+import FeedbackModal from "@/components/feedback/FeedbackModal";
 
 export default function SupportPage() {
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-zinc-950 text-foreground flex flex-col relative overflow-hidden">
       {/* Decorative Cockpit Glows */}
@@ -68,7 +73,10 @@ export default function SupportPage() {
                 <p className="text-[11px] font-bold text-zinc-400 uppercase leading-relaxed">
                   Help us improve the cockpit experience. Share your suggestions or report operational bugs.
                 </p>
-                <button className="w-full flex items-center justify-between p-4 rounded-xl bg-zinc-900 border border-white/5 hover:border-emerald-500/40 transition-all group">
+                <button 
+                  onClick={() => setIsFeedbackOpen(true)}
+                  className="w-full flex items-center justify-between p-4 rounded-xl bg-zinc-900 border border-white/5 hover:border-emerald-500/40 transition-all group"
+                >
                   <span className="text-xs font-black text-white">Submit Report</span>
                   <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-emerald-500 transition-colors" />
                 </button>
@@ -95,6 +103,11 @@ export default function SupportPage() {
           </div>
         </div>
       </main>
+
+      <FeedbackModal 
+        open={isFeedbackOpen} 
+        onClose={() => setIsFeedbackOpen(false)} 
+      />
 
       <AppFooter />
     </div>
