@@ -19,7 +19,7 @@ test.describe('Analytics Module Validation', () => {
     await expect(monthlyProgression).toBeVisible({ timeout: 15000 });
 
     // Verify the AppHeader is present
-    const brand = page.getByText(/Pilot Handbook/i);
+    const brand = page.getByRole('link', { name: /Pilot Handbook/i }).first();
     await expect(brand).toBeVisible();
   });
 });
