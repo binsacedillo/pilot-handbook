@@ -22,17 +22,11 @@ export default function AppFooter() {
             <Link href="/about" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
               About
             </Link>
-            <Link href="/terms" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
-              Terms of Service
+            <Link href="/support" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
+              Support
             </Link>
-            <Link href="/privacy" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/contact" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
-              Contact
-            </Link>
-            <Link href="/help" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
-              Help Center
+            <Link href="/legal" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
+              Compliance
             </Link>
           </div>
 
