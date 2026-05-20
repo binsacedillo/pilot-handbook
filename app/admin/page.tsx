@@ -13,7 +13,8 @@ import {
   CheckCircle, 
   Activity, 
   ShieldAlert,
-  HardDrive
+  HardDrive,
+  Loader2
 } from 'lucide-react';
 import UserManagementTable from '@/components/admin/UserManagementTable';
 import { Button } from '@/components/ui/button';
@@ -264,7 +265,7 @@ export default function AdminDashboard() {
           {activeTab === 'verifications' && (
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <ShieldAlert className="h-6 w-6 text-amber-500" />
+                <ShieldAlert className="h-6 w-6 text-amber-500 animate-pulse" />
                 <div className="space-y-0.5">
                   <h2 className="text-xl font-black uppercase tracking-widest italic leading-none">Credential Validation</h2>
                   <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{unverifiedUsers.length} Pending Actions Required</p>
@@ -272,47 +273,100 @@ export default function AdminDashboard() {
               </div>
 
               {unverifiedUsers.length > 0 ? (
-                <div className="grid gap-3">
-                  {unverifiedUsers.map((user) => (
-                    <GlassCard key={user.id} className="relative group overflow-hidden animate-entry">
-                      {/* Scanning Line Background */}
-                      <div className="absolute inset-0 bg-linear-to-r from-amber-500/0 via-amber-500/[0.03] to-amber-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                      
-                      <GlassCardContent className="p-0">
-                        <div className="flex items-center justify-between p-4">
-                          <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded bg-zinc-950 flex items-center justify-center border border-zinc-800">
-                              <span className="text-xl font-black text-amber-500/50 italic">
-                                {user.firstName?.[0] || user.email?.[0]?.toUpperCase() || '?'}
-                              </span>
-                            </div>
-                            <div className="space-y-0.5">
-                              <p className="text-sm font-bold text-foreground flex items-center gap-2 italic">
-                                {user.firstName} {user.lastName} 
-                                <span className="text-[8px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded border border-amber-500/30 animate-master-caution">PENDING APPROVAL</span>
-                              </p>
-                              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-tighter">{user.email}</p>
-                            </div>
-                          </div>
+                <div className="grid gap-4">
+                  {unverifiedUsers.map((user) => {
+                    const hasProfile = !!user.pilotProfile;
+                    const isCurrentlyVerifying = verifyPilotMutation.isPending && verifyPilotMutation.variables?.userId === user.id;
 
-                          <div className="flex items-center gap-3">
-                            <div className="text-right hidden sm:block">
-                              <p className="text-[8px] font-black text-zinc-500 uppercase">Registration Date</p>
-                              <p className="text-[10px] font-mono text-zinc-400">{new Date(user.createdAt).toLocaleDateString()}</p>
+                    return (
+                      <GlassCard key={user.id} className="relative group overflow-hidden animate-entry border border-zinc-800/40 hover:border-zinc-700/60 transition-all duration-300">
+                        {/* Scanning Line Background */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/[0.03] to-amber-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 pointer-events-none" />
+                        
+                        <GlassCardContent className="p-0">
+                          <div className="flex flex-col lg:flex-row lg:items-center justify-between p-6 gap-6">
+                            {/* Pilot Information */}
+                            <div className="flex items-start sm:items-center gap-4 flex-1 min-w-0">
+                              {/* Avatar / Initials with dynamic style */}
+                              <div className={cn(
+                                "h-14 w-14 rounded-xl flex flex-col items-center justify-center border font-mono shrink-0 shadow-inner",
+                                hasProfile 
+                                  ? "bg-blue-500/10 border-blue-500/20 text-blue-400" 
+                                  : "bg-zinc-950 border-zinc-800 text-zinc-600"
+                              )}>
+                                <span className="text-xl font-black italic">
+                                  {user.pilotProfile?.licenseType || user.firstName?.[0] || user.email?.[0]?.toUpperCase() || '?'}
+                                </span>
+                                <span className="text-[7px] font-black uppercase tracking-tighter opacity-60 leading-none mt-0.5">
+                                  {hasProfile ? "PROFILE" : "NO PROF"}
+                                </span>
+                              </div>
+
+                              {/* Identity details */}
+                              <div className="space-y-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-2.5">
+                                  <h3 className="text-base font-black text-foreground uppercase tracking-tight italic">
+                                    {user.firstName} {user.lastName}
+                                  </h3>
+                                  <span className="text-[8px] font-black uppercase tracking-widest bg-amber-500/15 text-amber-500 px-2 py-0.5 rounded border border-amber-500/20 animate-pulse">
+                                    Pending Approval
+                                  </span>
+                                </div>
+                                <p className="text-xs font-mono text-zinc-500 truncate">{user.email}</p>
+                                <p className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest leading-none">ID: {user.id.slice(0, 8)}...</p>
+                              </div>
                             </div>
-                            <Button
-                              onClick={() => handleVerify(user.id, true)}
-                              disabled={verifyPilotMutation.isPending}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] px-6 h-10 shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all italic border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1"
-                            >
-                              <CheckCircle className="h-3.5 w-3.5 mr-2" />
-                              Approve Certificate
-                            </Button>
+
+                            {/* Credentials Details Block */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 lg:gap-8 border-t lg:border-t-0 lg:border-l border-zinc-800/60 pt-4 lg:pt-0 lg:pl-8 flex-1">
+                              <div className="space-y-0.5">
+                                <span className="text-[8px] font-black text-zinc-500 uppercase tracking-wider block">License Type</span>
+                                <span className="text-xs font-black text-zinc-300 font-mono">
+                                  {user.pilotProfile?.licenseType || "NOT YET SET"}
+                                </span>
+                              </div>
+                              <div className="space-y-0.5">
+                                <span className="text-[8px] font-black text-zinc-500 uppercase tracking-wider block">License Number</span>
+                                <span className="text-xs font-black text-zinc-300 font-mono truncate block max-w-[120px]">
+                                  {user.pilotProfile?.licenseNumber || "N/A"}
+                                </span>
+                              </div>
+                              <div className="space-y-0.5 col-span-2 sm:col-span-1">
+                                <span className="text-[8px] font-black text-zinc-500 uppercase tracking-wider block">Registration Date</span>
+                                <span className="text-xs font-black text-zinc-400 font-mono">
+                                  {new Date(user.createdAt).toLocaleDateString()}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Action Button Controls */}
+                            <div className="flex items-center justify-end w-full lg:w-auto border-t lg:border-t-0 pt-4 lg:pt-0">
+                              <Button
+                                onClick={() => handleVerify(user.id, true)}
+                                disabled={verifyPilotMutation.isPending}
+                                className={cn(
+                                  "w-full lg:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] px-6 h-11 transition-all italic border-b-4 border-emerald-800 active:border-b-0 active:translate-y-0.5 shadow-[0_0_15px_rgba(16,185,129,0.15)]",
+                                  isCurrentlyVerifying && "opacity-80 cursor-not-allowed"
+                                )}
+                              >
+                                {isCurrentlyVerifying ? (
+                                  <>
+                                    <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
+                                    Approving...
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="h-3.5 w-3.5 mr-2" />
+                                    Approve Certificate
+                                  </>
+                                )}
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      </GlassCardContent>
-                    </GlassCard>
-                  ))}
+                        </GlassCardContent>
+                      </GlassCard>
+                    );
+                  })}
                 </div>
               ) : (
                 <GlassCard className="p-12 text-center bg-zinc-950/20">

@@ -40,11 +40,14 @@ export const adminRouter = createTRPCRouter({
     .input(paginationSchema)
     .query(async ({ ctx, input }) => {
       const skip = input?.skip || 0;
-      const take = input?.take || 10;
+      const take = input?.take || 100; // Increase default batch size for admin view
 
       const users = await ctx.db.user.findMany({
         skip,
         take,
+        include: {
+          pilotProfile: true,
+        },
         orderBy: { createdAt: "desc" },
       });
 

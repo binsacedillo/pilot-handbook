@@ -154,6 +154,9 @@ describe('Admin Router', () => {
       expect(ctx.db.user.findMany).toHaveBeenCalledWith({
         skip: 0,
         take: 10,
+        include: {
+          pilotProfile: true,
+        },
         orderBy: { createdAt: 'desc' },
       });
     });
