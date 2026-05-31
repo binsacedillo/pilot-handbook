@@ -40,7 +40,7 @@ export const adminRouter = createTRPCRouter({
     .input(paginationSchema)
     .query(async ({ ctx, input }) => {
       const skip = input?.skip || 0;
-      const take = input?.take || 100; // Increase default batch size for admin view
+      const take = Math.min(input?.take || 100, 500); // Capped at 500 max
 
       const users = await ctx.db.user.findMany({
         skip,
