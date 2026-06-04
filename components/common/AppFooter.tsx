@@ -28,6 +28,9 @@ export default function AppFooter() {
             <Link href="/legal" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
               Compliance
             </Link>
+            <Link href="/privacy" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
+              Privacy
+            </Link>
           </div>
 
           {/* Copyright */}
