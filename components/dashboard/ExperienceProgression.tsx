@@ -1,17 +1,29 @@
 "use client";
-
+ 
 import React from "react";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { Clock, Target, TrendingUp } from "lucide-react";
-
+ 
 interface ExperienceProgressionProps {
   totalHours: number;
   goalHours?: number;
 }
-
+ 
 export default function ExperienceProgression({ totalHours, goalHours = 1500 }: ExperienceProgressionProps) {
   const percentage = Math.min(100, (totalHours / goalHours) * 100);
-  
+
+  // Dynamic milestone tracking based on current logged hours
+  const getMilestoneName = (hours: number) => {
+    if (hours < 25) return "Solo Check Ready";
+    if (hours < 50) return "Private Pilot Checkride";
+    if (hours < 100) return "Instrument Rating Ready";
+    if (hours < 300) return "Commercial Pilot Prep";
+    return "ATP / Airline Ready";
+  };
+
+  const getGoalLabel = (goal: number) => {
+    return "to Career Goal";
+  };
+
   return (
     <div className="bg-(--glass-bg) rounded-2xl border border-(--glass-border) p-6 overflow-hidden relative shadow-(--glass-bezel) backdrop-blur-xl">
       {/* Background Glow */}
@@ -33,7 +45,9 @@ export default function ExperienceProgression({ totalHours, goalHours = 1500 }: 
           <span className="text-4xl font-black text-blue-500/90 tracking-tighter">
             {Math.floor(percentage)}%
           </span>
-          <p className="text-[10px] text-zinc-500 dark:text-zinc-500 light:text-slate-500 font-bold uppercase tracking-tight">to Career Goal</p>
+          <p className="text-[10px] text-zinc-500 dark:text-zinc-500 light:text-slate-500 font-bold uppercase tracking-tight">
+            {getGoalLabel(goalHours)}
+          </p>
         </div>
       </div>
 
@@ -43,7 +57,7 @@ export default function ExperienceProgression({ totalHours, goalHours = 1500 }: 
           className="h-full bg-linear-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-1000 ease-out relative"
           style={{ width: `${percentage}%` }}
         >
-          <div className="absolute inset-0 bg-white/20 animate-pulse" />
+          <div className="absolute inset-0 bg-white/20" />
         </div>
       </div>
 
@@ -54,7 +68,9 @@ export default function ExperienceProgression({ totalHours, goalHours = 1500 }: 
             </div>
             <div className="flex flex-col">
                 <span className="text-[10px] text-zinc-500 dark:text-zinc-500 light:text-slate-500 font-bold uppercase">Time Remaining</span>
-                <span className="text-xs font-mono font-bold text-foreground">{(goalHours - totalHours).toLocaleString()} Hrs</span>
+                <span className="text-xs font-mono font-bold text-foreground">
+                  {Math.max(0, goalHours - totalHours).toLocaleString()} Hrs
+                </span>
             </div>
         </div>
         <div className="flex items-center gap-3">
@@ -63,10 +79,11 @@ export default function ExperienceProgression({ totalHours, goalHours = 1500 }: 
             </div>
             <div className="flex flex-col">
                 <span className="text-[10px] text-zinc-500 dark:text-zinc-500 light:text-slate-500 font-bold uppercase">Aviation Milestones</span>
-                <span className="text-xs font-bold text-foreground">Commercial Ready</span>
+                <span className="text-xs font-bold text-foreground">{getMilestoneName(totalHours)}</span>
             </div>
         </div>
       </div>
     </div>
   );
 }
+
