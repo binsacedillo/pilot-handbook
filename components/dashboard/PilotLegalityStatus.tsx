@@ -197,7 +197,7 @@ export default function PilotLegalityStatus({ pilotName, initialStats }: PilotLe
             <div className="mt-6 border-t border-white/5 pt-6">
               <span className="text-[9px] uppercase font-black text-zinc-500 tracking-[0.2em] block mb-3">Active Advisories</span>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {legality.alerts.map((alert, i) => (
+                {legality.alerts.map((alert: string, i: number) => (
                   <div key={i} className="flex items-start gap-3 p-3 bg-zinc-950/40 border border-white/5 rounded-xl text-xs text-zinc-300 transition-colors hover:bg-zinc-950/60 leading-normal">
                     <AlertTriangle className={cn("w-4 h-4 shrink-0 mt-0.5", alert.includes("Critical") || alert.includes("expired") ? "text-red-400" : "text-amber-400")} />
                     <span className="font-semibold tracking-tight">{alert}</span>
