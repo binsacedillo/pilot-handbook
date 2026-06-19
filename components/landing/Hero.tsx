@@ -4,27 +4,31 @@ import { SignedIn, SignedOut } from "@clerk/nextjs";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion, useSpring } from "framer-motion";
+import { Shield, Radio, Smartphone } from "lucide-react";
 
 export default function Hero() {
 	const shouldReduceMotion = useReducedMotion();
 	const { scrollY } = useScroll();
 
 	// Parallax effect: background moves slower than scroll
-	// We use y values that are subtle to maintain ISO compliance and prevent motion sickness
-	// Background starts slightly offset upwards (-10%) to prevent gaps at the top
-	const y1 = useTransform(scrollY, [0, 500], [0, 100]);
-	const y2 = useTransform(scrollY, [0, 500], [0, -50]);
+	// Wrap scrollY in useSpring for a smooth, physics-based glide
+	const smoothY = useSpring(scrollY, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+	const y1 = useTransform(smoothY, [0, 500], [0, 100]);
+	const y_mid = useTransform(smoothY, [0, 500], [0, 25]);
+	const y2 = useTransform(smoothY, [0, 500], [0, -50]);
 
 	const backgroundY = shouldReduceMotion ? 0 : y1;
+	const midgroundY = shouldReduceMotion ? 0 : y_mid;
 	const contentY = shouldReduceMotion ? 0 : y2;
 
 	return (
 		<section className="relative overflow-hidden bg-zinc-950 min-h-175 md:min-h-212.5 pb-20">
 			{/* Parallax Background Image - Oversized to prevent gaps during motion */}
 			<motion.div 
-				className="absolute -top-[10%] left-0 w-full h-[120%]" 
-				style={{ y: backgroundY }}
+				className="absolute -top-[10%] left-0 w-full h-[120%] will-change-transform" 
+				style={{ y: backgroundY, translateZ: 0 }}
 			>
 				<Image
 					src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop"
@@ -36,19 +40,34 @@ export default function Hero() {
 				/>
 			</motion.div>
 
+			{/* Midground Atmosphere/Cloud Layer for 3D depth */}
+			<motion.div 
+				className="absolute inset-0 pointer-events-none z-10 opacity-30 mix-blend-screen will-change-transform"
+				style={{ y: midgroundY, translateZ: 0 }}
+			>
+				<Image
+					src="https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?q=80&w=2000&auto=format&fit=crop"
+					alt="Subtle clouds layer"
+					fill
+					className="object-cover pointer-events-none select-none"
+					sizes="100vw"
+				/>
+			</motion.div>
+
 			{/* Gradient Overlays for premium feel and depth */}
 			{/* Top edge fade to transition from navigation */}
 			<div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-zinc-950 to-transparent z-10" />
 			
-			<div className="absolute inset-0 bg-linear-to-b from-slate-900/70 via-blue-900/50 to-slate-900/70" />
+			{/* Neutral dark overlay to keep image clean and maintain airplane colors contrast */}
+			<div className="absolute inset-0 bg-neutral-950/50" />
 
-			{/* Accessibility: Dark overlay for contrast ratio */}
-			<div className="absolute inset-0 bg-black/40" />
+			{/* Garmin G1000 Instrument Panel style: Soft localized radial glow behind the text container */}
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(59,130,246,0.18)_0%,rgba(0,0,0,0)_60%)] pointer-events-none z-10" />
 
 			{/* Content */}
 			<motion.div 
-				className="relative container mx-auto px-4 py-12 md:py-20"
-				style={{ y: contentY }}
+				className="relative container mx-auto px-4 py-12 md:py-20 z-20 will-change-transform"
+				style={{ y: contentY, translateZ: 0 }}
 			>
 				<div className="max-w-6xl mx-auto">
 					{/* Text Content */}
@@ -58,8 +77,8 @@ export default function Hero() {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8, ease: "easeOut" }}
 					>
-						<div className="inline-block mb-4 px-3 py-1 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 text-blue-200 rounded-full text-sm font-medium">
-							CAAP-ready logbook for PH pilots
+						<div className="inline-block mb-4 px-3 py-1.5 bg-white/[0.04] backdrop-blur-md border border-white/10 text-blue-200 rounded-full text-xs font-semibold font-mono uppercase tracking-widest">
+							✈️ CAAP-Ready Logbook for PH Pilots
 						</div>
 						<h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight drop-shadow-lg">
 							Your Flight Hours,
@@ -71,12 +90,12 @@ export default function Hero() {
 							and simplified fleet management. Track flights, manage aircraft, and grow your aviation
 							career with confidence.
 						</p>
-						<div className="flex flex-col sm:flex-row gap-3 justify-center items-center w-full sm:w-auto px-4 sm:px-0">
+						<div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full sm:w-auto px-4 sm:px-0">
 							<SignedOut>
 								<Link href="/sign-up" className="w-full sm:w-auto">
 									<Button
 										size="lg"
-										className="w-full sm:w-auto px-6 sm:px-8 text-sm sm:text-base bg-blue-600 hover:bg-blue-700 text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+										className="w-full sm:w-48 font-bold uppercase bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.2)] hover:shadow-[0_0_25px_rgba(37,99,235,0.45)] hover:scale-[1.02] active:scale-[0.97] transition-all duration-300 ease-out tracking-wider hover:tracking-widest"
 									>
 										Get Started
 									</Button>
@@ -84,8 +103,7 @@ export default function Hero() {
 								<Link href="/sign-in" className="w-full sm:w-auto">
 									<Button
 										size="lg"
-										variant="outline"
-										className="w-full sm:w-auto px-6 sm:px-8 text-sm sm:text-base border-2 border-blue-400 text-white hover:bg-blue-400/20 backdrop-blur-sm shadow-lg"
+										className="w-full sm:w-48 font-bold uppercase border border-white/10 bg-zinc-950/40 text-zinc-300 hover:bg-white/10 hover:text-white active:scale-[0.97] backdrop-blur-md transition-all duration-200 ease-out"
 									>
 										Sign In
 									</Button>
@@ -95,7 +113,7 @@ export default function Hero() {
 								<Link href="/dashboard" className="w-full sm:w-auto">
 									<Button
 										size="lg"
-										className="w-full sm:w-auto px-6 sm:px-8 text-sm sm:text-base bg-blue-600 hover:bg-blue-700 text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+										className="w-full sm:w-48 font-bold uppercase bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.2)] hover:shadow-[0_0_25px_rgba(37,99,235,0.45)] hover:scale-[1.02] active:scale-[0.97] transition-all duration-300 ease-out tracking-wider hover:tracking-widest"
 									>
 										Open Dashboard
 									</Button>
@@ -110,17 +128,17 @@ export default function Hero() {
 							animate={{ opacity: 1 }}
 							transition={{ delay: 0.5, duration: 1 }}
 						>
-							<div className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 backdrop-blur-md border border-blue-400/20 rounded-full hover:bg-blue-500/20 transition-colors cursor-default">
-								<span className="text-xl">🛡️</span>
-								<span className="text-blue-100 font-medium text-sm">CAAP Standard</span>
+							<div className="flex items-center gap-2 px-4 py-2 bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-full hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 cursor-default font-mono">
+								<Shield className="h-4 w-4 text-blue-400" />
+								<span className="text-blue-100 font-medium text-xs uppercase tracking-wider">CAAP Standard</span>
 							</div>
-							<div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 backdrop-blur-md border border-green-400/20 rounded-full hover:bg-green-500/20 transition-colors cursor-default">
-								<span className="text-xl">⚡</span>
-								<span className="text-green-100 font-medium text-sm">Real-time Sync</span>
+							<div className="flex items-center gap-2 px-4 py-2 bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-full hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 cursor-default font-mono">
+								<Radio className="h-4 w-4 text-emerald-400 animate-pulse" style={{ animationDuration: "3s" }} />
+								<span className="text-green-100 font-medium text-xs uppercase tracking-wider">Real-time Sync</span>
 							</div>
-							<div className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 backdrop-blur-md border border-purple-400/20 rounded-full hover:bg-purple-500/20 transition-colors cursor-default">
-								<span className="text-xl">📱</span>
-								<span className="text-purple-100 font-medium text-sm">Mobile First</span>
+							<div className="flex items-center gap-2 px-4 py-2 bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-full hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 cursor-default font-mono">
+								<Smartphone className="h-4 w-4 text-purple-400" />
+								<span className="text-purple-100 font-medium text-xs uppercase tracking-wider">Mobile First</span>
 							</div>
 						</motion.div>
 

@@ -79,7 +79,6 @@ export default function AdminDashboard() {
       {/* HUD Atmosphere */}
       <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-b from-blue-500/[0.02] to-transparent" />
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-500/10 animate-hud-scanline blur-[1px]" />
         {/* Monochromatic Grain/Overlay */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150" />
       </div>
