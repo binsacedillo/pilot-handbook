@@ -40,6 +40,9 @@ graph TD
 
 # Monetization & Verification Flow
 
+> [!NOTE]
+> **Conceptual Architecture:** The following payment flows and PayMongo integrations represent planned premium features. They are not currently active in the database schema or code repository.
+
 ```mermaid
 sequenceDiagram
     participant Pilot

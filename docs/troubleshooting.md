@@ -16,7 +16,7 @@
 | Problem | Likely Cause | First Step |
 | :--- | :--- | :--- |
 | **App won't start** | Missing `DATABASE_URL` | Check Vercel Environment Variables |
-| **Migrations fail** | Missing `DIRECT_URL` | Verify Neon direct connection string |
+| **Migrations fail** | Invalid `DATABASE_URL` | Verify Neon connection string and pooler settings |
 | **Users not syncing** | Webhook Secret mismatch | Check Clerk Dashboard -> Webhooks |
 | **Admin panel locked** | User role not promoted | Run `npm run make:admin <id>` |
 | **Data is stale** | Next.js Caching | Add `export const dynamic = "force-dynamic"` |
@@ -32,13 +32,12 @@
 **Symptoms:** `ECONNREFUSED`, `ETIMEDOUT`, or `Can't reach database`.
 
 **Root Cause:** Vercel cannot reach Neon.
-1. **DATABASE_URL**: Used for app runtime (Pooled connection).
-2. **DIRECT_URL**: Used for migrations (Direct connection).
+1. **DATABASE_URL**: Used for app runtime, migrations, and prisma config.
 
 **The Fix:**
-- Ensure both are set in Vercel.
+- Ensure the connection string is set in Vercel.
 - In Neon, the connection string usually looks like: `postgresql://user:pass@host/neondb?sslmode=require`.
-- If using a pooler, ensure the host includes the `-pooler` suffix if provided by Neon.
+- If using a pooler connection string, verify the host is correct and SSL is enabled.
 </details>
 
 <details>

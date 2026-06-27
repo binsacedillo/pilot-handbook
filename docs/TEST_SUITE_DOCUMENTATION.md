@@ -1,6 +1,6 @@
 # 🧪 Test Suite Documentation
 
-> **Status:** ✅ All Tests Passing (70+ tests) | **Framework:** Vitest
+> **Status:** ✅ All Tests Passing (109+ tests) | **Framework:** Vitest
 
 ## 📋 Table of Contents
 - [Quick Start](#-quick-start)
@@ -27,10 +27,10 @@ We use a layered testing strategy to ensure reliability and security:
 
 | Module | Focus Areas | Location |
 | :--- | :--- | :--- |
-| **Flights** | Schema validation, time calculations, instruction logic. | `__tests__/routers/flight.test.ts` |
-| **Aircraft** | Status grouping, fleet stats, model validation. | `__tests__/routers/aircraft.test.ts` |
-| **Analytics** | Monthly aggregation, 90-day recency, PIC/Dual totals. | `__tests__/routers/stats.test.ts` |
-| **Security** | RBAC, user isolation, data ownership, input sanitization. | `__tests__/security/authorization.test.ts` |
+| **Flights** | Schema validation, time calculations, instruction logic. | `server/routers/__tests__/flight.test.ts` |
+| **Aircraft** | Status grouping, fleet stats, model validation. | `server/routers/__tests__/aircraft.test.ts` |
+| **Analytics** | Monthly aggregation, 90-day recency, PIC/Dual totals. | `server/routers/__tests__/analytics.test.ts` |
+| **Security** | RBAC, user isolation, data ownership, input sanitization. | `server/routers/__tests__/security.test.ts` |
 
 ---
 
@@ -52,7 +52,7 @@ We use a layered testing strategy to ensure reliability and security:
 ## 🛠 Developer Guide
 
 ### Adding a New Test
-Follow the existing patterns in `__tests__/`. Use descriptive `it` blocks:
+Follow the existing patterns in `server/routers/__tests__/` or `lib/__tests__/`. Use descriptive `it` blocks:
 ```typescript
 it('should prevent overlapping PIC and Dual time', () => {
   // 1. Arrange (Setup mock data)

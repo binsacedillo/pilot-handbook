@@ -50,7 +50,7 @@ interface DevBadgeProps {
 
 **Usage Examples:**
 ```tsx
-import DevBadge from "@/components/DevBadge";
+import DevBadge from "@/components/dev/DevBadge";
 
 // In a page title
 <h1 className="flex items-center gap-2">
@@ -132,7 +132,7 @@ This is useful if you want to:
 
 ```tsx
 // app/dashboard/analytics/page.tsx
-import DevBadge from "@/components/DevBadge";
+import DevBadge from "@/components/dev/DevBadge";
 
 export default function AnalyticsPage() {
   return (
