@@ -128,11 +128,14 @@ erDiagram
 
     SAFETY_SNAPSHOT {
         string id PK
-        string type
+        enum type
         json results
-        string status
+        enum status
     }
 ```
+
+`SafetySnapshot.type` is constrained to `DENSITY_ALTITUDE`, `WEIGHT_BALANCE`, or `FUEL`.
+`SafetySnapshot.status` is constrained to `NORMAL`, `CAUTION`, `WARNING`, or `INVALID`.
 
 # 🚀 User Journey: From Onboarding to Professional Operations
 

@@ -46,7 +46,6 @@ next-env.d.ts
 
 # internal docs and dev scripts
 internal-docs/
-/docs/
 check-db.ts
 
 playwright-report/

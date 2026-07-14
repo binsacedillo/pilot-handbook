@@ -47,12 +47,8 @@
 
 **The Fix:**
 1. Append `?sslmode=verify-full` to your connection strings.
-2. If using a legacy setup that requires it, ensure `lib/db.ts` has the following (only as a last resort):
-   ```typescript
-   if (process.env.NODE_ENV === "production") {
-     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-   }
-   ```
+2. Use the Neon-provided pooled or direct connection string exactly as issued, including SSL parameters.
+3. Do not disable TLS verification in application code. If verification still fails, fix the connection string, runtime trust store, or hosting environment instead of bypassing certificate checks.
 </details>
 
 ---

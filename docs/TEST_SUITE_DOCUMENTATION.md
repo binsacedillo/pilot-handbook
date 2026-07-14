@@ -1,6 +1,6 @@
 # 🧪 Test Suite Documentation
 
-> **Status:** ✅ All Tests Passing (109+ tests) | **Framework:** Vitest
+> **Status:** ✅ All Tests Passing (111 tests) | **Framework:** Vitest
 
 ## 📋 Table of Contents
 - [Quick Start](#-quick-start)
@@ -30,7 +30,10 @@ We use a layered testing strategy to ensure reliability and security:
 | **Flights** | Schema validation, time calculations, instruction logic. | `server/routers/__tests__/flight.test.ts` |
 | **Aircraft** | Status grouping, fleet stats, model validation. | `server/routers/__tests__/aircraft.test.ts` |
 | **Analytics** | Monthly aggregation, 90-day recency, PIC/Dual totals. | `server/routers/__tests__/analytics.test.ts` |
+| **Decision** | Safety snapshot logging, enum validation, history retrieval. | `server/routers/__tests__/decision.test.ts` |
 | **Security** | RBAC, user isolation, data ownership, input sanitization. | `server/routers/__tests__/security.test.ts` |
+| **Weather** | METAR/TAF parsing and route-level weather behavior. | `server/routers/__tests__/weather.test.ts` |
+| **Compliance** | Currency and compliance engine rules. | `lib/__tests__/compliance-engine.test.ts` |
 
 ---
 
@@ -41,6 +44,8 @@ We use a layered testing strategy to ensure reliability and security:
 - [x] **Aircraft:** Fleet management, status tracking (Active/Maint/Inactive).
 - [x] **Analytics:** 12-month history, average duration, recency compliance.
 - [x] **Auth:** Clerk integration, session validation, role-based access (Admin/Pilot).
+- [x] **Decision:** Safety snapshot validation, persistence, and history queries.
+- [x] **Weather:** Forecast ingestion and operational edge cases.
 
 ### Security & Quality
 - [x] **User Isolation:** Users can never see/edit data belonging to others.
@@ -85,4 +90,4 @@ npm test -- --run
 
 ---
 
-**Last Updated:** May 2026
+**Last Updated:** July 2026
