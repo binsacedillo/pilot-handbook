@@ -21,7 +21,7 @@ import { WeightBalanceResults } from "./weight-balance/types";
 import { DensityAltitudeResults } from "./DensityAltitudeCalculator";
 import { FuelPlannerResults } from "./fuel-planner/types";
 
-interface WorkflowResults {
+interface WorkflowResults extends Record<string, unknown> {
   wb?: WeightBalanceResults;
   da?: DensityAltitudeResults;
   fuel?: FuelPlannerResults;
@@ -104,7 +104,7 @@ export default function PreflightWorkflow() {
   });
 
   const currentStatus = useMemo(() => {
-    const statuses = Object.values(results).map(r => r?.decision?.status);
+    const statuses = [results.wb, results.da, results.fuel].map(r => r?.decision?.status);
     if (statuses.includes('WARNING')) return 'WARNING';
     if (statuses.includes('CAUTION')) return 'CAUTION';
     return 'NORMAL';

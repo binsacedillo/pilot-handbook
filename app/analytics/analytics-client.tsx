@@ -118,11 +118,11 @@ export function AnalyticsClient() {
               <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest italic">L12M Frequency</span>
             </GlassCardHeader>
             <GlassCardContent>
-              <div className="h-[300px] w-full pt-4">
+              <div className="h-[300px] min-h-[300px] w-full min-w-0 pt-4">
                 {monthLoading ? (
                   <Skeleton className="h-full w-full rounded-2xl" />
                 ) : (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <AreaChart data={hoursByMonth || []}>
                       <defs>
                         <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
@@ -183,11 +183,11 @@ export function AnalyticsClient() {
               </div>
             </GlassCardHeader>
             <GlassCardContent>
-              <div className="h-[300px] w-full">
+              <div className="h-[300px] min-h-[300px] w-full min-w-0">
                 {typeLoading ? (
                   <Skeleton className="h-full w-full rounded-2xl" />
                 ) : (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <PieChart>
                       <Pie
                         data={hoursByType || []}

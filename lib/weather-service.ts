@@ -19,6 +19,8 @@ const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 const AVWX_BASE_URL = "https://avwx.rest/api";
 const AVWX_KEY = process.env.AVWX_API_KEY || "";
+const isDevelopment = process.env.NODE_ENV === "development";
+const shouldLogOperationalErrors = process.env.NODE_ENV !== "test";
 
 // --- Internal Helpers ---
 
@@ -101,7 +103,7 @@ async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
     if (AVWX_KEY) {
       url.searchParams.append("token", AVWX_KEY);
     } else {
-      if (process.env.NODE_ENV !== 'test') {
+      if (isDevelopment) {
         console.warn("AVWX_API_KEY not found in environment variables");
       }
       return null;
@@ -112,8 +114,8 @@ async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
     });
 
     if (!response.ok) {
-      if (process.env.NODE_ENV !== 'test') {
-        console.error(`AVWX API error for ${icao}: ${response.status} ${response.statusText}`);
+      if (shouldLogOperationalErrors) {
+        console.error(`AVWX API error: ${response.status} ${response.statusText}`);
       }
       return null;
     }
@@ -121,8 +123,8 @@ async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
     const data = (await response.json()) as AVWXMetarResponse | AVWXErrorResponse;
 
     if ("error" in data && data.error) {
-      if (process.env.NODE_ENV !== 'test') {
-        console.error(`AVWX error for ${icao}:`, data.message);
+      if (shouldLogOperationalErrors) {
+        console.error("AVWX error:", data.message);
       }
       return null;
     }
@@ -171,8 +173,8 @@ async function fetchMetarFromAVWX(icao: string): Promise<MetarData | null> {
       timezone: tz,
     };
   } catch (error) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error(`Failed to fetch from AVWX for ${icao}:`, error);
+    if (shouldLogOperationalErrors) {
+      console.error("Failed to fetch from AVWX:", error);
     }
     return null;
   }
@@ -192,7 +194,7 @@ export const weatherService = {
     if (cached) {
       const age = Date.now() - cached.timestamp;
       if (age < CACHE_DURATION) {
-        if (process.env.NODE_ENV !== 'test') {
+        if (isDevelopment) {
           console.log(`Using cached METAR for ${cleanIcao} (age: ${Math.round(age / 1000)}s)`);
         }
         return cached.data;
@@ -200,8 +202,8 @@ export const weatherService = {
       weatherCache.delete(cleanIcao);
     }
 
-    if (process.env.NODE_ENV !== 'test') {
-      console.log(`Fetching METAR for ${cleanIcao}, API key present: ${!!AVWX_KEY}`);
+    if (isDevelopment) {
+      console.log(`Fetching METAR for ${cleanIcao}`);
     }
 
     // 2. Fetch from API
@@ -209,12 +211,12 @@ export const weatherService = {
 
     // 3. Fallback to Mock
     if (!metar) {
-      if (process.env.NODE_ENV !== 'test') {
+      if (isDevelopment) {
         console.log(`Using mock METAR data for ${cleanIcao}`);
       }
       metar = getMockMetar(cleanIcao);
     } else {
-      if (process.env.NODE_ENV !== 'test') {
+      if (isDevelopment) {
         console.log(`Successfully fetched real METAR for ${cleanIcao}`);
       }
     }

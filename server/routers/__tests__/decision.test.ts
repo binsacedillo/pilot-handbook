@@ -25,7 +25,7 @@ describe('Decision Router', () => {
         aircraftId: 'aircraft-1',
         inputs: { temp: 30, alt: 5000 },
         results: { densityAlt: 7500 },
-        status: 'CAUTION',
+        status: 'CAUTION' as const,
         reason: 'High density altitude',
         recommendation: 'Reduce takeoff weight',
       };
@@ -56,7 +56,7 @@ describe('Decision Router', () => {
         type: 'FUEL' as const,
         inputs: {},
         results: {},
-        status: 'OK',
+        status: 'NORMAL' as const,
       };
 
       await expect(caller.logSnapshot(input)).rejects.toThrow();
@@ -67,20 +67,45 @@ describe('Decision Router', () => {
         type: 'WEIGHT_BALANCE' as const,
         inputs: {},
         results: {},
-        status: 'OK',
+        status: 'NORMAL' as const,
       };
 
       ctx.db.safetySnapshot.create.mockRejectedValue(new Error('DB Error'));
 
       await expect(caller.logSnapshot(input)).rejects.toThrow(/Could not save safety snapshot/);
     });
+
+    it('should reject unsupported safety statuses', async () => {
+      const input = {
+        type: 'FUEL' as const,
+        inputs: {},
+        results: {},
+        status: 'OK',
+      };
+
+      // @ts-expect-error - runtime validation should reject unsupported statuses.
+      await expect(caller.logSnapshot(input)).rejects.toThrow();
+      expect(ctx.db.safetySnapshot.create).not.toHaveBeenCalled();
+    });
+
+    it('should reject non-JSON snapshot payloads', async () => {
+      const input = {
+        type: 'FUEL' as const,
+        inputs: { fuelGallons: 40, unsupported: undefined },
+        results: { enduranceHours: 3.5 },
+        status: 'NORMAL' as const,
+      };
+
+      await expect(caller.logSnapshot(input)).rejects.toThrow();
+      expect(ctx.db.safetySnapshot.create).not.toHaveBeenCalled();
+    });
   });
 
   describe('getHistory', () => {
     it('should retrieve snapshot history for the user', async () => {
       const mockHistory = [
-        { id: '1', type: 'FUEL', status: 'OK', calculatedAt: new Date() },
-        { id: '2', type: 'WEIGHT_BALANCE', status: 'OK', calculatedAt: new Date() },
+        { id: '1', type: 'FUEL', status: 'NORMAL', calculatedAt: new Date() },
+        { id: '2', type: 'WEIGHT_BALANCE', status: 'CAUTION', calculatedAt: new Date() },
       ];
 
       ctx.db.safetySnapshot.findMany.mockResolvedValue(mockHistory);

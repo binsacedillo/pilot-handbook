@@ -1,13 +1,29 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import type { Prisma } from "@prisma/client";
+
+const safetyStatusSchema = z.enum(['NORMAL', 'CAUTION', 'WARNING', 'INVALID']);
+
+const jsonValueSchema: z.ZodType<Prisma.InputJsonValue | null> = z.lazy(() =>
+  z.union([
+    z.string(),
+    z.number().finite(),
+    z.boolean(),
+    z.null(),
+    z.array(jsonValueSchema),
+    z.record(z.string(), jsonValueSchema),
+  ])
+);
+
+const jsonObjectSchema: z.ZodType<Prisma.InputJsonObject> = z.record(z.string(), jsonValueSchema);
 
 const logSnapshotSchema = z.object({
   type: z.enum(['DENSITY_ALTITUDE', 'WEIGHT_BALANCE', 'FUEL']),
   aircraftId: z.string().optional().nullable(),
-  inputs: z.record(z.string(), z.any()),
-  results: z.record(z.string(), z.any()),
-  status: z.string(),
+  inputs: jsonObjectSchema,
+  results: jsonObjectSchema,
+  status: safetyStatusSchema,
   reason: z.string().optional().nullable(),
   recommendation: z.string().optional().nullable(),
 });

@@ -208,8 +208,8 @@ export default function WeightBalanceCalculator({ isCompact = false, onResultCha
         </Card>
 
         <Card className="border-2 shadow-xl h-[380px]">
-           <CardContent className="h-full pt-6">
-              <ResponsiveContainer width="100%" height="100%">
+           <CardContent className="h-full min-h-0 min-w-0 pt-6">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                  <ScatterChart margin={{ top: 10, right: 30, bottom: 20, left: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
                     <XAxis type="number" dataKey="x" name="Arm" unit=" in" domain={[34, 48]} fontSize={10} />

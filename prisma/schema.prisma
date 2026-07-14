@@ -145,15 +145,28 @@ enum AuditAction {
   UNVERIFY
 }
 
+enum SafetySnapshotType {
+  DENSITY_ALTITUDE
+  WEIGHT_BALANCE
+  FUEL
+}
+
+enum SafetyStatus {
+  NORMAL
+  CAUTION
+  WARNING
+  INVALID
+}
+
 model SafetySnapshot {
   id             String   @id @default(uuid())
-  type           String   // 'DENSITY_ALTITUDE' | 'WEIGHT_BALANCE' | 'FUEL'
+  type           SafetySnapshotType
   userId         String
   aircraftId     String?
   inputs         Json
   results        Json
   calculatedAt   DateTime @default(now())
-  status         String   // 'NORMAL' | 'CAUTION' | 'WARNING' | 'INVALID'
+  status         SafetyStatus
   reason         String?
   recommendation String?
 

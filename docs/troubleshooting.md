@@ -20,7 +20,7 @@
 | **Users not syncing** | Webhook Secret mismatch | Check Clerk Dashboard -> Webhooks |
 | **Admin panel locked** | User role not promoted | Run `npm run make:admin <id>` |
 | **Data is stale** | Next.js Caching | Add `export const dynamic = "force-dynamic"` |
-| **SSL/TLS Errors** | Missing SSL parameter | Append `?sslmode=require` to DB URL |
+| **SSL/TLS Errors** | Missing SSL parameter | Append `?sslmode=verify-full` to DB URL |
 
 ---
 
@@ -36,7 +36,7 @@
 
 **The Fix:**
 - Ensure the connection string is set in Vercel.
-- In Neon, the connection string usually looks like: `postgresql://user:pass@host/neondb?sslmode=require`.
+- In Neon, the connection string usually looks like: `postgresql://user:pass@host/neondb?sslmode=verify-full`.
 - If using a pooler connection string, verify the host is correct and SSL is enabled.
 </details>
 
@@ -46,7 +46,7 @@
 **Symptoms:** `self signed certificate`, `UNABLE_TO_VERIFY_LEAF_SIGNATURE`.
 
 **The Fix:**
-1. Append `?sslmode=require` to your connection strings.
+1. Append `?sslmode=verify-full` to your connection strings.
 2. If using a legacy setup that requires it, ensure `lib/db.ts` has the following (only as a last resort):
    ```typescript
    if (process.env.NODE_ENV === "production") {
